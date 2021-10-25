@@ -38,7 +38,9 @@
     "react/prop-types": "off",
     "jsx-quotes": [2, "prefer-single"],
     "comma-dangle": "off",
-    "object-curly-newline": "off"
+    "object-curly-newline": "off",
+    "jsx-a11y/label-has-associated-control": "off",
+    "jsx-a11y/label-has-for": "off"
   },
   "settings": {
     "import/resolver": {

@@ -4,10 +4,12 @@ import { HomePage } from './pages/HomePage/HomePage';
 import { LoginPage } from './pages/HomePage/LoginPage';
 
 const App: React.FC = () => (
-  <Router>
-    <Route path='/' component={HomePage} exact />
-    <Route path='/login' component={LoginPage} />
-  </Router>
+  <div className='h-screen w-screen'>
+    <Router>
+      <Route path='/' component={HomePage} exact />
+      <Route path='/login' component={LoginPage} />
+    </Router>
+  </div>
 );
 
 export default App;
