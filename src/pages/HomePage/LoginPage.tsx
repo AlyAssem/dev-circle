@@ -20,11 +20,7 @@ export const LoginPage: React.FC = () => (
           >
             Email
           </label>
-          <input
-            id='email'
-            type='email'
-            className='bg-gray-200 rounded w-full text-gray-700 focus:outline-none border-b-4 border-gray-300 focus:border-green-600 transition duration-500 px-3 pb-3'
-          />
+          <input id='email' type='email' className='login-card__input' />
         </div>
 
         <div className='mb-6 pt-3 rounded bg-gray-200'>
@@ -34,11 +30,7 @@ export const LoginPage: React.FC = () => (
           >
             Password
           </label>
-          <input
-            id='password'
-            type='password'
-            className='bg-gray-200 rounded w-full text-gray-700 focus:outline-none border-b-4 border-gray-300 focus:border-green-600 transition duration-500 px-3 pb-3'
-          />
+          <input id='password' type='password' className='login-card__input' />
         </div>
         <div className='flex justify-between items-center'>
           <a
@@ -47,20 +39,17 @@ export const LoginPage: React.FC = () => (
           >
             Forgot your password?
           </a>
-          <button
-            className='px-2 object-contain bg-green-600 hover:bg-green-700 text-white font-bold py-2 rounded shadow-lg hover:shadow-xl transition duration-200'
-            type='submit'
-          >
+          <button className='login-card__submit-btn' type='submit'>
             Sign In
           </button>
         </div>
       </form>
     </main>
     <div className='max-w-lg mx-auto text-center mt-12 mb-6'>
-      <p className='text-green-700'>
-        Dont have an account? &nbsp;
-        <a href=' ' className='font-bold hover:underline'>
-          Sign up
+      <p>
+        Don&apos;t have an account? &nbsp;
+        <a href=' ' className='font-bold text-green-700 hover:underline'>
+          Sign Up
         </a>
         .
       </p>
