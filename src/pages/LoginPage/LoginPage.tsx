@@ -15,8 +15,9 @@ export const LoginPage: React.FC = () => {
         .max(15, 'Must be 15 characters or less')
         .required('Required'),
     }),
-    onSubmit: (values) => {
-      alert(JSON.stringify(values, null, 2));
+    onSubmit: (values, { resetForm }) => {
+      console.log(values);
+      resetForm();
     },
   });
   return (
@@ -26,7 +27,7 @@ export const LoginPage: React.FC = () => {
           DevCircle
         </div>
       </header>
-      <div className='login-card'>
+      <div className='auth-card'>
         <section className='mb-3'>
           <h3 className='font-bold text-2xl'>Welcome to DevCircle</h3>
           <p className='text-gray-600 pt-2'>Sign in to your account.</p>
@@ -43,7 +44,7 @@ export const LoginPage: React.FC = () => {
             <input
               id='email'
               type='email'
-              className='login-card__input'
+              className='auth-card__input'
               value={formik.values.email}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
@@ -63,7 +64,7 @@ export const LoginPage: React.FC = () => {
             <input
               id='password'
               type='password'
-              className='login-card__input'
+              className='auth-card__input'
               value={formik.values.password}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
@@ -79,7 +80,7 @@ export const LoginPage: React.FC = () => {
             >
               Forgot your password?
             </a>
-            <button className='login-card__submit-btn' type='submit'>
+            <button className='auth-card__submit-btn' type='submit'>
               Sign In
             </button>
           </div>
@@ -88,7 +89,10 @@ export const LoginPage: React.FC = () => {
       <div className='max-w-lg mx-auto text-center mt-12 mb-6'>
         <p>
           Don&apos;t have an account? &nbsp;
-          <a href=' ' className='font-bold text-green-700 hover:underline'>
+          <a
+            href='/register'
+            className='font-bold text-green-700 hover:underline'
+          >
             Sign Up
           </a>
           .
