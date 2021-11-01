@@ -34,7 +34,7 @@ export const RegisterPage: React.FC = () => {
     },
   });
   return (
-    <div className='pt-36 min-h-screen bg-gray-100'>
+    <div className='pt-24 pb-6 min-h-screen bg-gray-100 '>
       <header className='max-w-lg mx-auto'>
         <div className='text-4xl font-bold text-green-500 text-center'>
           DevCircle
@@ -133,6 +133,15 @@ export const RegisterPage: React.FC = () => {
             </button>
           </div>
         </form>
+      </div>
+      <div className='max-w-lg mx-auto text-center mt-12 mb-6'>
+        <p>
+          Already a member? &nbsp;
+          <a href='/login' className='font-bold text-green-700 hover:underline'>
+            Sign In
+          </a>
+          .
+        </p>
       </div>
     </div>
   );
