@@ -2,12 +2,18 @@ import React from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 
+interface IFormValues {
+  email: string;
+  password: string;
+}
+
 export const LoginPage: React.FC = () => {
+  const initialValues: IFormValues = {
+    email: '',
+    password: '',
+  };
   const formik = useFormik({
-    initialValues: {
-      email: '',
-      password: '',
-    },
+    initialValues,
     validationSchema: Yup.object({
       email: Yup.string().email('Invalid email address').required('Required'),
       password: Yup.string()

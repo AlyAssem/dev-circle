@@ -2,16 +2,27 @@ import React from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 
+interface IFormValues {
+  userName: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
+
 export const RegisterPage: React.FC = () => {
+  const initialValues: IFormValues = {
+    userName: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+  };
+
   const formik = useFormik({
-    initialValues: {
-      userName: '',
-      email: '',
-      password: '',
-      confirmPassword: '',
-    },
+    initialValues,
     validationSchema: Yup.object({
-      userName: Yup.string().required('Required'),
+      userName: Yup.string()
+        .matches(/[a-zA-Z]/, 'string should be alphanumeric')
+        .required('Required'),
       email: Yup.string().email('Invalid email address').required('Required'),
       password: Yup.string()
         .min(8, 'Must be 8 characters or more')
