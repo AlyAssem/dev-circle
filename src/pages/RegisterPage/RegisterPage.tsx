@@ -1,28 +1,27 @@
 import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useFormik } from 'formik';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { uuid } from 'uuidv4';
 import * as Yup from 'yup';
 
-interface IFormValues {
-  userName: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-}
+import { registerUser } from '../../redux-features/users';
+import { AppDispatch, RootState } from '../../store';
 
 export const RegisterPage: React.FC = () => {
-  const initialValues: IFormValues = {
-    userName: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-  };
+  const { userInfo, error } = useSelector((state: RootState) => state.users);
+  const dispatch: AppDispatch = useDispatch();
 
   const formik = useFormik({
-    initialValues,
+    initialValues: {
+      userName: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+    },
     validationSchema: Yup.object({
-      userName: Yup.string()
-        .matches(/[a-zA-Z]/, 'string should be alphanumeric')
-        .required('Required'),
+      userName: Yup.string().required('Required'),
       email: Yup.string().email('Invalid email address').required('Required'),
       password: Yup.string()
         .min(8, 'Must be 8 characters or more')
@@ -32,15 +31,58 @@ export const RegisterPage: React.FC = () => {
         .oneOf([Yup.ref('password')], 'Passwords must match')
         .required('Required'),
     }),
-    onSubmit: (values, { resetForm }) => {
-      fetch('/api/users', {
-        method: 'POST',
-        body: JSON.stringify(values),
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-      });
+    onSubmit: async (values, { resetForm }) => {
+      const resultAction = await dispatch(
+        registerUser({
+          id: uuid(),
+          email: values.email,
+          userName: values.userName,
+        })
+      );
+
+      if (registerUser.fulfilled.match(resultAction)) {
+        // user will have a type signature of User as we passed that as the Returned parameter in createAsyncThunk
+        const user = resultAction.payload;
+        toast.success(
+          <div>
+            Success
+            <br />
+            <span>Registered: {user.userName}</span>
+          </div>,
+          {
+            position: toast.POSITION.BOTTOM_RIGHT,
+          }
+        );
+      }
+
+      if (registerUser.rejected.match(resultAction)) {
+        if (resultAction.payload) {
+          // if the error is sent from server payload
+          toast.error(
+            <div>
+              Error
+              <br />
+              {resultAction.payload.errorMessage}
+            </div>,
+
+            {
+              position: toast.POSITION.BOTTOM_RIGHT,
+            }
+          );
+        } else {
+          toast.error(
+            <div>
+              Error
+              <br />
+              {resultAction.error}
+            </div>,
+            {
+              position: toast.POSITION.BOTTOM_RIGHT,
+            }
+          );
+        }
+      }
+
       resetForm();
     },
   });
@@ -154,6 +196,7 @@ export const RegisterPage: React.FC = () => {
           .
         </p>
       </div>
+      <ToastContainer />
     </div>
   );
 };
