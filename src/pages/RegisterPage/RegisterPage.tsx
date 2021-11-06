@@ -1,17 +1,15 @@
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { useFormik } from 'formik';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { uuid } from 'uuidv4';
 import * as Yup from 'yup';
 
+import { useAppDispatch } from '../../redux-features/hooks';
 import { registerUser } from '../../redux-features/users';
-import { AppDispatch, RootState } from '../../store';
 
 export const RegisterPage: React.FC = () => {
-  const { userInfo, error } = useSelector((state: RootState) => state.users);
-  const dispatch: AppDispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const formik = useFormik({
     initialValues: {
@@ -37,6 +35,7 @@ export const RegisterPage: React.FC = () => {
           id: uuid(),
           email: values.email,
           userName: values.userName,
+          password: values.password,
         })
       );
 
