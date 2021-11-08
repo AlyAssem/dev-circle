@@ -86,7 +86,11 @@ export const LoginPage: React.FC = () => {
             >
               Forgot your password?
             </a>
-            <button className='auth-card__submit-btn' type='submit'>
+            <button
+              className='auth-card__submit-btn'
+              type='submit'
+              disabled={!formik.isValid}
+            >
               Sign In
             </button>
           </div>

@@ -219,7 +219,11 @@ export const RegisterPage: React.FC = () => {
             </div>
           ) : null}
           <div className='flex justify-center items-center'>
-            <button className='auth-card__submit-btn' type='submit'>
+            <button
+              className='auth-card__submit-btn'
+              type='submit'
+              disabled={!formik.isValid}
+            >
               Sign Up
             </button>
           </div>

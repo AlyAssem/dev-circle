@@ -9,6 +9,8 @@ module.exports = {
   variants: {
     extend: {},
     borderColor: ({ after }) => after(['invalid']),
+    opacity: ({ after }) => after(['disabled']),
+    cursor: ({ after }) => after(['disabled']),
   },
   plugins: [
     plugin(({ addVariant, e }) => {
