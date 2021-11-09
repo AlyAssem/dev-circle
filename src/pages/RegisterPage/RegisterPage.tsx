@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useFormik } from 'formik';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -232,9 +233,13 @@ export const RegisterPage: React.FC = () => {
       <div className='max-w-lg mx-auto text-center mt-12 mb-6'>
         <p>
           Already a member? &nbsp;
-          <a href='/login' className='font-bold text-green-700 hover:underline'>
+          <Link
+            id='signinLink'
+            to='/login'
+            className='font-bold text-green-700 hover:underline'
+          >
             Sign In
-          </a>
+          </Link>
           .
         </p>
       </div>

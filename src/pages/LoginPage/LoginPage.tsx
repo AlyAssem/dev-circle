@@ -1,6 +1,7 @@
 import React from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import { Link } from 'react-router-dom';
 
 interface IFormValues {
   email: string;
@@ -99,12 +100,12 @@ export const LoginPage: React.FC = () => {
       <div className='max-w-lg mx-auto text-center mt-12 mb-6'>
         <p>
           Don&apos;t have an account? &nbsp;
-          <a
-            href='/register'
+          <Link
+            to='/register'
             className='font-bold text-green-700 hover:underline'
           >
             Sign Up
-          </a>
+          </Link>
           .
         </p>
       </div>
