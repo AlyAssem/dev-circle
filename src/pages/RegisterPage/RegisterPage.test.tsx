@@ -99,6 +99,7 @@ describe('RegisterPage', () => {
       const passwordError = wrapper.find({ id: 'passwordError' });
       expect(passwordError.props().children).toEqual('Required');
     });
+
     it('should have short password error when the value is less than 8 characters', async () => {
       const password = '1234567';
       await updateFormikField(passwordInput, 'password', password);
@@ -109,6 +110,16 @@ describe('RegisterPage', () => {
       expect(passwordError.props().children).toEqual(
         'Must be 8 characters or more'
       );
+    });
+
+    it('should make the submit button disabled when there is a validation error', async () => {
+      const password = '';
+      await updateFormikField(passwordInput, 'password', password);
+      wrapper.update();
+
+      const registerButton = wrapper.find({ id: 'registerBtn' });
+
+      expect(registerButton.props().disabled).toBe(true);
     });
   });
 
