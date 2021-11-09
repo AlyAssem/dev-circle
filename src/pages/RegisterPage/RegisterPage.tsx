@@ -161,7 +161,9 @@ export const RegisterPage: React.FC = () => {
             />
           </div>
           {formik.touched.email && formik.errors.email ? (
-            <div className='text-red-500 mb-3'>{formik.errors.email}</div>
+            <div id='emailError' className='text-red-500 mb-3'>
+              {formik.errors.email}
+            </div>
           ) : null}
 
           <div className='mb-3 pt-3 rounded bg-gray-200 relative'>
@@ -180,6 +182,7 @@ export const RegisterPage: React.FC = () => {
               onBlur={formik.handleBlur}
             />
             <button
+              id='showPasswordIcon'
               type='button'
               className='text-green-600 absolute right-3'
               onClick={handleShowPasswordToggle}
@@ -188,7 +191,9 @@ export const RegisterPage: React.FC = () => {
             </button>
           </div>
           {formik.touched.password && formik.errors.password ? (
-            <div className='text-red-500 mb-3'>{formik.errors.password}</div>
+            <div id='passwordError' className='text-red-500 mb-3'>
+              {formik.errors.password}
+            </div>
           ) : null}
 
           <div className='mb-3 pt-3 rounded bg-gray-200 relative'>
@@ -221,6 +226,7 @@ export const RegisterPage: React.FC = () => {
           ) : null}
           <div className='flex justify-center items-center'>
             <button
+              id='registerBtn'
               className='auth-card__submit-btn'
               type='submit'
               disabled={!formik.isValid}
