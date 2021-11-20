@@ -1,30 +1,48 @@
-import React, { useState } from 'react';
+/* eslint-disable import/no-extraneous-dependencies */
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useFormik } from 'formik';
 import { ToastContainer, toast } from 'react-toastify';
+import { History, LocationState } from 'history';
 import 'react-toastify/dist/ReactToastify.css';
 import { uuid } from 'uuidv4';
 import * as Yup from 'yup';
 
-import { useAppDispatch } from '../../redux-features/hooks';
+import { useAppDispatch, useAppSelector } from '../../redux-features/hooks';
 import { registerUser } from '../../redux-features/users';
 import Eye from '../../icons/Eye';
 import EyeOff from '../../icons/EyeOff';
 
-export const RegisterPage: React.FC = () => {
+interface IProps {
+  history: History<LocationState>;
+}
+
+interface IFormValues {
+  userName: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
+
+export const RegisterPage: React.FC<IProps> = ({ history }: IProps) => {
+  const dispatch = useAppDispatch();
+
+  const userInfo = useAppSelector((state) => state.users.userInfo);
+
   const [state, setState] = useState({
     shouldShowPassword: false,
     shouldShowConfirmPassword: false,
   });
-  const dispatch = useAppDispatch();
+
+  const initialValues: IFormValues = {
+    userName: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+  };
 
   const formik = useFormik({
-    initialValues: {
-      userName: '',
-      email: '',
-      password: '',
-      confirmPassword: '',
-    },
+    initialValues,
     validationSchema: Yup.object({
       userName: Yup.string().required('Required'),
       email: Yup.string().email('Invalid email address').required('Required'),
@@ -36,7 +54,7 @@ export const RegisterPage: React.FC = () => {
         .oneOf([Yup.ref('password')], 'Passwords must match')
         .required('Required'),
     }),
-    onSubmit: async (values, { resetForm }) => {
+    onSubmit: async (values) => {
       const resultAction = await dispatch(
         registerUser({
           id: uuid(),
@@ -45,21 +63,6 @@ export const RegisterPage: React.FC = () => {
           password: values.password,
         })
       );
-
-      if (registerUser.fulfilled.match(resultAction)) {
-        // user will have a type signature of User as we passed that as the Returned parameter in createAsyncThunk
-        const user = resultAction.payload;
-        toast.success(
-          <div>
-            Success
-            <br />
-            <span>Registered: {user.userName}</span>
-          </div>,
-          {
-            position: toast.POSITION.BOTTOM_RIGHT,
-          }
-        );
-      }
 
       if (registerUser.rejected.match(resultAction)) {
         if (resultAction.payload) {
@@ -88,10 +91,14 @@ export const RegisterPage: React.FC = () => {
           );
         }
       }
-
-      resetForm();
     },
   });
+
+  useEffect(() => {
+    if (userInfo) {
+      history.push('/');
+    }
+  }, [history, userInfo]);
 
   const handleShowPasswordToggle = () => {
     setState((currState) => ({

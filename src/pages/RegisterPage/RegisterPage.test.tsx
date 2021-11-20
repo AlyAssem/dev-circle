@@ -3,6 +3,7 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import { act } from '@testing-library/react';
 import { mount, ReactWrapper, shallow } from 'enzyme';
 import { Provider } from 'react-redux';
+import { createMemoryHistory } from 'history';
 
 import { RegisterPage } from './RegisterPage';
 import { store } from '../../store';
@@ -29,10 +30,13 @@ describe('RegisterPage', () => {
   let wrapper: ReactWrapper<React.FC>;
 
   beforeEach(() => {
+    const history = createMemoryHistory({
+      initialEntries: ['/register'],
+    });
     wrapper = mount(
       <Router>
         <Provider store={store}>
-          <RegisterPage />
+          <RegisterPage history={history} />
         </Provider>
       </Router>
     );
