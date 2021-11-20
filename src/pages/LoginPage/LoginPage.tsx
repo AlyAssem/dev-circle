@@ -1,14 +1,33 @@
-import React from 'react';
+/* eslint-disable import/no-extraneous-dependencies */
+import React, { useEffect } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { Link } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import { History, LocationState } from 'history';
 
+import { useAppDispatch, useAppSelector } from '../../redux-features/hooks';
+import { loginUser } from '../../redux-features/users';
+
+interface IProps {
+  history: History<LocationState>;
+}
 interface IFormValues {
   email: string;
   password: string;
 }
 
-export const LoginPage: React.FC = () => {
+export const LoginPage: React.FC<IProps> = ({ history }: IProps) => {
+  const dispatch = useAppDispatch();
+
+  const loggedInUserInfo = useAppSelector((state) => state.users.userInfo);
+
+  useEffect(() => {
+    if (loggedInUserInfo) {
+      history.push('/');
+    }
+  }, [history, loggedInUserInfo]);
+
   const initialValues: IFormValues = {
     email: '',
     password: '',
@@ -22,9 +41,41 @@ export const LoginPage: React.FC = () => {
         .max(15, 'Must be 15 characters or less')
         .required('Required'),
     }),
-    onSubmit: (values, { resetForm }) => {
-      console.log(values);
-      resetForm();
+    onSubmit: async (values) => {
+      const resultAction = await dispatch(
+        loginUser({
+          email: values.email,
+          password: values.password,
+        })
+      );
+
+      if (loginUser.rejected.match(resultAction)) {
+        if (resultAction.payload) {
+          // if the error is sent from server payload
+          toast.error(
+            <div>
+              Error
+              <br />
+              {resultAction.payload.errorMessage}
+            </div>,
+
+            {
+              position: toast.POSITION.BOTTOM_RIGHT,
+            }
+          );
+        } else {
+          toast.error(
+            <div>
+              Error
+              <br />
+              {resultAction.error}
+            </div>,
+            {
+              position: toast.POSITION.BOTTOM_RIGHT,
+            }
+          );
+        }
+      }
     },
   });
   return (
@@ -80,13 +131,7 @@ export const LoginPage: React.FC = () => {
           {formik.touched.password && formik.errors.password ? (
             <div className='text-red-500 mb-3'>{formik.errors.password}</div>
           ) : null}
-          <div className='flex justify-between items-center'>
-            <a
-              href=' '
-              className='text-sm text-green-600 hover:text-green-700 hover:underline'
-            >
-              Forgot your password?
-            </a>
+          <div className='mx-auto'>
             <button
               className='auth-card__submit-btn'
               type='submit'
@@ -109,6 +154,7 @@ export const LoginPage: React.FC = () => {
           .
         </p>
       </div>
+      <ToastContainer />
     </div>
   );
 };

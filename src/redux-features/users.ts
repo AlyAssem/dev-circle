@@ -13,8 +13,12 @@ interface ValidationErrors {
   errorMessage: string;
 }
 
-interface RegisterUserResponse {
-  user: User;
+interface UserResponse {
+  user: {
+    id: string;
+    userName: string;
+    email: string;
+  };
 }
 
 interface UsersState {
@@ -24,8 +28,8 @@ interface UsersState {
 
 export const registerUser = createAsyncThunk<
   // Return type of the payload creator
-  User,
-  // First argument to the payload creator
+  { id: string; userName: string; email: string },
+  // userData object type
   User,
   // { id: string } & Partial<User>, // id is a must but the rest of User interface is optional
   {
@@ -41,9 +45,44 @@ export const registerUser = createAsyncThunk<
       },
     };
 
-    const response = await axios.post<RegisterUserResponse>(
+    const response = await axios.post<UserResponse>(
       '/api/users',
       { id, userName, email, password },
+      config
+    );
+
+    return response.data.user;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (err: any) {
+    const error: AxiosError<ValidationErrors> = err;
+    if (!error.response) {
+      throw err;
+    }
+    return rejectWithValue(error.response.data);
+  }
+});
+
+export const loginUser = createAsyncThunk<
+  // Return type of the payload creator
+  { id: string; userName: string; email: string },
+  // userData object type
+  { email: string; password: string },
+  {
+    // Optional fields for defining thunkApi field types
+    rejectValue: ValidationErrors;
+  }
+>('users/login', async (userData, { rejectWithValue }) => {
+  try {
+    const { email, password } = userData;
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+
+    const response = await axios.post<UserResponse>(
+      '/api/users/login',
+      { email, password },
       config
     );
 
@@ -74,6 +113,19 @@ const usersSlice = createSlice({
       state.userInfo = payload;
     });
     builder.addCase(registerUser.rejected, (state, action) => {
+      if (action.payload) {
+        // Being that we passed in ValidationErrors to rejectType
+        // in `createAsyncThunk`, the payload will be available here.
+        state.error = action.payload.errorMessage;
+      } else {
+        state.error = action.error.message;
+      }
+    });
+
+    builder.addCase(loginUser.fulfilled, (state, { payload }) => {
+      state.userInfo = payload;
+    });
+    builder.addCase(loginUser.rejected, (state, action) => {
       if (action.payload) {
         // Being that we passed in ValidationErrors to rejectType
         // in `createAsyncThunk`, the payload will be available here.
