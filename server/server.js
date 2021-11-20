@@ -24,6 +24,14 @@ app.post('/api/users', (req, res) => {
     email: req.body.email,
     password: req.body.password,
   };
+
+  const doesUserExist = users.some((user) => user.email === newUser.email);
+
+  if (doesUserExist) {
+    res.status(400);
+    throw new Error('User already exists');
+  }
+
   users.push(newUser);
   fs.writeFileSync(DATA_FILE, JSON.stringify(users));
 
@@ -31,6 +39,21 @@ app.post('/api/users', (req, res) => {
   delete responseUser.password;
 
   res.status(201).json({ user: responseUser });
+});
+
+app.post('/api/users/login', (req, res) => {
+  const { email, password } = req.body;
+  const users = JSON.parse(fs.readFileSync(DATA_FILE));
+
+  const registeredUser = users.find((user) => user.email === email);
+
+  if (registeredUser && registeredUser.password === password) {
+    delete registeredUser.password;
+    res.json({ user: registeredUser });
+  } else {
+    res.status(401);
+    throw new Error('Invalid Email or Password');
+  }
 });
 
 const notFound = (req, res, next) => {
