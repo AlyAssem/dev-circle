@@ -9,7 +9,7 @@ import { History, LocationState } from 'history';
 import { useAppDispatch, useAppSelector } from '../../redux-features/hooks';
 import { loginUser } from '../../redux-features/users';
 
-interface IProps {
+interface ILoginPageProps {
   history: History<LocationState>;
 }
 interface IFormValues {
@@ -17,7 +17,9 @@ interface IFormValues {
   password: string;
 }
 
-export const LoginPage: React.FC<IProps> = ({ history }: IProps) => {
+export const LoginPage: React.FC<ILoginPageProps> = ({
+  history,
+}: ILoginPageProps) => {
   const dispatch = useAppDispatch();
 
   const loggedInUserInfo = useAppSelector((state) => state.users.userInfo);

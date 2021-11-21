@@ -13,7 +13,7 @@ import { registerUser } from '../../redux-features/users';
 import Eye from '../../icons/Eye';
 import EyeOff from '../../icons/EyeOff';
 
-interface IProps {
+interface IRegisterPageProps {
   history: History<LocationState>;
 }
 
@@ -24,7 +24,9 @@ interface IFormValues {
   confirmPassword: string;
 }
 
-export const RegisterPage: React.FC<IProps> = ({ history }: IProps) => {
+export const RegisterPage: React.FC<IRegisterPageProps> = ({
+  history,
+}: IRegisterPageProps) => {
   const dispatch = useAppDispatch();
 
   const userInfo = useAppSelector((state) => state.users.userInfo);
