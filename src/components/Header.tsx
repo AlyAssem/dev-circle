@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import Menu from '../icons/Menu';
+import { useAppDispatch } from '../redux-features/hooks';
+import { logout } from '../redux-features/users';
+
 interface IHeaderProps {
   loggedInUserName: string | undefined;
 }
@@ -8,6 +11,13 @@ export const Header: React.FC<IHeaderProps> = ({
   loggedInUserName,
 }: IHeaderProps) => {
   const [isNavigationMenuOpen, setIsNavigationMenuOpen] = useState(false);
+  const dispatch = useAppDispatch();
+
+  const handleLogout = () => {
+    localStorage.removeItem('userInfo');
+    dispatch(logout());
+  };
+
   return (
     <header>
       <nav className='h-14 px-5 flex justify-between items-center bg-white shadow'>
@@ -42,3 +52,4 @@ export const Header: React.FC<IHeaderProps> = ({
       </nav>
     </header>
   );
+};

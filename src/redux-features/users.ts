@@ -23,7 +23,7 @@ interface UserResponse {
 
 interface UsersState {
   error: string | null | undefined;
-  userInfo: Partial<User>;
+  userInfo: Partial<User> | null;
 }
 
 export const registerUser = createAsyncThunk<
@@ -50,6 +50,8 @@ export const registerUser = createAsyncThunk<
       { id, userName, email, password },
       config
     );
+
+    localStorage.setItem('userInfo', JSON.stringify(response.data.user));
 
     return response.data.user;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -86,6 +88,8 @@ export const loginUser = createAsyncThunk<
       config
     );
 
+    localStorage.setItem('userInfo', JSON.stringify(response.data.user));
+
     return response.data.user;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {
@@ -98,14 +102,18 @@ export const loginUser = createAsyncThunk<
 });
 
 const initialState: UsersState = {
-  userInfo: {},
+  userInfo: null,
   error: null,
 };
 
 const usersSlice = createSlice({
   name: 'users',
   initialState,
-  reducers: {},
+  reducers: {
+    logout: (state) => {
+      state.userInfo = null;
+    },
+  },
   extraReducers: (builder) => {
     // The `builder` callback form is used here
     // because it provides correctly typed reducers from the action creators
@@ -136,5 +144,7 @@ const usersSlice = createSlice({
     });
   },
 });
+
+export const { logout } = usersSlice.actions;
 
 export default usersSlice.reducer;
