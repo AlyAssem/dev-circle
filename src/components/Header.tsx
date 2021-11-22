@@ -7,9 +7,7 @@ interface IHeaderProps {
   loggedInUserName: string | undefined;
 }
 
-export const Header: React.FC<IHeaderProps> = ({
-  loggedInUserName,
-}: IHeaderProps) => {
+export const Header: React.FC<IHeaderProps> = ({ loggedInUserName }) => {
   const [isNavigationMenuOpen, setIsNavigationMenuOpen] = useState(false);
   const dispatch = useAppDispatch();
 
