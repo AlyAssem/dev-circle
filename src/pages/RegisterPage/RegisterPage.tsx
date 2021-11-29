@@ -17,6 +17,11 @@ interface IRegisterPageProps {
   history: History<LocationState>;
 }
 
+interface IRegisterPageState {
+  shouldShowPassword: boolean;
+  shouldShowConfirmPassword: boolean;
+}
+
 interface IFormValues {
   userName: string;
   email: string;
@@ -31,7 +36,7 @@ export const RegisterPage: React.FC<IRegisterPageProps> = ({
 
   const userInfo = useAppSelector((state) => state.users.userInfo);
 
-  const [state, setState] = useState({
+  const [state, setState] = useState<IRegisterPageState>({
     shouldShowPassword: false,
     shouldShowConfirmPassword: false,
   });
@@ -97,7 +102,7 @@ export const RegisterPage: React.FC<IRegisterPageProps> = ({
   });
 
   useEffect(() => {
-    if (userInfo) {
+    if (userInfo && Object.keys(userInfo).length !== 0) {
       history.push('/');
     }
   }, [history, userInfo]);

@@ -18,6 +18,7 @@
   },
   "plugins": ["react", "@typescript-eslint", "react-hooks"],
   "rules": {
+    "implicit-arrow-linebreak": "off",
     "no-use-before-define": "off",
     "react/jsx-one-expression-per-line": "off",
     "@typescript-eslint/no-var-requires": 0,

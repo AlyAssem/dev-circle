@@ -25,7 +25,7 @@ export const LoginPage: React.FC<ILoginPageProps> = ({
   const loggedInUserInfo = useAppSelector((state) => state.users.userInfo);
 
   useEffect(() => {
-    if (loggedInUserInfo) {
+    if (loggedInUserInfo && Object.keys(loggedInUserInfo).length !== 0) {
       history.push('/');
     }
   }, [history, loggedInUserInfo]);

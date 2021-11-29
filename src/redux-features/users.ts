@@ -23,7 +23,7 @@ interface UserResponse {
 
 interface UsersState {
   error: string | null | undefined;
-  userInfo: Partial<User> | null;
+  userInfo: Partial<User>;
 }
 
 export const registerUser = createAsyncThunk<
@@ -102,7 +102,7 @@ export const loginUser = createAsyncThunk<
 });
 
 const initialState: UsersState = {
-  userInfo: null,
+  userInfo: {},
   error: null,
 };
 
@@ -111,7 +111,7 @@ const usersSlice = createSlice({
   initialState,
   reducers: {
     logout: (state) => {
-      state.userInfo = null;
+      state.userInfo = {};
     },
   },
   extraReducers: (builder) => {

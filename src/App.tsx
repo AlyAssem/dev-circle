@@ -5,7 +5,7 @@ import { LoginPage } from './pages/LoginPage/LoginPage';
 import { RegisterPage } from './pages/RegisterPage/RegisterPage';
 
 const App: React.FC = () => (
-  <div className='h-screen w-screen'>
+  <div>
     <Router>
       <Route path='/' component={HomePage} exact />
       <Route path='/login' component={LoginPage} />

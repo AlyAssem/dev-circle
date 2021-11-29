@@ -16,7 +16,7 @@ export const HomePage: React.FC<IHomePageProps> = ({
   const userInfo = useAppSelector((state) => state.users.userInfo);
 
   useEffect(() => {
-    if (!userInfo) {
+    if (userInfo && Object.keys(userInfo).length === 0) {
       history.push('/register');
     }
   }, [history, userInfo]);
