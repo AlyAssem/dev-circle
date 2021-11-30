@@ -96,9 +96,7 @@ app.put('/api/posts/:id', (req, res) => {
   const { postUserInfo, title, content } = req.body;
   const posts = JSON.parse(fs.readFileSync(POSTS_DATA_FILE));
 
-  const foundPostIndex = posts.findIndex(
-    (post) => post.id === Number(req.params.id)
-  );
+  const foundPostIndex = posts.findIndex((post) => post.id === req.params.id);
 
   if (foundPostIndex !== -1) {
     if (posts[foundPostIndex].postUserInfo.id !== postUserInfo.id) {
@@ -121,13 +119,22 @@ app.put('/api/posts/:id', (req, res) => {
 app.get('/api/posts/:id', (req, res) => {
   const posts = JSON.parse(fs.readFileSync(POSTS_DATA_FILE));
 
-  const foundPost = posts.find((post) => post.id === Number(req.params.id));
+  const foundPost = posts.find((post) => post.id === req.params.id);
 
   if (foundPost) {
     res.json(foundPost);
   } else {
-    res.status(404).json({ message: 'Post not found!' });
+    res.status(404).json({ errorMessage: 'Post not found!' });
   }
+});
+
+app.delete('/api/posts/:id', (req, res) => {
+  const posts = JSON.parse(fs.readFileSync(POSTS_DATA_FILE));
+
+  const filteredPosts = posts.filter((post) => post.id !== req.params.id);
+
+  fs.writeFileSync(POSTS_DATA_FILE, JSON.stringify(filteredPosts));
+  res.json({ message: 'Post removed' });
 });
 
 const notFound = (req, res, next) => {
