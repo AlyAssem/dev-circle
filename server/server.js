@@ -59,7 +59,10 @@ app.post('/api/users/login', (req, res) => {
 
 app.get('/api/posts', (req, res) => {
   const data = fs.readFileSync(POSTS_DATA_FILE);
-  res.json({ posts: JSON.parse(data) });
+  // using setTimeout so that the loader appears before loading data, like mocking a database.
+  setTimeout(() => {
+    res.json({ posts: JSON.parse(data) });
+  }, 3000);
 });
 
 app.post('/api/posts', (req, res) => {
@@ -109,7 +112,7 @@ app.put('/api/posts/:id', (req, res) => {
 
     // delete updatedPost.postUserInfo;
 
-    res.json(updatedPost);
+    res.json({ post: updatedPost });
   } else {
     res.status(404);
     throw new Error('Post not found');
@@ -134,7 +137,7 @@ app.delete('/api/posts/:id', (req, res) => {
   const filteredPosts = posts.filter((post) => post.id !== req.params.id);
 
   fs.writeFileSync(POSTS_DATA_FILE, JSON.stringify(filteredPosts));
-  res.json({ message: 'Post removed' });
+  res.json({ message: 'Post removed', postId: req.params.id });
 });
 
 const notFound = (req, res, next) => {
