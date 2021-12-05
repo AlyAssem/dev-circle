@@ -1,11 +1,14 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import React, { useEffect, useState, useRef } from 'react';
 import { History, LocationState } from 'history';
+import { toast, ToastContainer } from 'react-toastify';
 
 import { Header } from '../../components/Header';
 import { useAppSelector, useAppDispatch } from '../../redux-features/hooks';
 import Posts from '../../components/Posts';
+import Modal from '../../components/Modal';
 import { getPosts } from '../../redux-features/posts';
+import Loader from '../../components/Loader';
 
 interface IHomePageProps {
   history: History<LocationState>;
@@ -14,6 +17,8 @@ interface IHomePageProps {
 export const HomePage: React.FC<IHomePageProps> = ({
   history,
 }: IHomePageProps) => {
+  const [isCreatePostModalOpen, setIsCreatePostModalOpen] = useState(false);
+  const dispatch = useAppDispatch();
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   const fetchPosts = useRef(() => {});
 
@@ -65,8 +70,14 @@ export const HomePage: React.FC<IHomePageProps> = ({
   return (
     <>
       <Header loggedInUserName={userInfo?.userName} />
-      <div className='w-full flex justify-center'>
-        <Posts posts={DUMMY_POSTS} />
+      <div className='flex justify-end'>
+        <button
+          type='button'
+          className='bg-green-600 m-4 px-4 py-2 text-gray-100 rounded shadow'
+          onClick={() => setIsCreatePostModalOpen(true)}
+        >
+          Create Post
+        </button>
       </div>
 
       {isLoading ? (
@@ -75,6 +86,13 @@ export const HomePage: React.FC<IHomePageProps> = ({
         <div className='w-full flex flex-col items-center'>
           <Posts posts={posts} />
         </div>
+      )}
+      {isCreatePostModalOpen && (
+        <Modal
+          modalTitle='Add Post'
+          modalAction='Create'
+          onClose={() => setIsCreatePostModalOpen(false)}
+        />
       )}
       <ToastContainer />
     </>
