@@ -1,6 +1,21 @@
 # Dev-Circle Web Application
 > A web application for developers to share posts, comment and like others' posts and have a knowledge sharing community, Built with React-Hooks, Typescript, Redux-toolkit, Tailwindcss, nodejs(A simple backend with  json files as mock data to handle frontend services).
 
+## Features: It's still under development but the current implemented features are the following.
+
+- Register && login.
+- CRUD operations for posts.
+- form validation using formik.
+- unit tests for user registeration 
+
+## Future-work:
+- Implementing websockets for real time notification for posts likes and comments between users.
+- likes and comments on posts between users.
+- multi-theme support.
+- multi-language support.
+- unit tests coverage throughout the whole project.
+- using generators to create ids instead of UUIDV4.
+
 ## Used Technologies
 ### Front-End
 
