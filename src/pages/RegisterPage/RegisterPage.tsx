@@ -5,7 +5,7 @@ import { useFormik } from 'formik';
 import { ToastContainer, toast } from 'react-toastify';
 import { History, LocationState } from 'history';
 import 'react-toastify/dist/ReactToastify.css';
-import { uuid } from 'uuidv4';
+import { v4 as uuidV4 } from 'uuid';
 import * as Yup from 'yup';
 
 import { useAppDispatch, useAppSelector } from '../../redux-features/hooks';
@@ -64,7 +64,7 @@ export const RegisterPage: React.FC<IRegisterPageProps> = ({
     onSubmit: async (values) => {
       const resultAction = await dispatch(
         registerUser({
-          id: uuid(),
+          id: uuidV4(),
           email: values.email,
           userName: values.userName,
           password: values.password,
