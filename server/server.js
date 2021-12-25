@@ -1,6 +1,7 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
+const bcrypt = require('bcrypt');
 
 const app = express();
 app.use(express.json());
@@ -17,43 +18,61 @@ app.get('/api/users', (req, res) => {
   res.json(JSON.parse(data));
 });
 
-app.post('/api/users', (req, res) => {
+app.post('/api/users', async (req, res, next) => {
   const users = JSON.parse(fs.readFileSync(USERS_DATA_FILE));
-  const newUser = {
-    id: req.body.id,
-    userName: req.body.userName,
-    email: req.body.email,
-    password: req.body.password,
-  };
 
-  const doesUserExist = users.some((user) => user.email === newUser.email);
+  try {
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(req.body.password, salt);
 
-  if (doesUserExist) {
-    res.status(400);
-    throw new Error('User already exists');
+    const newUser = {
+      id: req.body.id,
+      userName: req.body.userName,
+      email: req.body.email,
+      password: hashedPassword,
+    };
+
+    const doesUserExist = users.some((user) => user.email === newUser.email);
+
+    if (doesUserExist) {
+      res.status(400);
+      const error = new Error('User already exists');
+      next(error);
+    } else {
+      users.push(newUser);
+      fs.writeFileSync(USERS_DATA_FILE, JSON.stringify(users));
+
+      const responseUser = { ...newUser };
+      delete responseUser.password;
+
+      res.status(201).json({ user: responseUser });
+    }
+  } catch (err) {
+    throw new Error('Could not hash the user password');
   }
-
-  users.push(newUser);
-  fs.writeFileSync(USERS_DATA_FILE, JSON.stringify(users));
-
-  const responseUser = { ...newUser };
-  delete responseUser.password;
-
-  res.status(201).json({ user: responseUser });
 });
 
-app.post('/api/users/login', (req, res) => {
+app.post('/api/users/login', async (req, res, next) => {
   const { email, password } = req.body;
   const users = JSON.parse(fs.readFileSync(USERS_DATA_FILE));
 
   const registeredUser = users.find((user) => user.email === email);
 
-  if (registeredUser && registeredUser.password === password) {
-    delete registeredUser.password;
-    res.json({ user: registeredUser });
-  } else {
-    res.status(401);
-    throw new Error('Invalid Email or Password');
+  try {
+    const doesPasswordsMatch = await bcrypt.compare(
+      password,
+      registeredUser.password
+    );
+
+    if (registeredUser && doesPasswordsMatch) {
+      delete registeredUser.password;
+      res.json({ user: registeredUser });
+    } else {
+      res.status(401);
+      throw new Error('Invalid email or password');
+    }
+  } catch (err) {
+    throw new Error('Could not hash the user password');
   }
 });
 
@@ -134,10 +153,16 @@ app.get('/api/posts/:id', (req, res) => {
 app.delete('/api/posts/:id', (req, res) => {
   const posts = JSON.parse(fs.readFileSync(POSTS_DATA_FILE));
 
+  const postToDelete = posts.find((post) => post.id === req.params.id);
   const filteredPosts = posts.filter((post) => post.id !== req.params.id);
 
-  fs.writeFileSync(POSTS_DATA_FILE, JSON.stringify(filteredPosts));
-  res.json({ message: 'Post removed', postId: req.params.id });
+  if (postToDelete) {
+    fs.writeFileSync(POSTS_DATA_FILE, JSON.stringify(filteredPosts));
+    res.json({ message: 'Post removed', postId: req.params.id });
+  } else {
+    res.status(404);
+    throw new Error('Post not found');
+  }
 });
 
 const notFound = (req, res, next) => {
