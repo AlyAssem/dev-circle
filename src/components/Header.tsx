@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Menu from '../icons/Menu';
+import MenuIcon from '../icons/MenuIcon';
 import { useAppDispatch } from '../redux-features/hooks';
 import { logout } from '../redux-features/users';
 
@@ -45,7 +45,7 @@ export const Header: React.FC<IHeaderProps> = ({ loggedInUserName }) => {
           className='md:hidden'
           onClick={() => setIsNavigationMenuOpen((currState) => !currState)}
         >
-          <Menu />
+          <MenuIcon />
         </button>
       </nav>
     </header>
