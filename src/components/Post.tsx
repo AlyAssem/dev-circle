@@ -1,23 +1,33 @@
 import React, { useState } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
-import Delete from '../icons/Delete';
-import Edit from '../icons/Edit';
+import CommentIcon from '../icons/CommentIcon';
+import DeleteIcon from '../icons/DeleteIcon';
+import EditIcon from '../icons/EditIcon';
+import FilledLikeIcon from '../icons/FilledLikeIcon';
+import LikeIcon from '../icons/LikeIcon';
 import { useAppDispatch, useAppSelector } from '../redux-features/hooks';
 import { deletePost } from '../redux-features/posts';
-import Modal from './Modal';
 
 interface IPost {
   id: string;
   title: string;
   content: string;
+  openPostEditModal: (id: string) => void;
   postUserInfo: {
     id: string;
     userName: string;
   };
 }
 
-const Post: React.FC<IPost> = ({ title, content, id, postUserInfo }) => {
-  const [isEditPostModalOpen, setIsEditPostModalOpen] = useState(false);
+const Post: React.FC<IPost> = ({
+  title,
+  content,
+  id,
+  postUserInfo,
+  openPostEditModal,
+}) => {
+  const [isPostLiked, setIsPostLiked] = useState(false);
+
   const dispatch = useAppDispatch();
 
   const loggedInUserInfo = useAppSelector((state) => state.users.userInfo);
@@ -66,18 +76,49 @@ const Post: React.FC<IPost> = ({ title, content, id, postUserInfo }) => {
     }
   };
 
+  const handlePostLike = () => {
+    alert('YOU HAVE LIKED THE POST');
+    setIsPostLiked(!isPostLiked);
+  };
+
   return (
     <>
       <div className='post_card'>
         <div className='flex flex-col h-full justify-between'>
-          <div className='p-3'>
-            <div className='text-gray-900 font-bold text-xl mb-2'>{title}</div>
-            <p className='text-gray-700 text-base'>{content}</p>
+          <div className='flex justify-between'>
+            <div className='p-3'>
+              <div className='text-gray-900 font-bold text-xl mb-2'>
+                {title}
+              </div>
+              <p className='text-gray-700 text-base'>{content}</p>
+            </div>
+            <div className='flex gap-x-2 pr-4'>
+              <div className='flex flex-col items-center'>
+                <span> 2 </span>
+                <button
+                  id='likePostIcon'
+                  type='button'
+                  className='hover:text-green-600'
+                  onClick={handlePostLike}
+                >
+                  {isPostLiked ? <FilledLikeIcon /> : <LikeIcon />}
+                </button>
+              </div>
+              <div className='flex flex-col items-center'>
+                <span>3</span>
+                <button
+                  id='commentOnPostIcon'
+                  type='button'
+                  className='hover:text-green-600'
+                >
+                  <CommentIcon />
+                </button>
+              </div>
+            </div>
           </div>
-
           <div className='p-4'>
             <span className='block text-green-600 font-medium'>
-              {postUserInfo.userName},
+              {postUserInfo.userName}
             </span>
             <div className='flex justify-between'>
               <span className='text-gray-600'>
@@ -91,15 +132,15 @@ const Post: React.FC<IPost> = ({ title, content, id, postUserInfo }) => {
                     className='hover:text-red-600'
                     onClick={handlePostDelete}
                   >
-                    <Delete />
+                    <DeleteIcon />
                   </button>
                   <button
                     id='editPostIcon'
                     type='button'
                     className='ml-3 hover:text-green-600'
-                    onClick={() => setIsEditPostModalOpen(true)}
+                    onClick={() => openPostEditModal(id)}
                   >
-                    <Edit />
+                    <EditIcon />
                   </button>
                 </div>
               )}
@@ -108,14 +149,6 @@ const Post: React.FC<IPost> = ({ title, content, id, postUserInfo }) => {
         </div>
       </div>
       <ToastContainer />
-      {isEditPostModalOpen && (
-        <Modal
-          postId={id}
-          modalTitle='Edit Post'
-          modalAction='Edit'
-          onClose={() => setIsEditPostModalOpen(false)}
-        />
-      )}
     </>
   );
 };
