@@ -5,28 +5,28 @@ import { v4 as uuidV4 } from 'uuid';
 import { useAppDispatch, useAppSelector } from '../redux-features/hooks';
 import { createPost, editPost } from '../redux-features/posts';
 
-interface IModalProps {
+interface IPostModalProps {
   // eslint-disable-next-line react/require-default-props
   postId?: string;
-  modalTitle: string;
-  modalAction: string;
+  title: string;
+  action: string;
   onClose: () => void;
 }
 
 interface IState {
-  title: string;
-  content: string;
+  postTitle: string;
+  postContent: string;
 }
 
-const Modal: React.FC<IModalProps> = ({
+const PostModal: React.FC<IPostModalProps> = ({
   postId = '',
-  modalTitle,
-  modalAction,
+  title,
+  action,
   onClose,
 }) => {
   const [state, setState] = useState<IState>({
-    title: '',
-    content: '',
+    postTitle: '',
+    postContent: '',
   });
   const dispatch = useAppDispatch();
   const userInfo = useAppSelector((reduxState) => reduxState.users.userInfo);
@@ -38,8 +38,8 @@ const Modal: React.FC<IModalProps> = ({
         createPost({
           id: uuidV4(),
           postUserInfo: { id: id || '', userName: userName || '' },
-          title: state.title,
-          content: state.content,
+          title: state.postTitle,
+          content: state.postContent,
         })
       );
 
@@ -80,8 +80,8 @@ const Modal: React.FC<IModalProps> = ({
     const resultAction = await dispatch(
       editPost({
         postUserInfo: { id: id || '', userName: userName || '' },
-        title: state.title,
-        content: state.content,
+        title: state.postTitle,
+        content: state.postContent,
         id: postId || '',
       })
     );
@@ -146,7 +146,7 @@ const Modal: React.FC<IModalProps> = ({
         tabIndex={0}
       >
         <h4 id='modal-title' className='text-lg font-bold'>
-          {modalTitle}
+          {title}
         </h4>
         <div id='modal-body' className='bg-gray-50 p-4 my-2'>
           <div className='mb-3 pt-3 rounded bg-gray-200'>
@@ -160,7 +160,7 @@ const Modal: React.FC<IModalProps> = ({
               id='title'
               type='text'
               className='auth-card__input'
-              value={state.title}
+              value={state.postTitle}
               onChange={(e) => handleInputChange(e, 'title')}
             />
           </div>
@@ -175,7 +175,7 @@ const Modal: React.FC<IModalProps> = ({
               id='content'
               type='text'
               className='auth-card__input'
-              value={state.content}
+              value={state.postContent}
               onChange={(e) => handleInputChange(e, 'content')}
             />
           </div>
@@ -188,12 +188,10 @@ const Modal: React.FC<IModalProps> = ({
             type='button'
             className='px-3 py-1 rounded text-white bg-green-600 hover:bg-green-800 disabled:opacity-50 \
              disabled:cursor-not-allowed'
-            onClick={
-              modalAction === 'Create' ? handlePostCreate : handlePostEdit
-            }
-            disabled={!state.title || !state.content}
+            onClick={action === 'Create' ? handlePostCreate : handlePostEdit}
+            disabled={!state.postTitle || !state.postContent}
           >
-            {modalAction}
+            {action}
           </button>
         </div>
       </div>
@@ -202,4 +200,4 @@ const Modal: React.FC<IModalProps> = ({
   );
 };
 
-export default Modal;
+export default PostModal;

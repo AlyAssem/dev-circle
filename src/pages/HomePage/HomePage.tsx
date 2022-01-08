@@ -6,9 +6,9 @@ import { toast, ToastContainer } from 'react-toastify';
 import { Header } from '../../components/Header';
 import { useAppSelector, useAppDispatch } from '../../redux-features/hooks';
 import Posts from '../../components/Posts';
-import Modal from '../../components/Modal';
-import { getPosts } from '../../redux-features/posts';
+import PostModal from '../../components/PostModal';
 import Loader from '../../components/Loader';
+import { getPosts } from '../../redux-features/posts';
 
 interface IHomePageProps {
   history: History<LocationState>;
@@ -88,9 +88,9 @@ export const HomePage: React.FC<IHomePageProps> = ({
         </div>
       )}
       {isCreatePostModalOpen && (
-        <Modal
-          modalTitle='Add Post'
-          modalAction='Create'
+        <PostModal
+          title='Add Post'
+          action='Create'
           onClose={() => setIsCreatePostModalOpen(false)}
         />
       )}
