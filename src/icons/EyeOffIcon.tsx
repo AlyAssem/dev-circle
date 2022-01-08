@@ -1,6 +1,6 @@
 import React from 'react';
 
-const EyeOff = (): React.ReactElement<SVGSVGElement> => (
+const EyeOffIcon = (): React.ReactElement<SVGElement> => (
   <svg
     className='w-6 h-6'
     fill='none'
@@ -17,4 +17,4 @@ const EyeOff = (): React.ReactElement<SVGSVGElement> => (
     />
   </svg>
 );
-export default EyeOff;
+export default EyeOffIcon;

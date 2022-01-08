@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Eye = (): React.ReactElement<SVGSVGElement> => (
+const EyeIcon = (): React.ReactElement<SVGElement> => (
   <svg
     className='w-6 h-6'
     fill='none'
@@ -24,4 +24,4 @@ const Eye = (): React.ReactElement<SVGSVGElement> => (
   </svg>
 );
 
-export default Eye;
+export default EyeIcon;

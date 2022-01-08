@@ -10,8 +10,8 @@ import * as Yup from 'yup';
 
 import { useAppDispatch, useAppSelector } from '../../redux-features/hooks';
 import { registerUser } from '../../redux-features/users';
-import Eye from '../../icons/Eye';
-import EyeOff from '../../icons/EyeOff';
+import EyeIcon from '../../icons/EyeIcon';
+import EyeOffIcon from '../../icons/EyeOffIcon';
 
 interface IRegisterPageProps {
   history: History<LocationState>;
@@ -201,7 +201,7 @@ export const RegisterPage: React.FC<IRegisterPageProps> = ({
               className='text-green-600 absolute right-3'
               onClick={handleShowPasswordToggle}
             >
-              {state.shouldShowPassword ? <EyeOff /> : <Eye />}
+              {state.shouldShowPassword ? <EyeOffIcon /> : <EyeIcon />}
             </button>
           </div>
           {formik.touched.password && formik.errors.password ? (
@@ -230,7 +230,7 @@ export const RegisterPage: React.FC<IRegisterPageProps> = ({
               className='text-green-600 absolute right-3'
               onClick={handleShowConfirmPasswordToggle}
             >
-              {state.shouldShowConfirmPassword ? <EyeOff /> : <Eye />}
+              {state.shouldShowConfirmPassword ? <EyeOffIcon /> : <EyeIcon />}
             </button>
           </div>
           {formik.touched.confirmPassword && formik.errors.confirmPassword ? (
