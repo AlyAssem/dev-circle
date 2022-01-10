@@ -152,31 +152,31 @@ const PostModal: React.FC<IPostModalProps> = ({
           <div className='mb-3 pt-3 rounded bg-gray-200'>
             <label
               className='block text-gray-700 text-sm font-bold mb-2 ml-3'
-              htmlFor='title'
+              htmlFor='post-title'
             >
               Title
             </label>
             <input
-              id='title'
+              id='post-title'
               type='text'
               className='auth-card__input'
               value={state.postTitle}
-              onChange={(e) => handleInputChange(e, 'title')}
+              onChange={(e) => handleInputChange(e, 'postTitle')}
             />
           </div>
           <div className='mb-3 pt-3 rounded bg-gray-200'>
             <label
               className='block text-gray-700 text-sm font-bold mb-2 ml-3'
-              htmlFor='content'
+              htmlFor='post-content'
             >
               Content
             </label>
             <input
-              id='content'
+              id='post-content'
               type='text'
               className='auth-card__input'
               value={state.postContent}
-              onChange={(e) => handleInputChange(e, 'content')}
+              onChange={(e) => handleInputChange(e, 'postContent')}
             />
           </div>
         </div>
