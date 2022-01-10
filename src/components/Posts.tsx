@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { CommentsModal } from './CommentsModal';
 import Post from './Post';
 import PostModal from './PostModal';
 
@@ -15,11 +16,18 @@ interface IPosts {
 }
 const Posts: React.FC<IPosts> = ({ posts }) => {
   const [isEditPostModalOpen, setIsEditPostModalOpen] = useState(false);
+  const [isCommentOnPostModalOpen, setIsCommentOnPostModalOpen] =
+    useState(false);
   const [clickedPostId, setClickedPostId] = useState('');
 
-  const getPostId = (postId: string) => {
+  const openPostEditModal = (postId: string) => {
     setClickedPostId(postId);
     setIsEditPostModalOpen(true);
+  };
+
+  const openPostCommentModal = (postId: string) => {
+    setClickedPostId(postId);
+    setIsCommentOnPostModalOpen(true);
   };
   return (
     <>
@@ -30,7 +38,8 @@ const Posts: React.FC<IPosts> = ({ posts }) => {
           title={item.title}
           content={item.content}
           postUserInfo={item.postUserInfo}
-          openPostEditModal={(id: string) => getPostId(id)}
+          openPostEditModal={(id: string) => openPostEditModal(id)}
+          openPostCommentModal={(id: string) => openPostCommentModal(id)}
         />
       ))}
       {isEditPostModalOpen && (
@@ -39,6 +48,12 @@ const Posts: React.FC<IPosts> = ({ posts }) => {
           title='Edit Post'
           action='Edit'
           onClose={() => setIsEditPostModalOpen(false)}
+        />
+      )}
+      {isCommentOnPostModalOpen && (
+        <CommentsModal
+          title='Comments'
+          onClose={() => setIsCommentOnPostModalOpen(false)}
         />
       )}
     </>

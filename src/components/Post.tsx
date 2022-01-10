@@ -13,6 +13,7 @@ interface IPost {
   title: string;
   content: string;
   openPostEditModal: (id: string) => void;
+  openPostCommentModal: (id: string) => void;
   postUserInfo: {
     id: string;
     userName: string;
@@ -25,6 +26,7 @@ const Post: React.FC<IPost> = ({
   id,
   postUserInfo,
   openPostEditModal,
+  openPostCommentModal,
 }) => {
   const [isPostLiked, setIsPostLiked] = useState(false);
 
@@ -77,7 +79,6 @@ const Post: React.FC<IPost> = ({
   };
 
   const handlePostLike = () => {
-    alert('YOU HAVE LIKED THE POST');
     setIsPostLiked(!isPostLiked);
   };
 
@@ -110,6 +111,7 @@ const Post: React.FC<IPost> = ({
                   id='commentOnPostIcon'
                   type='button'
                   className='hover:text-green-600'
+                  onClick={() => openPostCommentModal(id)}
                 >
                   <CommentIcon />
                 </button>

@@ -19,7 +19,7 @@ interface IState {
 }
 
 const PostModal: React.FC<IPostModalProps> = ({
-  postId = '',
+  postId,
   title,
   action,
   onClose,
