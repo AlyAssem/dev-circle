@@ -8,6 +8,7 @@ app.use(express.json());
 
 const USERS_DATA_FILE = path.join(__dirname, 'data/users.json');
 const POSTS_DATA_FILE = path.join(__dirname, 'data/posts.json');
+const COMMENTS_DATA_FILE = path.join(__dirname, 'data/comments.json');
 
 app.get('/', (req, res) => {
   res.send('API IS RUNNING...');
@@ -162,6 +163,62 @@ app.delete('/api/posts/:id', (req, res) => {
   } else {
     res.status(404);
     throw new Error('Post not found');
+  }
+});
+
+app.post('/api/posts/:postId/comments', (req, res) => {
+  const { id, userId, text, createdAt } = req.body;
+  const { postId } = req.params;
+
+  const comments = JSON.parse(fs.readFileSync(COMMENTS_DATA_FILE));
+
+  const newComment = {
+    id,
+    userId,
+    postId,
+    text,
+    createdAt,
+  };
+
+  const isNewCommentAlreadyWritten = comments.some(
+    (comment) =>
+      comment.userId === newComment.userId && comment.text === newComment.text
+  );
+
+  if (isNewCommentAlreadyWritten) {
+    res.status(400);
+    throw new Error('You have already written the comment');
+  }
+
+  comments.push(newComment);
+  fs.writeFileSync(COMMENTS_DATA_FILE, JSON.stringify(comments));
+
+  res.status(201).json({ comment: newComment });
+});
+
+app.get('/api/posts/:postId/comments', (req, res) => {
+  const data = fs.readFileSync(COMMENTS_DATA_FILE);
+  res.json({ comments: JSON.parse(data) });
+});
+
+app.put('/api/comments/:id', (req, res) => {
+  const { text } = req.body;
+  const { id } = req.params;
+
+  const comments = JSON.parse(fs.readFileSync(COMMENTS_DATA_FILE));
+
+  const foundCommentIndex = comments.findIndex((comment) => comment.id === id);
+  if (foundCommentIndex !== -1) {
+    const updatedComment = { ...comments[foundCommentIndex], text };
+
+    comments[foundCommentIndex] = updatedComment;
+
+    fs.writeFileSync(COMMENTS_DATA_FILE, JSON.stringify(comments));
+
+    res.json({ comment: updatedComment });
+  } else {
+    res.status(404);
+    throw new Error('Comment not found');
   }
 });
 
