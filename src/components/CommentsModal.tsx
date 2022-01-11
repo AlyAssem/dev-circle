@@ -8,15 +8,13 @@ interface ICommentsModalProps {
   onClose: () => void;
 }
 
-interface IState {
-  commentText: string;
-}
-
 export const CommentsModal: React.FC<ICommentsModalProps> = ({
   commentId,
   title,
   onClose,
 }) => {
+  const [commentText, setCommentText] = useState('');
+
   const DUMMY_USERS_AND_COMMENTS = [
     {
       name: 'aly',
@@ -65,8 +63,8 @@ export const CommentsModal: React.FC<ICommentsModalProps> = ({
               id='post-title'
               type='text'
               className='auth-card__input'
-              // value={state.postTitle}
-              // onChange={(e) => handleInputChange(e, 'postTitle')}
+              value={commentText}
+              onChange={(e) => setCommentText(e.target.value)}
             />
           </div>
           <button

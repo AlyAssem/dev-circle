@@ -124,7 +124,7 @@ const Post: React.FC<IPost> = ({
             </span>
             <div className='flex justify-between'>
               <span className='text-gray-600'>
-                {new Date().toLocaleDateString()}
+                {new Date().toLocaleString()}
               </span>
               {loggedInUserInfo.id === postUserInfo.id && (
                 <div>
