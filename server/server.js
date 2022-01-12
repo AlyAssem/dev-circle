@@ -155,6 +155,8 @@ app.delete('/api/posts/:id', (req, res) => {
   const posts = JSON.parse(fs.readFileSync(POSTS_DATA_FILE));
 
   const postToDelete = posts.find((post) => post.id === req.params.id);
+
+  // to update the json file.
   const filteredPosts = posts.filter((post) => post.id !== req.params.id);
 
   if (postToDelete) {
@@ -168,14 +170,13 @@ app.delete('/api/posts/:id', (req, res) => {
 
 app.post('/api/posts/:postId/comments', (req, res) => {
   const { id, userId, text, createdAt } = req.body;
-  const { postId } = req.params;
 
   const comments = JSON.parse(fs.readFileSync(COMMENTS_DATA_FILE));
 
   const newComment = {
     id,
     userId,
-    postId,
+    postId: req.params.postId,
     text,
     createdAt,
   };
@@ -185,13 +186,34 @@ app.post('/api/posts/:postId/comments', (req, res) => {
       comment.userId === newComment.userId && comment.text === newComment.text
   );
 
-  if (isNewCommentAlreadyWritten) {
+  const isCommentWritteOnSamePost = comments.some(
+    (comment) => comment.postId === newComment.postId
+  );
+
+  if (isNewCommentAlreadyWritten && isCommentWritteOnSamePost) {
     res.status(400);
     throw new Error('You have already written the comment');
   }
 
   comments.push(newComment);
   fs.writeFileSync(COMMENTS_DATA_FILE, JSON.stringify(comments));
+
+  // increase the commentsCount for the relevant post.
+  const posts = JSON.parse(fs.readFileSync(POSTS_DATA_FILE));
+
+  const commentedOnPostId = posts.findIndex(
+    (post) => post.id === req.params.postId
+  );
+
+  const updatedPost = {
+    ...posts[commentedOnPostId],
+    commentsCount: posts[commentedOnPostId].commentsCount
+      ? posts[commentedOnPostId].commentsCount + 1
+      : 1,
+  };
+
+  posts[commentedOnPostId] = updatedPost;
+  fs.writeFileSync(POSTS_DATA_FILE, JSON.stringify(posts));
 
   res.status(201).json({ comment: newComment });
 });
