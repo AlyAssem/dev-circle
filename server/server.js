@@ -244,6 +244,49 @@ app.put('/api/comments/:id', (req, res) => {
   }
 });
 
+app.delete('/api/comments/:id', (req, res) => {
+  const comments = JSON.parse(fs.readFileSync(COMMENTS_DATA_FILE));
+
+  const commentToDelete = comments.find(
+    (comment) => comment.id === req.params.id
+  );
+
+  // to update the json file.
+  const filteredComments = comments.filter(
+    (comment) => comment.id !== req.params.id
+  );
+
+  if (commentToDelete) {
+    fs.writeFileSync(COMMENTS_DATA_FILE, JSON.stringify(filteredComments));
+
+    // decrease the commentsCount for the relevant post.
+    const posts = JSON.parse(fs.readFileSync(POSTS_DATA_FILE));
+
+    const deletedCommentPostId = commentToDelete.postId;
+
+    // the id in the array for the post that was commented on.
+    const modifiedPostId = posts.findIndex(
+      (post) => post.id === commentToDelete.postId
+    );
+
+    const commentedOnPost = posts.find(
+      (post) => post.id === deletedCommentPostId
+    );
+
+    const updatedPost = {
+      ...commentedOnPost,
+      commentsCount: commentedOnPost.commentsCount - 1,
+    };
+    posts[modifiedPostId] = updatedPost;
+    fs.writeFileSync(POSTS_DATA_FILE, JSON.stringify(posts));
+
+    res.json({ message: 'Comment removed', commentId: req.params.id });
+  } else {
+    res.status(404);
+    throw new Error('Comment not found');
+  }
+});
+
 const notFound = (req, res, next) => {
   console.log('NOT FOUND ERROR');
   const error = new Error(`Not Found - ${req.originalUrl}`);
