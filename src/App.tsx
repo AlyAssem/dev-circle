@@ -8,6 +8,7 @@ const App: React.FC = () => (
   <div>
     <Router>
       <Route path='/' component={HomePage} exact />
+      <Route path='/posts/:id' component={HomePage} />
       <Route path='/login' component={LoginPage} />
       <Route path='/register' component={RegisterPage} />
     </Router>

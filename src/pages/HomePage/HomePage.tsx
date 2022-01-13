@@ -1,6 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import React, { useEffect, useState, useRef } from 'react';
-import { History, LocationState } from 'history';
+import { Route } from 'react-router-dom';
+import { History } from 'history';
 import { toast, ToastContainer } from 'react-toastify';
 
 import { Header } from '../../components/Header';
@@ -11,10 +12,16 @@ import Loader from '../../components/Loader';
 import { getPosts } from '../../redux-features/posts';
 
 interface IHomePageProps {
-  history: History<LocationState>;
+  match: {
+    params: {
+      id: string;
+    };
+  };
+  history: History;
 }
 
 export const HomePage: React.FC<IHomePageProps> = ({
+  match,
   history,
 }: IHomePageProps) => {
   const [isCreatePostModalOpen, setIsCreatePostModalOpen] = useState(false);
@@ -64,8 +71,10 @@ export const HomePage: React.FC<IHomePageProps> = ({
   }, [history, userInfo]);
 
   useEffect(() => {
-    fetchPosts.current();
-  }, []);
+    // when logging in there will be no posts. however, when re-routing from post-comments modal no need to
+    // fetch posts again
+    if (!match.params.id && !posts.length) fetchPosts.current();
+  }, [match.params.id, posts]);
 
   return (
     <>
@@ -84,7 +93,12 @@ export const HomePage: React.FC<IHomePageProps> = ({
         <Loader />
       ) : (
         <div className='w-full flex flex-col items-center'>
-          <Posts posts={posts} />
+          <Route
+            // eslint-disable-next-line @typescript-eslint/no-shadow
+            render={({ history }) => (
+              <Posts posts={posts} match={match} history={history} />
+            )}
+          />
         </div>
       )}
       {isCreatePostModalOpen && (
