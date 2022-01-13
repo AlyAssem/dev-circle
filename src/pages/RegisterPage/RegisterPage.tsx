@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useFormik } from 'formik';
 import { ToastContainer, toast } from 'react-toastify';
-import { History, LocationState } from 'history';
+import { History } from 'history';
 import 'react-toastify/dist/ReactToastify.css';
 import { v4 as uuidV4 } from 'uuid';
 import * as Yup from 'yup';
@@ -14,7 +14,7 @@ import EyeIcon from '../../icons/EyeIcon';
 import EyeOffIcon from '../../icons/EyeOffIcon';
 
 interface IRegisterPageProps {
-  history: History<LocationState>;
+  history: History;
 }
 
 interface IRegisterPageState {

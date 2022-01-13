@@ -4,13 +4,13 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { Link } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
-import { History, LocationState } from 'history';
+import { History } from 'history';
 
 import { useAppDispatch, useAppSelector } from '../../redux-features/hooks';
 import { loginUser } from '../../redux-features/users';
 
 interface ILoginPageProps {
-  history: History<LocationState>;
+  history: History;
 }
 interface IFormValues {
   email: string;
