@@ -220,7 +220,11 @@ app.post('/api/posts/:postId/comments', (req, res) => {
 
 app.get('/api/posts/:postId/comments', (req, res) => {
   const data = fs.readFileSync(COMMENTS_DATA_FILE);
-  res.json({ comments: JSON.parse(data) });
+  const postComments = JSON.parse(data).filter(
+    (comment) => comment.postId === req.params.postId
+  );
+
+  res.json({ comments: postComments });
 });
 
 app.put('/api/comments/:id', (req, res) => {
