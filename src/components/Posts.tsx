@@ -1,5 +1,4 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { Route } from 'react-router-dom';
 import { History } from 'history';
 import { CommentsModal } from './CommentsModal';
 import Post from './Post';
@@ -31,6 +30,10 @@ const Posts: React.FC<IPosts> = ({ match, history, posts }) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
   const openPostCommentModal = useRef((postId: string) => {});
 
+  useEffect(() => {
+    if (match.params.id) openPostCommentModal.current(clickedPostId);
+  }, [match.params.id, clickedPostId, openPostCommentModal]);
+
   const openPostEditModal = (postId: string) => {
     setClickedPostId(postId);
     setIsEditPostModalOpen(true);
@@ -46,10 +49,6 @@ const Posts: React.FC<IPosts> = ({ match, history, posts }) => {
       });
     }
   };
-
-  useEffect(() => {
-    if (match.params.id) openPostCommentModal.current(clickedPostId);
-  }, [match.params.id, clickedPostId, openPostCommentModal]);
 
   return (
     <>
@@ -74,8 +73,9 @@ const Posts: React.FC<IPosts> = ({ match, history, posts }) => {
           onClose={() => setIsEditPostModalOpen(false)}
         />
       )}
-      {isCommentOnPostModalOpen && (
+      {isCommentOnPostModalOpen && clickedPostId && (
         <CommentsModal
+          postId={clickedPostId}
           title='Comments'
           onClose={() => {
             setIsCommentOnPostModalOpen(false);
