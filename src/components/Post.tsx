@@ -7,6 +7,7 @@ import FilledLikeIcon from '../icons/FilledLikeIcon';
 import LikeIcon from '../icons/LikeIcon';
 import { useAppDispatch, useAppSelector } from '../redux-features/hooks';
 import { deletePost } from '../redux-features/posts';
+import { User } from '../redux-features/users';
 
 interface IPost {
   id: string;
@@ -14,10 +15,7 @@ interface IPost {
   content: string;
   openPostEditModal: (id: string) => void;
   openPostCommentModal: (id: string) => void;
-  postUserInfo: {
-    id: string;
-    userName: string;
-  };
+  postUserInfo: Partial<User>;
 }
 
 const Post: React.FC<IPost> = ({

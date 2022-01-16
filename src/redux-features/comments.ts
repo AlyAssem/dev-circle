@@ -6,11 +6,12 @@ interface ValidationErrors {
   errorMessage: string;
 }
 
-interface IComment {
+export interface IComment {
   id: string;
   userId: string;
   postId: string;
   text: string;
+  createdAt: string;
 }
 
 interface commentsState {

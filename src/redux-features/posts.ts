@@ -1,23 +1,19 @@
 /* eslint-disable no-param-reassign */
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios, { AxiosError } from 'axios';
+import { User } from './users';
 
-interface User {
-  id: string;
-  userName: string;
-}
-
-interface Post {
+export interface IPost {
   id: string;
   title: string;
   content: string;
-  postUserInfo: User;
+  postUserInfo: Partial<User>;
 }
 
 interface PostsState {
   error: string | null | undefined;
   isLoading: boolean | undefined;
-  posts: Array<Post> | [];
+  posts: Array<IPost> | [];
 }
 const initialState: PostsState = {
   posts: [],
@@ -31,7 +27,7 @@ interface ValidationErrors {
 
 export const getPosts = createAsyncThunk<
   // Return type of the payload creator
-  Array<Post>,
+  Array<IPost>,
   undefined,
   {
     // Optional fields for defining thunkApi field types
@@ -39,7 +35,7 @@ export const getPosts = createAsyncThunk<
   }
 >('posts/getPosts', async (_, { rejectWithValue }) => {
   try {
-    const response = await axios.get<{ posts: Array<Post> }>('/api/posts');
+    const response = await axios.get<{ posts: Array<IPost> }>('/api/posts');
 
     return response.data.posts;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -54,9 +50,9 @@ export const getPosts = createAsyncThunk<
 
 export const createPost = createAsyncThunk<
   // Return type of the payload creator
-  Post,
+  IPost,
   // postData object type
-  Post,
+  IPost,
   {
     // Optional fields for defining thunkApi field types
     rejectValue: ValidationErrors;
@@ -71,7 +67,7 @@ export const createPost = createAsyncThunk<
     };
 
     const response = await axios.post<{
-      post: Post;
+      post: IPost;
     }>(
       '/api/posts',
       {
@@ -96,9 +92,9 @@ export const createPost = createAsyncThunk<
 
 export const editPost = createAsyncThunk<
   // Return type of the payload creator
-  Post,
+  IPost,
   // postData object type
-  Post,
+  IPost,
   {
     // Optional fields for defining thunkApi field types
     rejectValue: ValidationErrors;
@@ -113,7 +109,7 @@ export const editPost = createAsyncThunk<
     };
 
     const response = await axios.put<{
-      post: Post;
+      post: IPost;
     }>(
       `/api/posts/${id}`,
       {

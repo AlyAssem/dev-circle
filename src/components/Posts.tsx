@@ -1,76 +1,53 @@
-import React, { useRef, useEffect, useState } from 'react';
-import { History } from 'history';
+import React, { useState } from 'react';
+import { IPost } from '../redux-features/posts';
 import { CommentsModal } from './CommentsModal';
 import Post from './Post';
 import PostModal from './PostModal';
 
 interface IPosts {
-  match: {
-    params: {
-      id: string;
-    };
-  };
-  history: History;
-  posts: Array<{
-    id: string;
-    title: string;
-    content: string;
-    postUserInfo: {
-      id: string;
-      userName: string;
-    };
-  }>;
+  posts: Array<IPost>;
 }
-const Posts: React.FC<IPosts> = ({ match, history, posts }) => {
+const Posts: React.FC<IPosts> = ({ posts }) => {
   const [isEditPostModalOpen, setIsEditPostModalOpen] = useState(false);
   const [isCommentOnPostModalOpen, setIsCommentOnPostModalOpen] =
     useState(false);
   const [clickedPostId, setClickedPostId] = useState('');
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
-  const openPostCommentModal = useRef((postId: string) => {});
-
-  useEffect(() => {
-    if (match.params.id) openPostCommentModal.current(clickedPostId);
-  }, [match.params.id, clickedPostId, openPostCommentModal]);
 
   const openPostEditModal = (postId: string) => {
     setClickedPostId(postId);
     setIsEditPostModalOpen(true);
   };
 
-  openPostCommentModal.current = (postId: string) => {
+  const openPostCommentModal = (postId: string) => {
     setClickedPostId(postId);
     setIsCommentOnPostModalOpen(true);
-
-    if (!match.params.id) {
-      history.push({
-        pathname: `/posts/${postId}`,
-      });
-    }
   };
 
   return (
     <>
-      {posts.map((item, idx) => (
+      {posts.map((item) => (
         <Post
           id={item.id}
-          key={idx.toString()}
+          key={item.id}
           title={item.title}
           content={item.content}
           postUserInfo={item.postUserInfo}
           openPostEditModal={(id: string) => openPostEditModal(id)}
           openPostCommentModal={(id: string) => {
-            openPostCommentModal.current(id);
+            openPostCommentModal(id);
           }}
         />
       ))}
+
       {isEditPostModalOpen && (
         <PostModal
           postId={clickedPostId}
           title='Edit Post'
           action='Edit'
-          onClose={() => setIsEditPostModalOpen(false)}
+          onClose={() => {
+            setIsEditPostModalOpen(false);
+            setClickedPostId('');
+          }}
         />
       )}
       {isCommentOnPostModalOpen && clickedPostId && (
@@ -79,9 +56,7 @@ const Posts: React.FC<IPosts> = ({ match, history, posts }) => {
           title='Comments'
           onClose={() => {
             setIsCommentOnPostModalOpen(false);
-            history.push({
-              pathname: '/',
-            });
+            setClickedPostId('');
           }}
         />
       )}
