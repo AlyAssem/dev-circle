@@ -70,8 +70,10 @@ export const CommentsModal: React.FC<ICommentsModalProps> = ({
   };
 
   useEffect(() => {
-    fetchPostComments.current();
-  }, []);
+    if (comments.length === 0) {
+      fetchPostComments.current();
+    }
+  }, [comments]);
 
   useEffect(() => {
     if (comments.length > 0) {
@@ -146,23 +148,15 @@ export const CommentsModal: React.FC<ICommentsModalProps> = ({
           {commentsWithUserMapped.map((comment) => (
             <>
               <div id='user-comment' className='flex flex-col'>
-                <span>@{comment?.userInfo?.userName}</span>
+                <span className='text-green-600'>
+                  @{comment?.userInfo?.userName}
+                </span>
+                <div className='m-3'>{comment.text}</div>
                 <span>{comment.createdAt}</span>
-                <span>{comment.text}</span>
               </div>
               <hr className='w-full border-b-2 border-black opacity-10 mb-5' />
             </>
           ))}
-          {/* {DUMMY_USERS_AND_COMMENTS.map((user) => (
-            <>
-              <div id='user-comment' className='flex flex-col'>
-                <span>@{user.name}</span>
-                <span>{new Date().toLocaleString()}</span>
-                <span>{user.comment}</span>
-              </div>
-              <hr className='w-full border-b-2 border-black opacity-10 mb-5' />
-            </>
-          ))} */}
         </div>
       </div>
     </div>
