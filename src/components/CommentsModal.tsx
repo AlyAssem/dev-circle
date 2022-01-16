@@ -1,27 +1,96 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { toast } from 'react-toastify';
 import CloseIcon from '../icons/CloseIcon';
+import { getPostComments, IComment } from '../redux-features/comments';
+import { useAppDispatch, useAppSelector } from '../redux-features/hooks';
+import { User } from '../redux-features/users';
 
 interface ICommentsModalProps {
   // eslint-disable-next-line react/require-default-props
-  commentId?: string;
+  // commentId?: string;
+  postId: string;
   title: string;
   onClose: () => void;
 }
 
+interface ICommentWithUserInfo extends IComment {
+  userInfo: User | undefined;
+}
+
 export const CommentsModal: React.FC<ICommentsModalProps> = ({
-  commentId,
+  // commentId,
+  postId,
   title,
   onClose,
 }) => {
   const [commentText, setCommentText] = useState('');
+  const [commentsWithUserMapped, setCommentswithUserMapped] = useState<
+    Array<ICommentWithUserInfo>
+  >([]);
 
-  const DUMMY_USERS_AND_COMMENTS = [
-    {
-      name: 'aly',
-      comment: 'hey dude this is awesome!',
-    },
-    { name: 'mahmoud', comment: 'hey man this is awful!' },
-  ];
+  const dispatch = useAppDispatch();
+
+  // const userInfo = useAppSelector((state) => state.users.userInfo);
+  const users = useAppSelector((state) => state.users.users);
+  const comments = useAppSelector((state) => state.comments.comments);
+  // const isLoading = useAppSelector((state) => state.posts.isLoading);
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  const fetchPostComments = useRef(() => {});
+
+  fetchPostComments.current = async () => {
+    const resultAction = await dispatch(getPostComments(postId));
+    if (getPostComments.rejected.match(resultAction)) {
+      if (resultAction.payload) {
+        // if the error is sent from server payload
+        toast.error(
+          <div>
+            Error
+            <br />
+            {resultAction.payload.errorMessage}
+          </div>,
+
+          {
+            position: toast.POSITION.BOTTOM_RIGHT,
+          }
+        );
+      } else {
+        toast.error(
+          <div>
+            Error
+            <br />
+            {resultAction.error}
+          </div>,
+          {
+            position: toast.POSITION.BOTTOM_RIGHT,
+          }
+        );
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchPostComments.current();
+  }, []);
+
+  useEffect(() => {
+    if (comments.length > 0) {
+      const commentsMapping = comments.map((comment) => ({
+        ...comment,
+        userInfo: users.find((user) => user.id === comment.userId),
+      }));
+
+      setCommentswithUserMapped(commentsMapping);
+    }
+  }, [comments, users]);
+
+  // const DUMMY_USERS_AND_COMMENTS = [
+  //   {
+  //     name: 'aly',
+  //     comment: 'hey dude this is awesome!',
+  //   },
+  //   { name: 'mahmoud', comment: 'hey man this is awful!' },
+  // ];
   return (
     <div
       onClick={() => onClose()}
@@ -69,12 +138,22 @@ export const CommentsModal: React.FC<ICommentsModalProps> = ({
           </div>
           <button
             type='button'
-            className='w-1/6 block mx-auto mb-1 px-3 py-1 rounded text-white bg-green-600 hover:bg-green-800'
+            className='block mx-auto mb-1 px-3 py-1 rounded text-white bg-green-600 hover:bg-green-800'
           >
             Add
           </button>
           <hr className='w-full border-b-2 border-black opacity-10 mb-5' />
-          {DUMMY_USERS_AND_COMMENTS.map((user) => (
+          {commentsWithUserMapped.map((comment) => (
+            <>
+              <div id='user-comment' className='flex flex-col'>
+                <span>@{comment?.userInfo?.userName}</span>
+                <span>{comment.createdAt}</span>
+                <span>{comment.text}</span>
+              </div>
+              <hr className='w-full border-b-2 border-black opacity-10 mb-5' />
+            </>
+          ))}
+          {/* {DUMMY_USERS_AND_COMMENTS.map((user) => (
             <>
               <div id='user-comment' className='flex flex-col'>
                 <span>@{user.name}</span>
@@ -83,7 +162,7 @@ export const CommentsModal: React.FC<ICommentsModalProps> = ({
               </div>
               <hr className='w-full border-b-2 border-black opacity-10 mb-5' />
             </>
-          ))}
+          ))} */}
         </div>
       </div>
     </div>
