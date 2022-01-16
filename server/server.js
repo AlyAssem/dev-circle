@@ -16,7 +16,7 @@ app.get('/', (req, res) => {
 
 app.get('/api/users', (req, res) => {
   const data = fs.readFileSync(USERS_DATA_FILE);
-  res.json(JSON.parse(data));
+  res.json({ users: JSON.parse(data) });
 });
 
 app.post('/api/users', async (req, res, next) => {

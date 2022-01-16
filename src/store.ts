@@ -7,7 +7,7 @@ const userInfoFromStorage = localStorage.getItem('userInfo')
   : {};
 
 const preloadedState = {
-  users: { userInfo: userInfoFromStorage, error: null },
+  users: { userInfo: userInfoFromStorage, users: [], error: null },
 };
 
 export const store = configureStore({ reducer, preloadedState });
