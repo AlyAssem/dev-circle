@@ -1,3 +1,6 @@
+/* eslint-disable indent */
+/* eslint-disable react/jsx-indent */
+/* eslint-disable react/self-closing-comp */
 import React, { useState, useRef, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import CloseIcon from '../icons/CloseIcon';
@@ -33,7 +36,7 @@ export const CommentsModal: React.FC<ICommentsModalProps> = ({
   // const userInfo = useAppSelector((state) => state.users.userInfo);
   const users = useAppSelector((state) => state.users.users);
   const comments = useAppSelector((state) => state.comments.comments);
-  // const isLoading = useAppSelector((state) => state.posts.isLoading);
+  const isLoading = useAppSelector((state) => state.comments.isLoading);
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   const fetchPostComments = useRef(() => {});
@@ -86,13 +89,6 @@ export const CommentsModal: React.FC<ICommentsModalProps> = ({
     }
   }, [comments, users]);
 
-  // const DUMMY_USERS_AND_COMMENTS = [
-  //   {
-  //     name: 'aly',
-  //     comment: 'hey dude this is awesome!',
-  //   },
-  //   { name: 'mahmoud', comment: 'hey man this is awful!' },
-  // ];
   return (
     <div
       onClick={() => onClose()}
@@ -145,18 +141,25 @@ export const CommentsModal: React.FC<ICommentsModalProps> = ({
             Add
           </button>
           <hr className='w-full border-b-2 border-black opacity-10 mb-5' />
-          {commentsWithUserMapped.map((comment) => (
-            <>
-              <div id='user-comment' className='flex flex-col'>
-                <span className='text-green-600'>
-                  @{comment?.userInfo?.userName}
-                </span>
-                <div className='m-3'>{comment.text}</div>
-                <span>{comment.createdAt}</span>
-              </div>
-              <hr className='w-full border-b-2 border-black opacity-10 mb-5' />
-            </>
-          ))}
+          {isLoading
+            ? ['skeleton1', 'skeleton2'].map((skeletonName) => (
+                <div key={skeletonName}>
+                  <div className='h-8 w-1/4 rounded bg-gray-200 animate-pulse' />
+                  <div className='m-3 h-8 w-full rounded bg-gray-200 animate-pulse' />
+                  <div className='h-8 w-3/4 xs:w-2/4 rounded bg-gray-200 animate-pulse' />
+                  <hr className='w-full border-b-2 border-black opacity-10 mb-5' />
+                </div>
+              ))
+            : commentsWithUserMapped.map((comment) => (
+                <div id='user-comment' className='flex flex-col'>
+                  <span className='text-green-600'>
+                    @{comment?.userInfo?.userName}
+                  </span>
+                  <div className='m-3'>{comment.text}</div>
+                  <span>{comment.createdAt}</span>
+                  <hr className='w-full border-b-2 border-black opacity-10 mb-5' />
+                </div>
+              ))}
         </div>
       </div>
     </div>

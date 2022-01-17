@@ -82,7 +82,7 @@ app.get('/api/posts', (req, res) => {
   // using setTimeout so that the loader appears before loading data, like mocking a database.
   setTimeout(() => {
     res.json({ posts: JSON.parse(data) });
-  }, 3000);
+  }, 2000);
 });
 
 app.post('/api/posts', (req, res) => {
@@ -224,7 +224,10 @@ app.get('/api/posts/:postId/comments', (req, res) => {
     (comment) => comment.postId === req.params.postId
   );
 
-  res.json({ comments: postComments });
+  // using setTimeout so that the loader appears before loading data, like mocking a database.
+  setTimeout(() => {
+    res.json({ comments: postComments });
+  }, 2000);
 });
 
 app.put('/api/comments/:id', (req, res) => {
