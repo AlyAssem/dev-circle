@@ -106,7 +106,7 @@ export const CommentsModal: React.FC<ICommentsModalProps> = ({
       tabIndex={0}
     >
       <div
-        className='bg-white p-3 w-2/6 cursor-default'
+        className='w-3/4 xs:w-2/4 bg-white p-3 cursor-default'
         role='button'
         onKeyDown={() => {
           // console.log(e);
