@@ -10,6 +10,7 @@
 
 ## Future-work:
 - Implementing websockets for real time notification for posts likes and comments between users.
+- Implementing LRU cache algorithm with searching for posts of an individual user
 - likes and comments on posts between users.
 - multi-theme support.
 - multi-language support.
