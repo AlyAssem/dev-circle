@@ -219,14 +219,27 @@ app.post('/api/posts/:postId/comments', (req, res) => {
 });
 
 app.get('/api/posts/:postId/comments', (req, res) => {
-  const data = fs.readFileSync(COMMENTS_DATA_FILE);
-  const postComments = JSON.parse(data).filter(
+  const comments = fs.readFileSync(COMMENTS_DATA_FILE);
+  const users = JSON.parse(fs.readFileSync(USERS_DATA_FILE));
+
+  const postComments = JSON.parse(comments).filter(
     (comment) => comment.postId === req.params.postId
   );
 
+  // populate userInfo for the comments
+  const userPopulatedComments = postComments.map((comment) => {
+    const commentUser = users.find((user) => user.id === comment.userId);
+    return {
+      ...comment,
+      userInfo: {
+        ...commentUser,
+      },
+    };
+  });
+
   // using setTimeout so that the loader appears before loading data, like mocking a database.
   setTimeout(() => {
-    res.json({ comments: postComments });
+    res.json({ comments: userPopulatedComments });
   }, 2000);
 });
 
