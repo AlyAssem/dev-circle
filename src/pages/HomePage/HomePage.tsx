@@ -9,7 +9,6 @@ import Posts from '../../components/Posts';
 import PostModal from '../../components/PostModal/PostModal';
 import Loader from '../../components/Loader';
 import { getPosts } from '../../redux-features/posts';
-import { getUsers } from '../../redux-features/users';
 
 interface IHomePageProps {
   history: History;
@@ -22,8 +21,6 @@ export const HomePage: React.FC<IHomePageProps> = ({
   const dispatch = useAppDispatch();
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   const fetchPosts = useRef(() => {});
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  const fetchUsers = useRef(() => {});
 
   const userInfo = useAppSelector((state) => state.users.userInfo);
   const posts = useAppSelector((state) => state.posts.posts);
@@ -60,37 +57,6 @@ export const HomePage: React.FC<IHomePageProps> = ({
     }
   };
 
-  fetchUsers.current = async () => {
-    const resultAction = await dispatch(getUsers());
-    if (getUsers.rejected.match(resultAction)) {
-      if (resultAction.payload) {
-        // if the error is sent from server payload
-        toast.error(
-          <div>
-            Error
-            <br />
-            {resultAction.payload.errorMessage}
-          </div>,
-
-          {
-            position: toast.POSITION.BOTTOM_RIGHT,
-          }
-        );
-      } else {
-        toast.error(
-          <div>
-            Error
-            <br />
-            {resultAction.error}
-          </div>,
-          {
-            position: toast.POSITION.BOTTOM_RIGHT,
-          }
-        );
-      }
-    }
-  };
-
   useEffect(() => {
     if (userInfo && Object.keys(userInfo).length === 0) {
       history.push('/register');
@@ -99,7 +65,6 @@ export const HomePage: React.FC<IHomePageProps> = ({
 
   useEffect(() => {
     fetchPosts.current();
-    fetchUsers.current();
   }, []);
 
   return (

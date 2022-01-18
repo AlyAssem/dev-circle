@@ -27,29 +27,6 @@ interface UsersState {
   users: Array<User>;
 }
 
-export const getUsers = createAsyncThunk<
-  // Return type of the payload creator
-  Array<User>,
-  undefined,
-  {
-    // Optional fields for defining thunkApi field types
-    rejectValue: ValidationErrors;
-  }
->('users/getUsers', async (_, { rejectWithValue }) => {
-  try {
-    const response = await axios.get<{ users: Array<User> }>('/api/users');
-    return response.data.users;
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (err: any) {
-    const error: AxiosError<ValidationErrors> = err;
-    if (!error.response) {
-      throw err;
-    }
-    return rejectWithValue(error.response.data);
-  }
-});
-
 export const registerUser = createAsyncThunk<
   // Return type of the payload creator
   { id: string; userName: string; email: string },
@@ -142,9 +119,6 @@ const usersSlice = createSlice({
   extraReducers: (builder) => {
     // The `builder` callback form is used here
     // because it provides correctly typed reducers from the action creators
-    builder.addCase(getUsers.fulfilled, (state, { payload }) => {
-      state.users = payload;
-    });
     builder.addCase(registerUser.fulfilled, (state, { payload }) => {
       state.userInfo = payload;
     });

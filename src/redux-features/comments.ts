@@ -1,6 +1,7 @@
 /* eslint-disable no-param-reassign */
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios, { AxiosError } from 'axios';
+import { User } from './users';
 
 interface ValidationErrors {
   errorMessage: string;
@@ -12,6 +13,7 @@ export interface IComment {
   postId: string;
   text: string;
   createdAt: string;
+  userInfo: User;
 }
 
 interface commentsState {

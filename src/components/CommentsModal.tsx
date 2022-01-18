@@ -4,9 +4,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import CloseIcon from '../icons/CloseIcon';
-import { getPostComments, IComment } from '../redux-features/comments';
+import { getPostComments } from '../redux-features/comments';
 import { useAppDispatch, useAppSelector } from '../redux-features/hooks';
-import { User } from '../redux-features/users';
 
 interface ICommentsModalProps {
   // eslint-disable-next-line react/require-default-props
@@ -16,10 +15,6 @@ interface ICommentsModalProps {
   onClose: () => void;
 }
 
-interface ICommentWithUserInfo extends IComment {
-  userInfo: User | undefined;
-}
-
 export const CommentsModal: React.FC<ICommentsModalProps> = ({
   // commentId,
   postId,
@@ -27,14 +22,9 @@ export const CommentsModal: React.FC<ICommentsModalProps> = ({
   onClose,
 }) => {
   const [commentText, setCommentText] = useState('');
-  const [commentsWithUserMapped, setCommentswithUserMapped] = useState<
-    Array<ICommentWithUserInfo>
-  >([]);
 
   const dispatch = useAppDispatch();
 
-  // const userInfo = useAppSelector((state) => state.users.userInfo);
-  const users = useAppSelector((state) => state.users.users);
   const comments = useAppSelector((state) => state.comments.comments);
   const isLoading = useAppSelector((state) => state.comments.isLoading);
 
@@ -77,17 +67,6 @@ export const CommentsModal: React.FC<ICommentsModalProps> = ({
       fetchPostComments.current();
     }
   }, [comments]);
-
-  useEffect(() => {
-    if (comments.length > 0) {
-      const commentsMapping = comments.map((comment) => ({
-        ...comment,
-        userInfo: users.find((user) => user.id === comment.userId),
-      }));
-
-      setCommentswithUserMapped(commentsMapping);
-    }
-  }, [comments, users]);
 
   return (
     <div
@@ -150,7 +129,7 @@ export const CommentsModal: React.FC<ICommentsModalProps> = ({
                   <hr className='w-full border-b-2 border-black opacity-10 mb-5' />
                 </div>
               ))
-            : commentsWithUserMapped.map((comment) => (
+            : comments.map((comment) => (
                 <div id='user-comment' className='flex flex-col'>
                   <span className='text-green-600'>
                     @{comment?.userInfo?.userName}
