@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { IPost } from '../redux-features/posts';
 import { CommentsModal } from './CommentsModal';
 import Post from './Post';
-import PostModal from './PostModal';
+import PostModal from './PostModal/PostModal';
 
 interface IPosts {
   posts: Array<IPost>;

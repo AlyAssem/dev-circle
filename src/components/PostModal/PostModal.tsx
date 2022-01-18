@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import { v4 as uuidV4 } from 'uuid';
 
-import { useAppDispatch, useAppSelector } from '../redux-features/hooks';
-import { createPost, editPost } from '../redux-features/posts';
+import { useAppDispatch, useAppSelector } from '../../redux-features/hooks';
+import { createPost, editPost } from '../../redux-features/posts';
 
 interface IPostModalProps {
   // eslint-disable-next-line react/require-default-props
@@ -120,7 +120,7 @@ const PostModal: React.FC<IPostModalProps> = ({
     e: React.ChangeEvent<HTMLInputElement>,
     stateName: string
   ) => {
-    const newInputValue = e.currentTarget.value;
+    const newInputValue = e.target.value;
     setState((currState) => ({ ...currState, [stateName]: newInputValue }));
   };
 
@@ -185,6 +185,7 @@ const PostModal: React.FC<IPostModalProps> = ({
             Cancel
           </button>
           <button
+            id='modal-action'
             type='button'
             className='px-3 py-1 rounded text-white bg-green-600 hover:bg-green-800 disabled:opacity-50 \
              disabled:cursor-not-allowed'
