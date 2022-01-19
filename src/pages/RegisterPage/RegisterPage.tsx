@@ -149,7 +149,7 @@ export const RegisterPage: React.FC<IRegisterPageProps> = ({
             <input
               id='userName'
               type='text'
-              className='auth-card__input'
+              className='card__input'
               value={formik.values.userName}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
@@ -168,7 +168,7 @@ export const RegisterPage: React.FC<IRegisterPageProps> = ({
             <input
               id='email'
               type='email'
-              className='auth-card__input'
+              className='card__input'
               value={formik.values.email}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
@@ -190,7 +190,7 @@ export const RegisterPage: React.FC<IRegisterPageProps> = ({
             <input
               id='password'
               type={state.shouldShowPassword ? 'text' : 'password'}
-              className='auth-card__input'
+              className='card__input'
               value={formik.values.password}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
@@ -220,7 +220,7 @@ export const RegisterPage: React.FC<IRegisterPageProps> = ({
             <input
               id='confirmPassword'
               type={state.shouldShowConfirmPassword ? 'text' : 'password'}
-              className='auth-card__input'
+              className='card__input'
               value={formik.values.confirmPassword}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}

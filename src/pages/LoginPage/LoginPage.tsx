@@ -104,7 +104,7 @@ export const LoginPage: React.FC<ILoginPageProps> = ({
             <input
               id='email'
               type='email'
-              className='auth-card__input'
+              className='card__input'
               value={formik.values.email}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
@@ -124,7 +124,7 @@ export const LoginPage: React.FC<ILoginPageProps> = ({
             <input
               id='password'
               type='password'
-              className='auth-card__input'
+              className='card__input'
               value={formik.values.password}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}

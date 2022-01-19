@@ -1,12 +1,59 @@
-import React from 'react';
-import { IComment } from '../../redux-features/comments';
+import React, { useEffect, useRef } from 'react';
+import { toast, ToastContainer } from 'react-toastify';
+
+import { getPostComments } from '../../redux-features/comments';
+import { useAppDispatch, useAppSelector } from '../../redux-features/hooks';
 
 interface ICommentsProps {
-  comments: Array<IComment> | [];
-  isLoading: boolean | undefined;
+  postId: string;
 }
 
-export const Comments: React.FC<ICommentsProps> = ({ comments, isLoading }) => {
+export const Comments: React.FC<ICommentsProps> = ({ postId }) => {
+  const dispatch = useAppDispatch();
+
+  const comments = useAppSelector((state) => state.comments.comments);
+  const isLoading = useAppSelector((state) => state.comments.isLoading);
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  const fetchPostComments = useRef(() => {});
+
+  fetchPostComments.current = async () => {
+    const resultAction = await dispatch(getPostComments(postId));
+    if (getPostComments.rejected.match(resultAction)) {
+      if (resultAction.payload) {
+        // if the error is sent from server payload
+        toast.error(
+          <div>
+            Error
+            <br />
+            {resultAction.payload.errorMessage}
+          </div>,
+
+          {
+            position: toast.POSITION.BOTTOM_RIGHT,
+          }
+        );
+      } else {
+        toast.error(
+          <div>
+            Error
+            <br />
+            {resultAction.error}
+          </div>,
+          {
+            position: toast.POSITION.BOTTOM_RIGHT,
+          }
+        );
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (comments.length === 0) {
+      fetchPostComments.current();
+    }
+  }, [comments]);
+
   const skeletonComments = ['skeleton1', 'skeleton2'].map((skeletonName) => (
     <div key={skeletonName}>
       <div className='h-8 w-1/4 rounded bg-gray-200 animate-pulse' />
@@ -25,5 +72,10 @@ export const Comments: React.FC<ICommentsProps> = ({ comments, isLoading }) => {
     </div>
   ));
 
-  return <>{isLoading ? skeletonComments : actualComments}</>;
+  return (
+    <>
+      {isLoading ? skeletonComments : actualComments}
+      <ToastContainer />
+    </>
+  );
 };
