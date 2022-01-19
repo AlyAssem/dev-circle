@@ -159,7 +159,7 @@ const PostModal: React.FC<IPostModalProps> = ({
             <input
               id='post-title'
               type='text'
-              className='auth-card__input'
+              className='card__input'
               value={state.postTitle}
               onChange={(e) => handleInputChange(e, 'postTitle')}
             />
@@ -174,7 +174,7 @@ const PostModal: React.FC<IPostModalProps> = ({
             <input
               id='post-content'
               type='text'
-              className='auth-card__input'
+              className='card__input'
               value={state.postContent}
               onChange={(e) => handleInputChange(e, 'postContent')}
             />

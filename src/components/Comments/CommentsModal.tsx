@@ -1,11 +1,11 @@
-/* eslint-disable indent */
-/* eslint-disable react/jsx-indent */
 /* eslint-disable react/self-closing-comp */
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import CloseIcon from '../icons/CloseIcon';
-import { getPostComments } from '../redux-features/comments';
-import { useAppDispatch, useAppSelector } from '../redux-features/hooks';
+import CloseIcon from '../../icons/CloseIcon';
+import { getPostComments } from '../../redux-features/comments';
+import { useAppDispatch, useAppSelector } from '../../redux-features/hooks';
+import { CommentForm } from './CommentForm';
+import { Comments } from './Comments';
 
 interface ICommentsModalProps {
   // eslint-disable-next-line react/require-default-props
@@ -21,8 +21,6 @@ export const CommentsModal: React.FC<ICommentsModalProps> = ({
   title,
   onClose,
 }) => {
-  const [commentText, setCommentText] = useState('');
-
   const dispatch = useAppDispatch();
 
   const comments = useAppSelector((state) => state.comments.comments);
@@ -98,47 +96,9 @@ export const CommentsModal: React.FC<ICommentsModalProps> = ({
           </button>
         </div>
         <div id='modal-body' className='p-4 my-2'>
-          <div className='mb-3 pt-3 rounded bg-gray-200'>
-            <label
-              className='block text-gray-700 text-sm font-bold mb-2 ml-3'
-              htmlFor='post-title'
-            >
-              New comment
-            </label>
-            <input
-              id='post-title'
-              type='text'
-              className='auth-card__input'
-              value={commentText}
-              onChange={(e) => setCommentText(e.target.value)}
-            />
-          </div>
-          <button
-            type='button'
-            className='block mx-auto mb-1 px-3 py-1 rounded text-white bg-green-600 hover:bg-green-800'
-          >
-            Add
-          </button>
+          <CommentForm />
           <hr className='w-full border-b-2 border-black opacity-10 mb-5' />
-          {isLoading
-            ? ['skeleton1', 'skeleton2'].map((skeletonName) => (
-                <div key={skeletonName}>
-                  <div className='h-8 w-1/4 rounded bg-gray-200 animate-pulse' />
-                  <div className='m-3 h-8 w-full rounded bg-gray-200 animate-pulse' />
-                  <div className='h-8 w-3/4 xs:w-2/4 rounded bg-gray-200 animate-pulse' />
-                  <hr className='w-full border-b-2 border-black opacity-10 mb-5' />
-                </div>
-              ))
-            : comments.map((comment) => (
-                <div id='user-comment' className='flex flex-col'>
-                  <span className='text-green-600'>
-                    @{comment?.userInfo?.userName}
-                  </span>
-                  <div className='m-3'>{comment.text}</div>
-                  <span>{comment.createdAt}</span>
-                  <hr className='w-full border-b-2 border-black opacity-10 mb-5' />
-                </div>
-              ))}
+          <Comments comments={comments} isLoading={isLoading} />
         </div>
       </div>
     </div>
