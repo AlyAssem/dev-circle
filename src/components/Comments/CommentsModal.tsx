@@ -1,6 +1,5 @@
 /* eslint-disable react/self-closing-comp */
 import React from 'react';
-import { RenderCounter } from '../../common/RenderCounter';
 import CloseIcon from '../../icons/CloseIcon';
 import { CommentForm } from './CommentForm';
 import { Comments } from './Comments';
@@ -51,7 +50,6 @@ export const CommentsModal: React.FC<ICommentsModalProps> = ({
         <CommentForm />
         <hr className='w-full border-b-2 border-black opacity-10 mb-5' />
         <Comments postId={postId} />
-        <RenderCounter />
       </div>
     </div>
   </div>

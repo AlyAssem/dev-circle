@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
-import CommentIcon from '../icons/CommentIcon';
-import DeleteIcon from '../icons/DeleteIcon';
-import EditIcon from '../icons/EditIcon';
-import FilledLikeIcon from '../icons/FilledLikeIcon';
-import LikeIcon from '../icons/LikeIcon';
-import { useAppDispatch, useAppSelector } from '../redux-features/hooks';
-import { deletePost } from '../redux-features/posts';
-import { User } from '../redux-features/users';
+import CommentIcon from '../../icons/CommentIcon';
+import DeleteIcon from '../../icons/DeleteIcon';
+import EditIcon from '../../icons/EditIcon';
+import FilledLikeIcon from '../../icons/FilledLikeIcon';
+import LikeIcon from '../../icons/LikeIcon';
+import { useAppDispatch, useAppSelector } from '../../redux-features/hooks';
+import { deletePost } from '../../redux-features/posts';
+import { User } from '../../redux-features/users';
 
 interface IPost {
   id: string;

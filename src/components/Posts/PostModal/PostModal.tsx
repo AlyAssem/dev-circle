@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import { v4 as uuidV4 } from 'uuid';
-import { RenderCounter } from '../../common/RenderCounter';
 
-import { useAppDispatch, useAppSelector } from '../../redux-features/hooks';
-import { createPost, editPost } from '../../redux-features/posts';
+import { useAppDispatch, useAppSelector } from '../../../redux-features/hooks';
+import { createPost, editPost } from '../../../redux-features/posts';
 
 interface IPostModalProps {
   // eslint-disable-next-line react/require-default-props
@@ -195,7 +194,6 @@ const PostModal: React.FC<IPostModalProps> = ({
           >
             {action}
           </button>
-          <RenderCounter />
         </div>
       </div>
       <ToastContainer />

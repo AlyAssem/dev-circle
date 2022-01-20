@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { IPost } from '../redux-features/posts';
-import { CommentsModal } from './Comments/CommentsModal';
+import { IPost } from '../../redux-features/posts';
+import { CommentsModal } from '../Comments/CommentsModal';
 import Post from './Post';
 import PostModal from './PostModal/PostModal';
 

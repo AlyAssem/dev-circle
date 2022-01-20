@@ -1,5 +1,5 @@
 import React from 'react';
-import { ResizeableTextArea } from '../../common/ResizeableTextArea';
+import { ResizeableTextArea } from '../common/ResizeableTextArea';
 
 export const CommentForm: React.FC = () => (
   <>

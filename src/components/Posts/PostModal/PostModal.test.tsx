@@ -5,7 +5,7 @@ import { mount, ReactWrapper } from 'enzyme';
 import { Provider } from 'react-redux';
 
 import PostModal from './PostModal';
-import { store } from '../../store';
+import { store } from '../../../store';
 
 describe('PostModal', () => {
   let wrapper: ReactWrapper<React.FC>;

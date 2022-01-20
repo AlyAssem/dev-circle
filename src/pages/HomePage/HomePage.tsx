@@ -5,8 +5,8 @@ import { toast, ToastContainer } from 'react-toastify';
 
 import { Header } from '../../components/Header/Header';
 import { useAppSelector, useAppDispatch } from '../../redux-features/hooks';
-import Posts from '../../components/Posts';
-import PostModal from '../../components/PostModal/PostModal';
+import Posts from '../../components/Posts/Posts';
+import PostModal from '../../components/Posts/PostModal/PostModal';
 import Loader from '../../components/Loader';
 import { getPosts } from '../../redux-features/posts';
 
