@@ -1,7 +1,16 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 
-export const ResizeableTextArea: React.FC = () => {
-  const [value, setValue] = useState('');
+interface IResizableProps {
+  id: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+}
+
+export const ResizeableTextArea: React.FC<IResizableProps> = ({
+  id,
+  value,
+  onChange,
+}) => {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   useEffect(() => {
@@ -30,12 +39,14 @@ export const ResizeableTextArea: React.FC = () => {
   }, [value, textareaRef.current?.scrollHeight]);
 
   return (
-    <textarea
-      id='post-title'
-      ref={textareaRef}
-      className='card__input overflow-hidden resize-none max-h-64'
-      value={value}
-      onChange={(e) => setValue(e.target.value)}
-    />
+    <>
+      <textarea
+        id={id}
+        className='card__input overflow-hidden resize-none max-h-64'
+        ref={textareaRef}
+        value={value}
+        onChange={onChange}
+      />
+    </>
   );
 };
