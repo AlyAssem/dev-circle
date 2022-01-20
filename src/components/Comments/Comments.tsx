@@ -49,10 +49,8 @@ export const Comments: React.FC<ICommentsProps> = ({ postId }) => {
   };
 
   useEffect(() => {
-    if (comments.length === 0) {
-      fetchPostComments.current();
-    }
-  }, [comments]);
+    fetchPostComments.current();
+  }, []);
 
   const skeletonComments = ['skeleton1', 'skeleton2'].map((skeletonName) => (
     <div key={skeletonName}>
