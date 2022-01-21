@@ -9,7 +9,8 @@ export interface IPost {
   title: string;
   content: string;
   postUserInfo: Partial<User>;
-  commentsCount?: number;
+  commentsCount: number;
+  likesCount: number;
 }
 
 interface PostsState {
@@ -28,6 +29,54 @@ const initialState: PostsState = {
 interface ValidationErrors {
   errorMessage: string;
 }
+
+export const likePost = createAsyncThunk<
+  IPost,
+  // action function parameter object type
+  { postId: string },
+  {
+    // Optional fields for defining thunkApi field types
+    rejectValue: ValidationErrors;
+  }
+>('posts/likePost', async ({ postId }, { rejectWithValue }) => {
+  try {
+    const response = await axios.get<{ post: IPost }>(
+      `/api/posts/${postId}/like`
+    );
+
+    return response.data.post;
+  } catch (err: any) {
+    const error: AxiosError<ValidationErrors> = err;
+    if (!error.response) {
+      throw err;
+    }
+    return rejectWithValue(error.response.data);
+  }
+});
+
+export const unlikePost = createAsyncThunk<
+  IPost,
+  // action function parameter object type
+  { postId: string },
+  {
+    // Optional fields for defining thunkApi field types
+    rejectValue: ValidationErrors;
+  }
+>('posts/unlikePost', async ({ postId }, { rejectWithValue }) => {
+  try {
+    const response = await axios.get<{ post: IPost }>(
+      `/api/posts/${postId}/unlike`
+    );
+
+    return response.data.post;
+  } catch (err: any) {
+    const error: AxiosError<ValidationErrors> = err;
+    if (!error.response) {
+      throw err;
+    }
+    return rejectWithValue(error.response.data);
+  }
+});
 
 export const getPosts = createAsyncThunk<
   // Return type of the payload creator
@@ -78,7 +127,7 @@ export const createPost = createAsyncThunk<
   // Return type of the payload creator
   IPost,
   // postData object type
-  IPost,
+  Partial<IPost>, // it won't have the likeCounts and commentCounts
   {
     // Optional fields for defining thunkApi field types
     rejectValue: ValidationErrors;
@@ -101,6 +150,8 @@ export const createPost = createAsyncThunk<
         title,
         content,
         postUserInfo,
+        likesCount: 0,
+        commentsCount: 0,
       },
       config
     );
@@ -120,7 +171,7 @@ export const editPost = createAsyncThunk<
   // Return type of the payload creator
   IPost,
   // postData object type
-  IPost,
+  Partial<IPost>, // it won't have the likeCounts and commentCounts
   {
     // Optional fields for defining thunkApi field types
     rejectValue: ValidationErrors;
@@ -193,6 +244,26 @@ const postsSlice = createSlice({
   extraReducers: (builder) => {
     // The `builder` callback form is used here
     // because it provides correctly typed reducers from the action creators
+    builder.addCase(likePost.fulfilled, (state, { payload }) => {
+      const { id } = payload;
+      state.posts = state.posts.map((post) => {
+        if (post.id === id) {
+          return { ...payload, likesCount: post.likesCount + 1 };
+        }
+        return post;
+      });
+    });
+
+    builder.addCase(unlikePost.fulfilled, (state, { payload }) => {
+      const { id } = payload;
+      state.posts = state.posts.map((post) => {
+        if (post.id === id) {
+          return { ...payload, likesCount: post.likesCount - 1 };
+        }
+        return post;
+      });
+    });
+
     builder.addCase(getPosts.fulfilled, (state, { payload }) => {
       state.posts = payload;
       state.isLoading = false;
