@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ResizeableTextArea } from '../common/ResizeableTextArea';
+import { ResizableTextArea } from '../common/ResizableTextArea';
 
 interface ICommentFormProps {
   onCommentAdd: (comment: string) => void;
@@ -16,7 +16,7 @@ export const CommentForm: React.FC<ICommentFormProps> = ({ onCommentAdd }) => {
         >
           New comment
         </label>
-        <ResizeableTextArea
+        <ResizableTextArea
           id='comment-text'
           value={comment}
           onChange={(e) => setComment(e.target.value)}

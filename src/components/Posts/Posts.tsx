@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { IPost } from '../../redux-features/posts';
+import { useAppDispatch } from '../../redux-features/hooks';
+import { IPost, removePostInfo } from '../../redux-features/posts';
 import { CommentsModal } from '../Comments/CommentsModal';
 import Post from './Post';
 import PostModal from './PostModal/PostModal';
@@ -12,6 +13,7 @@ const Posts: React.FC<IPosts> = ({ posts }) => {
   const [isCommentOnPostModalOpen, setIsCommentOnPostModalOpen] =
     useState(false);
   const [clickedPostId, setClickedPostId] = useState('');
+  const dispatch = useAppDispatch();
 
   const openPostEditModal = (postId: string) => {
     setClickedPostId(postId);
@@ -47,6 +49,7 @@ const Posts: React.FC<IPosts> = ({ posts }) => {
           onClose={() => {
             setIsEditPostModalOpen(false);
             setClickedPostId('');
+            dispatch(removePostInfo());
           }}
         />
       )}

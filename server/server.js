@@ -145,7 +145,7 @@ app.get('/api/posts/:id', (req, res) => {
   const foundPost = posts.find((post) => post.id === req.params.id);
 
   if (foundPost) {
-    res.json(foundPost);
+    res.json({ post: foundPost });
   } else {
     res.status(404).json({ errorMessage: 'Post not found!' });
   }

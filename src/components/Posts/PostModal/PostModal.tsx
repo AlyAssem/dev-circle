@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import { v4 as uuidV4 } from 'uuid';
 
 import { useAppDispatch, useAppSelector } from '../../../redux-features/hooks';
-import { createPost, editPost } from '../../../redux-features/posts';
-import { ResizeableTextArea } from '../../common/ResizeableTextArea';
+import { createPost, editPost, getPost } from '../../../redux-features/posts';
+import { ResizableTextArea } from '../../common/ResizableTextArea';
 
 interface IPostModalProps {
   // eslint-disable-next-line react/require-default-props
@@ -20,11 +20,54 @@ const PostModal: React.FC<IPostModalProps> = ({
   action,
   onClose,
 }) => {
+  const dispatch = useAppDispatch();
+  const userInfo = useAppSelector((reduxState) => reduxState.users.userInfo);
   const [postTitle, setPostTitle] = useState('');
   const [postContent, setPostContent] = useState('');
 
-  const dispatch = useAppDispatch();
-  const userInfo = useAppSelector((reduxState) => reduxState.users.userInfo);
+  // eslint-disable-next-line @typescript-eslint/no-empty-function , @typescript-eslint/no-unused-vars
+  const fetchPost = useRef((_curentPostId: string) => {});
+
+  fetchPost.current = async (curentPostId: string) => {
+    const resultAction = await dispatch(getPost({ postId: curentPostId }));
+    if (getPost.fulfilled.match(resultAction)) {
+      setPostTitle(resultAction.payload.title);
+      setPostContent(resultAction.payload.content);
+    }
+    if (getPost.rejected.match(resultAction)) {
+      if (resultAction.payload) {
+        // if the error is sent from server payload
+        toast.error(
+          <div>
+            Error
+            <br />
+            {resultAction.payload.errorMessage}
+          </div>,
+
+          {
+            position: toast.POSITION.BOTTOM_RIGHT,
+          }
+        );
+      } else {
+        toast.error(
+          <div>
+            Error
+            <br />
+            {resultAction.error}
+          </div>,
+          {
+            position: toast.POSITION.BOTTOM_RIGHT,
+          }
+        );
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (action === 'Edit') {
+      fetchPost.current(postId || '');
+    }
+  }, [action, postId]);
 
   const handlePostCreate = async () => {
     if (userInfo) {
@@ -170,7 +213,7 @@ const PostModal: React.FC<IPostModalProps> = ({
             >
               Content
             </label>
-            <ResizeableTextArea
+            <ResizableTextArea
               id='post-content'
               value={postContent}
               onChange={(e) => setPostContent(e.target.value)}

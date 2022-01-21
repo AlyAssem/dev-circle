@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-param-reassign */
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios, { AxiosError } from 'axios';
@@ -8,15 +9,18 @@ export interface IPost {
   title: string;
   content: string;
   postUserInfo: Partial<User>;
+  commentsCount?: number;
 }
 
 interface PostsState {
   error: string | null | undefined;
   isLoading: boolean | undefined;
   posts: Array<IPost> | [];
+  postInfo: Partial<IPost>;
 }
 const initialState: PostsState = {
   posts: [],
+  postInfo: {},
   error: null,
   isLoading: false,
 };
@@ -38,7 +42,29 @@ export const getPosts = createAsyncThunk<
     const response = await axios.get<{ posts: Array<IPost> }>('/api/posts');
 
     return response.data.posts;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (err: any) {
+    const error: AxiosError<ValidationErrors> = err;
+    if (!error.response) {
+      throw err;
+    }
+    return rejectWithValue(error.response.data);
+  }
+});
+
+export const getPost = createAsyncThunk<
+  // Return type of the payload creator
+  IPost,
+  // action function parameter object type
+  { postId: string | undefined },
+  {
+    // Optional fields for defining thunkApi field types
+    rejectValue: ValidationErrors;
+  }
+>('posts/getPost', async ({ postId }, { rejectWithValue }) => {
+  try {
+    const response = await axios.get<{ post: IPost }>(`/api/posts/${postId}`);
+
+    return response.data.post;
   } catch (err: any) {
     const error: AxiosError<ValidationErrors> = err;
     if (!error.response) {
@@ -159,7 +185,11 @@ export const deletePost = createAsyncThunk<
 const postsSlice = createSlice({
   name: 'posts',
   initialState,
-  reducers: {},
+  reducers: {
+    removePostInfo: (state) => {
+      state.postInfo = {};
+    },
+  },
   extraReducers: (builder) => {
     // The `builder` callback form is used here
     // because it provides correctly typed reducers from the action creators
@@ -174,6 +204,19 @@ const postsSlice = createSlice({
 
     builder.addCase(getPosts.rejected, (state, action) => {
       state.isLoading = false;
+      if (action.payload) {
+        // Being that we passed in ValidationErrors to rejectType
+        // in `createAsyncThunk`, the payload will be available here.
+        state.error = action.payload.errorMessage;
+      } else {
+        state.error = action.error.message;
+      }
+    });
+
+    builder.addCase(getPost.fulfilled, (state, { payload }) => {
+      state.postInfo = payload;
+    });
+    builder.addCase(getPost.rejected, (state, action) => {
       if (action.payload) {
         // Being that we passed in ValidationErrors to rejectType
         // in `createAsyncThunk`, the payload will be available here.
@@ -233,5 +276,7 @@ const postsSlice = createSlice({
     });
   },
 });
+
+export const { removePostInfo } = postsSlice.actions;
 
 export default postsSlice.reducer;

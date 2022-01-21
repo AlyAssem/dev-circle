@@ -6,7 +6,7 @@ interface IResizableProps {
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
 }
 
-export const ResizeableTextArea: React.FC<IResizableProps> = ({
+export const ResizableTextArea: React.FC<IResizableProps> = ({
   id,
   value,
   onChange,
