@@ -6,6 +6,7 @@ import { v4 as uuidV4 } from 'uuid';
 import CloseIcon from '../../icons/CloseIcon';
 import { createPostComment } from '../../redux-features/comments';
 import { useAppDispatch, useAppSelector } from '../../redux-features/hooks';
+import { getPosts } from '../../redux-features/posts';
 import { CommentForm } from './CommentForm';
 import { Comments } from './Comments';
 
@@ -50,6 +51,7 @@ export const CommentsModal: React.FC<ICommentsModalProps> = ({
         }
       );
 
+      await dispatch(getPosts());
       onClose();
     }
 
@@ -114,7 +116,9 @@ export const CommentsModal: React.FC<ICommentsModalProps> = ({
         <div id='modal-body' className='p-4 my-2'>
           <CommentForm onCommentAdd={(comment) => handleCommentAdd(comment)} />
           <hr className='w-full border-b-2 border-black opacity-10 mb-5' />
-          <Comments postId={postId} />
+          <div className='max-h-64 overflow-y-auto overflow-x-hidden'>
+            <Comments postId={postId} />
+          </div>
         </div>
       </div>
     </div>

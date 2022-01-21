@@ -6,27 +6,30 @@ import EditIcon from '../../icons/EditIcon';
 import FilledLikeIcon from '../../icons/FilledLikeIcon';
 import LikeIcon from '../../icons/LikeIcon';
 import { useAppDispatch, useAppSelector } from '../../redux-features/hooks';
-import { deletePost } from '../../redux-features/posts';
-import { User } from '../../redux-features/users';
+import {
+  deletePost,
+  IPost,
+  likePost,
+  unlikePost,
+} from '../../redux-features/posts';
 
-interface IPost {
-  id: string;
-  title: string;
-  content: string;
+interface IPostProps extends IPost {
   openPostEditModal: (id: string) => void;
   openPostCommentModal: (id: string) => void;
-  postUserInfo: Partial<User>;
 }
 
-const Post: React.FC<IPost> = ({
+const Post: React.FC<IPostProps> = ({
   title,
   content,
   id,
   postUserInfo,
   openPostEditModal,
   openPostCommentModal,
+  likesCount,
+  commentsCount,
 }) => {
   const [isPostLiked, setIsPostLiked] = useState(false);
+  const [numberOfLikes, setNumberOfLikes] = useState(likesCount);
 
   const dispatch = useAppDispatch();
 
@@ -76,7 +79,13 @@ const Post: React.FC<IPost> = ({
     }
   };
 
-  const handlePostLike = () => {
+  const handlePostLike = async () => {
+    if (!isPostLiked) {
+      await dispatch(likePost({ postId: id }));
+    } else {
+      await dispatch(unlikePost({ postId: id }));
+    }
+    setNumberOfLikes(isPostLiked ? numberOfLikes - 1 : numberOfLikes + 1);
     setIsPostLiked(!isPostLiked);
   };
 
@@ -89,11 +98,11 @@ const Post: React.FC<IPost> = ({
               <div className='text-gray-900 font-bold text-xl mb-2'>
                 {title}
               </div>
-              <p className='text-gray-700 text-base'>{content}</p>
+              <div className='text-gray-700 text-base'>{content}</div>
             </div>
             <div className='flex gap-x-2 pr-4'>
               <div className='flex flex-col items-center'>
-                <span> 2 </span>
+                <span>{numberOfLikes}</span>
                 <button
                   id='likePostIcon'
                   type='button'
@@ -104,7 +113,7 @@ const Post: React.FC<IPost> = ({
                 </button>
               </div>
               <div className='flex flex-col items-center'>
-                <span>3</span>
+                <span>{commentsCount}</span>
                 <button
                   id='commentOnPostIcon'
                   type='button'

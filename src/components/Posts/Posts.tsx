@@ -38,6 +38,8 @@ const Posts: React.FC<IPosts> = ({ posts }) => {
           openPostCommentModal={(id: string) => {
             openPostCommentModal(id);
           }}
+          commentsCount={item.commentsCount}
+          likesCount={item.likesCount}
         />
       ))}
 
@@ -57,7 +59,7 @@ const Posts: React.FC<IPosts> = ({ posts }) => {
         <CommentsModal
           postId={clickedPostId}
           title='Comments'
-          onClose={() => {
+          onClose={async () => {
             setIsCommentOnPostModalOpen(false);
             setClickedPostId('');
           }}

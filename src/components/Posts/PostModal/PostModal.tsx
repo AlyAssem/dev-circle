@@ -8,7 +8,7 @@ import { ResizableTextArea } from '../../common/ResizableTextArea';
 
 interface IPostModalProps {
   // eslint-disable-next-line react/require-default-props
-  postId?: string;
+  postId?: string; // when creating a post the id is not determined yet.
   title: string;
   action: string;
   onClose: () => void;
