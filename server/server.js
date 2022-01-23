@@ -9,6 +9,7 @@ app.use(express.json());
 const USERS_DATA_FILE = path.join(__dirname, 'data/users.json');
 const POSTS_DATA_FILE = path.join(__dirname, 'data/posts.json');
 const COMMENTS_DATA_FILE = path.join(__dirname, 'data/comments.json');
+const LIKES_DATA_FILE = path.join(__dirname, 'data/likes.json');
 
 app.get('/', (req, res) => {
   res.send('API IS RUNNING...');
@@ -165,21 +166,38 @@ app.delete('/api/posts/:id', (req, res) => {
   }
 });
 
-// Like and unlike section
-app.get('/api/posts/:id/like', (req, res) => {
+app.get('/api/posts/:postId/like', (req, res) => {
+  const likesData = JSON.parse(fs.readFileSync(LIKES_DATA_FILE));
   const posts = JSON.parse(fs.readFileSync(POSTS_DATA_FILE));
 
-  const likedPostId = posts.findIndex((post) => post.id === req.params.id);
+  const isPostLikedByUser = likesData.some(
+    (likeObj) =>
+      likeObj.userId === req.body.userId && likeObj.postId === req.params.postId
+  );
 
-  const updatedPost = {
-    ...posts[likedPostId],
-    likesCount: posts[likedPostId].likesCount + 1,
-  };
+  if (!isPostLikedByUser) {
+    likesData.push({
+      userId: req.body.userId,
+      postId: req.params.postId,
+    });
+    fs.writeFileSync(LIKES_DATA_FILE, JSON.stringify(likesData));
 
-  posts[likedPostId] = updatedPost;
-  fs.writeFileSync(POSTS_DATA_FILE, JSON.stringify(posts));
+    // update the liked post likesCount.
+    const likedPostId = posts.findIndex(
+      (post) => post.id === req.params.postId
+    );
 
-  res.status(201).json({ post: posts[likedPostId] });
+    const updatedPost = {
+      ...posts[likedPostId],
+      likesCount: posts[likedPostId].likesCount + 1,
+    };
+
+    posts[likedPostId] = updatedPost;
+    fs.writeFileSync(POSTS_DATA_FILE, JSON.stringify(posts));
+
+    return res.status(201).json({ post: posts[likedPostId] });
+  }
+  return res.status(400).json({ error: 'Post already liked' });
 });
 
 app.get('/api/posts/:id/unlike', (req, res) => {
