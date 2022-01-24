@@ -182,7 +182,7 @@ app.get('/api/posts/:postId/like', (req, res) => {
     });
     fs.writeFileSync(LIKES_DATA_FILE, JSON.stringify(likesData));
 
-    // update the liked post likesCount.
+    // increment the liked post likesCount.
     const likedPostId = posts.findIndex(
       (post) => post.id === req.params.postId
     );
@@ -200,20 +200,40 @@ app.get('/api/posts/:postId/like', (req, res) => {
   return res.status(400).json({ error: 'Post already liked' });
 });
 
-app.get('/api/posts/:id/unlike', (req, res) => {
+app.get('/api/posts/:postId/unlike', (req, res) => {
+  const likesData = JSON.parse(fs.readFileSync(LIKES_DATA_FILE));
   const posts = JSON.parse(fs.readFileSync(POSTS_DATA_FILE));
 
-  const unlikedPostId = posts.findIndex((post) => post.id === req.params.id);
+  const isPostLikedByUser = likesData.some(
+    (likeObj) =>
+      likeObj.userId === req.body.userId && likeObj.postId === req.params.postId
+  );
+
+  if (!isPostLikedByUser) {
+    return res.status(400).json({ error: 'Post is not liked' });
+  }
+
+  const likeToDeleteIndex = likesData.findIndex(
+    (likeObj) =>
+      likeObj.userId === req.body.userId && likeObj.postId === req.params.postId
+  );
+
+  // remove the like from the data && update the LIKES_DATA_FILE.
+  const updatedLikesData = [...likesData].slice(likeToDeleteIndex + 1);
+  fs.writeFileSync(LIKES_DATA_FILE, JSON.stringify(updatedLikesData));
+
+  // decrement the liked post likesCount && update the POSTS_DATA_FILE.
+  const likedPostId = posts.findIndex((post) => post.id === req.params.postId);
 
   const updatedPost = {
-    ...posts[unlikedPostId],
-    likesCount: posts[unlikedPostId].likesCount - 1,
+    ...posts[likedPostId],
+    likesCount: posts[likedPostId].likesCount - 1,
   };
 
-  posts[unlikedPostId] = updatedPost;
+  posts[likedPostId] = updatedPost;
   fs.writeFileSync(POSTS_DATA_FILE, JSON.stringify(posts));
 
-  res.status(201).json({ post: posts[unlikedPostId] });
+  return res.status(201).json({ post: posts[likedPostId] });
 });
 
 app.post('/api/posts/:postId/comments', (req, res) => {
