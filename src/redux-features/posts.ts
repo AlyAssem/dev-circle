@@ -33,15 +33,23 @@ interface ValidationErrors {
 export const likePost = createAsyncThunk<
   IPost,
   // action function parameter object type
-  { postId: string },
+  { postId: string; userId: string },
   {
     // Optional fields for defining thunkApi field types
     rejectValue: ValidationErrors;
   }
->('posts/likePost', async ({ postId }, { rejectWithValue }) => {
+>('posts/likePost', async ({ postId, userId }, { rejectWithValue }) => {
   try {
-    const response = await axios.get<{ post: IPost }>(
-      `/api/posts/${postId}/like`
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+
+    const response = await axios.post<{ post: IPost }>(
+      `/api/posts/${postId}/like`,
+      { userId },
+      config
     );
 
     return response.data.post;
@@ -57,15 +65,22 @@ export const likePost = createAsyncThunk<
 export const unlikePost = createAsyncThunk<
   IPost,
   // action function parameter object type
-  { postId: string },
+  { postId: string; userId: string },
   {
     // Optional fields for defining thunkApi field types
     rejectValue: ValidationErrors;
   }
->('posts/unlikePost', async ({ postId }, { rejectWithValue }) => {
+>('posts/unlikePost', async ({ postId, userId }, { rejectWithValue }) => {
   try {
-    const response = await axios.get<{ post: IPost }>(
-      `/api/posts/${postId}/unlike`
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+    const response = await axios.post<{ post: IPost }>(
+      `/api/posts/${postId}/unlike`,
+      { userId },
+      config
     );
 
     return response.data.post;

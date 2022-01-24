@@ -65,8 +65,16 @@ app.post('/api/users/login', async (req, res, next) => {
       password,
       registeredUser.password
     );
-
     if (registeredUser && doesPasswordsMatch) {
+      // set likedPosts as an array for the authenticated user
+      const likesData = JSON.parse(fs.readFileSync(LIKES_DATA_FILE));
+      const userLikedPosts = likesData.filter(
+        (likeObj) => likeObj.userId === registeredUser.id
+      );
+      registeredUser.likedPosts = userLikedPosts.map(
+        (likeObj) => likeObj.postId
+      );
+
       delete registeredUser.password;
       res.json({ user: registeredUser });
     } else {
@@ -166,7 +174,7 @@ app.delete('/api/posts/:id', (req, res) => {
   }
 });
 
-app.get('/api/posts/:postId/like', (req, res) => {
+app.post('/api/posts/:postId/like', (req, res) => {
   const likesData = JSON.parse(fs.readFileSync(LIKES_DATA_FILE));
   const posts = JSON.parse(fs.readFileSync(POSTS_DATA_FILE));
 
@@ -200,7 +208,7 @@ app.get('/api/posts/:postId/like', (req, res) => {
   return res.status(400).json({ error: 'Post already liked' });
 });
 
-app.get('/api/posts/:postId/unlike', (req, res) => {
+app.post('/api/posts/:postId/unlike', (req, res) => {
   const likesData = JSON.parse(fs.readFileSync(LIKES_DATA_FILE));
   const posts = JSON.parse(fs.readFileSync(POSTS_DATA_FILE));
 

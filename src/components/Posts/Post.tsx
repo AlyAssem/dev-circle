@@ -81,9 +81,13 @@ const Post: React.FC<IPostProps> = ({
 
   const handlePostLike = async () => {
     if (!isPostLiked) {
-      await dispatch(likePost({ postId: id }));
+      await dispatch(
+        likePost({ postId: id, userId: loggedInUserInfo.id || '' })
+      );
     } else {
-      await dispatch(unlikePost({ postId: id }));
+      await dispatch(
+        unlikePost({ postId: id, userId: loggedInUserInfo.id || '' })
+      );
     }
     setNumberOfLikes(isPostLiked ? numberOfLikes - 1 : numberOfLikes + 1);
     setIsPostLiked(!isPostLiked);
