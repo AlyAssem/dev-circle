@@ -66,15 +66,6 @@ app.post('/api/users/login', async (req, res, next) => {
       registeredUser.password
     );
     if (registeredUser && doesPasswordsMatch) {
-      // set likedPosts as an array for the authenticated user
-      const likesData = JSON.parse(fs.readFileSync(LIKES_DATA_FILE));
-      const userLikedPosts = likesData.filter(
-        (likeObj) => likeObj.userId === registeredUser.id
-      );
-      registeredUser.likedPosts = userLikedPosts.map(
-        (likeObj) => likeObj.postId
-      );
-
       delete registeredUser.password;
       res.json({ user: registeredUser });
     } else {
@@ -86,6 +77,20 @@ app.post('/api/users/login', async (req, res, next) => {
   }
 });
 
+app.get('/api/users/:userId/likedPosts', async (req, res, next) => {
+  // set likedPosts as an array for the authenticated user
+  const likesData = JSON.parse(fs.readFileSync(LIKES_DATA_FILE));
+
+  const userLikedPosts = likesData.filter(
+    (likeObj) => likeObj.userId === req.params.userId
+  );
+
+  const likedPostsIds = userLikedPosts.map((likeObj) => likeObj.postId);
+
+  return res.json({
+    userLikedPosts: likedPostsIds,
+  });
+});
 app.get('/api/posts', (req, res) => {
   const data = fs.readFileSync(POSTS_DATA_FILE);
   // using setTimeout so that the loader appears before loading data, like mocking a database.
@@ -227,7 +232,9 @@ app.post('/api/posts/:postId/unlike', (req, res) => {
   );
 
   // remove the like from the data && update the LIKES_DATA_FILE.
-  const updatedLikesData = [...likesData].slice(likeToDeleteIndex + 1);
+  const updatedLikesData = [...likesData];
+  updatedLikesData.splice(likeToDeleteIndex, 1);
+
   fs.writeFileSync(LIKES_DATA_FILE, JSON.stringify(updatedLikesData));
 
   // decrement the liked post likesCount && update the POSTS_DATA_FILE.

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-param-reassign */
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios, { AxiosError } from 'axios';
@@ -7,6 +8,7 @@ export interface User {
   userName: string;
   email: string;
   password: string;
+  likedPosts?: Array<string>;
 }
 
 interface ValidationErrors {
@@ -26,6 +28,31 @@ interface UsersState {
   userInfo: Partial<User>;
   users: Array<User>;
 }
+
+export const getUserLikedPosts = createAsyncThunk<
+  // Return type of the payload creator
+  Array<string>,
+  // type of userId passed as param.
+  string,
+  {
+    // Optional fields for defining thunkApi field types
+    rejectValue: ValidationErrors;
+  }
+>('/users/getUserLikedPosts', async (userId, { rejectWithValue }) => {
+  try {
+    const response = await axios.get<{
+      userLikedPosts: Array<string>;
+    }>(`/api/users/${userId}/likedPosts`);
+
+    return response.data.userLikedPosts;
+  } catch (err: any) {
+    const error: AxiosError<ValidationErrors> = err;
+    if (!error.response) {
+      throw err;
+    }
+    return rejectWithValue(error.response.data);
+  }
+});
 
 export const registerUser = createAsyncThunk<
   // Return type of the payload creator
@@ -55,7 +82,6 @@ export const registerUser = createAsyncThunk<
     localStorage.setItem('userInfo', JSON.stringify(response.data.user));
 
     return response.data.user;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {
     const error: AxiosError<ValidationErrors> = err;
     if (!error.response) {
@@ -119,6 +145,12 @@ const usersSlice = createSlice({
   extraReducers: (builder) => {
     // The `builder` callback form is used here
     // because it provides correctly typed reducers from the action creators
+    builder.addCase(getUserLikedPosts.fulfilled, (state, { payload }) => {
+      state.userInfo = {
+        ...state.userInfo,
+        likedPosts: payload,
+      };
+    });
     builder.addCase(registerUser.fulfilled, (state, { payload }) => {
       state.userInfo = payload;
     });

@@ -16,6 +16,7 @@ import {
 interface IPostProps extends IPost {
   openPostEditModal: (id: string) => void;
   openPostCommentModal: (id: string) => void;
+  isPostLikedByUser: () => boolean;
 }
 
 const Post: React.FC<IPostProps> = ({
@@ -23,13 +24,16 @@ const Post: React.FC<IPostProps> = ({
   content,
   id,
   postUserInfo,
-  openPostEditModal,
-  openPostCommentModal,
   likesCount,
   commentsCount,
+  openPostEditModal,
+  openPostCommentModal,
+  isPostLikedByUser,
 }) => {
-  const [isPostLiked, setIsPostLiked] = useState(false);
+  const isPostLikedByUserResult = isPostLikedByUser();
+
   const [numberOfLikes, setNumberOfLikes] = useState(likesCount);
+  const [isPostLiked, setIsPostLiked] = useState(isPostLikedByUserResult);
 
   const dispatch = useAppDispatch();
 
