@@ -71,26 +71,33 @@ app.post('/api/users', async (req, res, next) => {
   }
 });
 
-app.post('/api/users/login', async (req, res, next) => {
+app.post('/api/users/login', (req, res, next) => {
   const { email, password } = req.body;
   const users = JSON.parse(fs.readFileSync(USERS_DATA_FILE));
 
   const registeredUser = users.find((user) => user.email === email);
 
-  try {
-    const doesPasswordsMatch = await bcrypt.compare(
-      password,
-      registeredUser.password
-    );
-    if (registeredUser && doesPasswordsMatch) {
-      delete registeredUser.password;
-      res.json({ user: registeredUser });
-    } else {
-      res.status(401);
-      throw new Error('Invalid email or password');
-    }
-  } catch (err) {
-    throw new Error('Could not hash the user password');
+  if (registeredUser) {
+    bcrypt
+      .compare(password, registeredUser.password)
+      .then((isMatch) => {
+        if (isMatch) {
+          delete registeredUser.password;
+          res.json({ user: registeredUser });
+        }
+      })
+      .catch((err) => {
+        res.status(500);
+        throw new Error('Internal server error');
+      });
+
+    // if the compare between the 2 passwords was not match
+    res.status(401);
+    throw new Error('Invalid password');
+  } else {
+    // if the user is not registered with the given email.
+    res.status(401);
+    throw new Error('Invalid email');
   }
 });
 
