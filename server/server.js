@@ -2,9 +2,26 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const bcrypt = require('bcrypt');
+const { createServer } = require('http');
+const { Server } = require('socket.io');
 
 const app = express();
+const httpServer = createServer(app);
 app.use(express.json());
+
+const io = new Server(httpServer, {
+  cors: {
+    origin: 'http://localhost:3000',
+  },
+});
+
+io.on('connection', (socket) => {
+  socket.on('sendNotification', ({ senderId, receiverId, type }) => {
+    console.log(senderId);
+    console.log(receiverId);
+    console.log(type);
+  });
+});
 
 const USERS_DATA_FILE = path.join(__dirname, 'data/users.json');
 const POSTS_DATA_FILE = path.join(__dirname, 'data/posts.json');
@@ -406,4 +423,6 @@ const errorHandler = (err, req, res, next) => {
 app.use(notFound);
 app.use(errorHandler);
 
-app.listen(5000, () => console.log('SERVER IS RUNNING ON PORT 5000'));
+httpServer.listen(5000, () => {
+  console.log('SERVER IS RUNNING ON PORT 5000');
+});

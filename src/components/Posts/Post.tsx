@@ -17,6 +17,7 @@ interface IPostProps extends IPost {
   openPostEditModal: (id: string) => void;
   openPostCommentModal: (id: string) => void;
   isPostLikedByUser: () => boolean;
+  socket: any;
 }
 
 const Post: React.FC<IPostProps> = ({
@@ -29,6 +30,7 @@ const Post: React.FC<IPostProps> = ({
   openPostEditModal,
   openPostCommentModal,
   isPostLikedByUser,
+  socket,
 }) => {
   const isPostLikedByUserResult = isPostLikedByUser();
 

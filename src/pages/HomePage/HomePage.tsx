@@ -1,5 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import React, { useEffect, useState, useRef } from 'react';
+import { io } from 'socket.io-client';
+
 import { History } from 'history';
 import { toast, ToastContainer } from 'react-toastify';
 
@@ -18,6 +20,7 @@ export const HomePage: React.FC<IHomePageProps> = ({
   history,
 }: IHomePageProps) => {
   const [isCreatePostModalOpen, setIsCreatePostModalOpen] = useState(false);
+  const [socket, setSocket] = useState<any>(null);
   const dispatch = useAppDispatch();
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   const fetchPosts = useRef(() => {});
@@ -67,9 +70,13 @@ export const HomePage: React.FC<IHomePageProps> = ({
     fetchPosts.current();
   }, []);
 
+  useEffect(() => {
+    setSocket(io('http://localhost:5000'));
+  }, []);
+
   return (
     <>
-      <Header loggedInUserName={userInfo?.userName} />
+      <Header socket={socket} />
       <div className='flex justify-end'>
         <button
           type='button'
@@ -84,7 +91,7 @@ export const HomePage: React.FC<IHomePageProps> = ({
         <Loader />
       ) : (
         <div className='w-full flex flex-col items-center'>
-          <Posts posts={posts} />
+          <Posts posts={posts} socket={socket} />
         </div>
       )}
       {isCreatePostModalOpen && (

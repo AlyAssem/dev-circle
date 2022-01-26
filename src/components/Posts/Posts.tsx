@@ -8,8 +8,9 @@ import PostModal from './PostModal/PostModal';
 
 interface IPosts {
   posts: Array<IPost>;
+  socket: any;
 }
-const Posts: React.FC<IPosts> = ({ posts }) => {
+const Posts: React.FC<IPosts> = ({ posts, socket }) => {
   const [isEditPostModalOpen, setIsEditPostModalOpen] = useState(false);
   const [isCommentOnPostModalOpen, setIsCommentOnPostModalOpen] =
     useState(false);
@@ -66,6 +67,7 @@ const Posts: React.FC<IPosts> = ({ posts }) => {
           commentsCount={item.commentsCount}
           likesCount={item.likesCount}
           isPostLikedByUser={() => isPostLikedByUser(item.id)}
+          socket={socket}
         />
       ))}
 
