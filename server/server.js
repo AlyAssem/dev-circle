@@ -9,24 +9,21 @@ const app = express();
 const httpServer = createServer(app);
 app.use(express.json());
 
+const USERS_DATA_FILE = path.join(__dirname, 'data/users.json');
+const POSTS_DATA_FILE = path.join(__dirname, 'data/posts.json');
+const COMMENTS_DATA_FILE = path.join(__dirname, 'data/comments.json');
+const LIKES_DATA_FILE = path.join(__dirname, 'data/likes.json');
+
+const userSocketObjects = [];
+
 const io = new Server(httpServer, {
   cors: {
     origin: 'http://localhost:3000',
   },
 });
-
-io.on('connection', (socket) => {
-  socket.on('sendNotification', ({ senderId, receiverId, type }) => {
-    console.log(senderId);
-    console.log(receiverId);
-    console.log(type);
-  });
-});
-
-const USERS_DATA_FILE = path.join(__dirname, 'data/users.json');
-const POSTS_DATA_FILE = path.join(__dirname, 'data/posts.json');
-const COMMENTS_DATA_FILE = path.join(__dirname, 'data/comments.json');
-const LIKES_DATA_FILE = path.join(__dirname, 'data/likes.json');
+// io.on('startup', (socket) => {
+//   socket.removeAllListeners();
+// });
 
 app.get('/', (req, res) => {
   res.send('API IS RUNNING...');
@@ -38,6 +35,27 @@ app.get('/api/users', (req, res) => {
 });
 
 app.post('/api/users', async (req, res, next) => {
+  io.on('connection', (socket) => {
+    const wasSocketAssignedtToUser = userSocketObjects.some(
+      (userSocketObj) => userSocketObj.userId === req.body.id
+    );
+    if (!wasSocketAssignedtToUser) {
+      userSocketObjects.push({ userId: req.body.id, socketId: socket.id });
+    }
+
+    console.log('SOCKET IS CONNECTED NOW');
+    console.log('userSocketObjects', userSocketObjects);
+    // socket.on('sendNotification', ({ senderId, receiverId, type, socketId }) => {
+    //   const users = JSON.parse(fs.readFileSync(USERS_DATA_FILE));
+    //   const receiverUser = users.find((user) => user.id === receiverId);
+
+    //   console.log(senderId);
+    //   console.log(receiverId);
+    //   console.log(type);
+    //   console.log('socketId', socketId);
+    // });
+  });
+
   const users = JSON.parse(fs.readFileSync(USERS_DATA_FILE));
 
   try {
@@ -81,19 +99,25 @@ app.post('/api/users/login', (req, res, next) => {
     bcrypt
       .compare(password, registeredUser.password)
       .then((isMatch) => {
+        let isPasswordInvalid = false;
+
         if (isMatch) {
           delete registeredUser.password;
           res.json({ user: registeredUser });
+        } else {
+          isPasswordInvalid = true;
+        }
+
+        // if the compare between the 2 passwords was not match
+        if (isPasswordInvalid) {
+          res.status(401);
+          throw new Error('Invalid password');
         }
       })
       .catch((err) => {
-        res.status(500);
-        throw new Error('Internal server error');
+        // let the custom error middleware handle it.
+        next(err);
       });
-
-    // if the compare between the 2 passwords was not match
-    res.status(401);
-    throw new Error('Invalid password');
   } else {
     // if the user is not registered with the given email.
     res.status(401);
