@@ -3,10 +3,10 @@ const fs = require('fs');
 const path = require('path');
 const bcrypt = require('bcrypt');
 const { createServer } = require('http');
-const { Server } = require('socket.io');
+// const { Server } = require('socket.io');
+const SocketServer = require('./socketServer.js');
 
 const app = express();
-const httpServer = createServer(app);
 app.use(express.json());
 
 const USERS_DATA_FILE = path.join(__dirname, 'data/users.json');
@@ -14,13 +14,25 @@ const POSTS_DATA_FILE = path.join(__dirname, 'data/posts.json');
 const COMMENTS_DATA_FILE = path.join(__dirname, 'data/comments.json');
 const LIKES_DATA_FILE = path.join(__dirname, 'data/likes.json');
 
-const userSocketObjects = [];
-
-const io = new Server(httpServer, {
+// socket configs.
+const httpServer = createServer(app);
+// eslint-disable-next-line import/order
+const io = require('socket.io')(httpServer, {
   cors: {
     origin: 'http://localhost:3000',
   },
 });
+
+// const userSocketObjects = [];
+
+io.on('connection', (socket) => {
+  SocketServer(socket);
+});
+// const io = new Server(httpServer, {
+//   cors: {
+//     origin: 'http://localhost:3000',
+//   },
+// });
 // io.on('startup', (socket) => {
 //   socket.removeAllListeners();
 // });
@@ -35,27 +47,6 @@ app.get('/api/users', (req, res) => {
 });
 
 app.post('/api/users', async (req, res, next) => {
-  io.on('connection', (socket) => {
-    const wasSocketAssignedtToUser = userSocketObjects.some(
-      (userSocketObj) => userSocketObj.userId === req.body.id
-    );
-    if (!wasSocketAssignedtToUser) {
-      userSocketObjects.push({ userId: req.body.id, socketId: socket.id });
-    }
-
-    console.log('SOCKET IS CONNECTED NOW');
-    console.log('userSocketObjects', userSocketObjects);
-    // socket.on('sendNotification', ({ senderId, receiverId, type, socketId }) => {
-    //   const users = JSON.parse(fs.readFileSync(USERS_DATA_FILE));
-    //   const receiverUser = users.find((user) => user.id === receiverId);
-
-    //   console.log(senderId);
-    //   console.log(receiverId);
-    //   console.log(type);
-    //   console.log('socketId', socketId);
-    // });
-  });
-
   const users = JSON.parse(fs.readFileSync(USERS_DATA_FILE));
 
   try {

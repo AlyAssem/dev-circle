@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
 import MenuIcon from '../../icons/MenuIcon';
-import { useAppDispatch } from '../../redux-features/hooks';
+import { useAppDispatch, useAppSelector } from '../../redux-features/hooks';
 import { logout } from '../../redux-features/users';
 
-interface IHeaderProps {
-  loggedInUserName: string | undefined;
-}
-
-export const Header: React.FC<IHeaderProps> = ({ loggedInUserName }) => {
+export const Header: React.FC = () => {
   const [isNavigationMenuOpen, setIsNavigationMenuOpen] = useState(false);
   const dispatch = useAppDispatch();
+
+  const userInfo = useAppSelector((reduxState) => reduxState.users.userInfo);
 
   const handleLogout = () => {
     localStorage.removeItem('userInfo');
@@ -34,7 +32,7 @@ export const Header: React.FC<IHeaderProps> = ({ loggedInUserName }) => {
               id='logged-in-userName'
               className='text-green-500 font-medium text-lg mr-4'
             >
-              {loggedInUserName}
+              {userInfo.userName}
             </span>
           </li>
           <li>
