@@ -17,7 +17,6 @@ interface IPostProps extends IPost {
   openPostEditModal: (id: string) => void;
   openPostCommentModal: (id: string) => void;
   isPostLikedByUser: () => boolean;
-  socket: any;
 }
 
 const Post: React.FC<IPostProps> = ({
@@ -30,7 +29,6 @@ const Post: React.FC<IPostProps> = ({
   openPostEditModal,
   openPostCommentModal,
   isPostLikedByUser,
-  socket,
 }) => {
   const isPostLikedByUserResult = isPostLikedByUser();
 
@@ -40,6 +38,7 @@ const Post: React.FC<IPostProps> = ({
   const dispatch = useAppDispatch();
 
   const loggedInUserInfo = useAppSelector((state) => state.users.userInfo);
+  const socket = useAppSelector((state) => state.globals.socket);
 
   const handlePostDelete = async () => {
     const resultAction = await dispatch(deletePost(id));
@@ -95,6 +94,17 @@ const Post: React.FC<IPostProps> = ({
         unlikePost({ postId: id, userId: loggedInUserInfo.id || '' })
       );
     }
+
+    if (!isPostLiked) {
+      // emit an event for the socket when the post is liked, the state would be false before it being liked.
+      socket.emit('sendNotification', {
+        senderMail: loggedInUserInfo.email,
+        senderId: loggedInUserInfo.id,
+        receiverId: postUserInfo.id, // the owner of the post.
+        type: 1, // eventType is like clicked and for comment would be 2.
+      });
+    }
+
     setNumberOfLikes(isPostLiked ? numberOfLikes - 1 : numberOfLikes + 1);
     setIsPostLiked(!isPostLiked);
   };

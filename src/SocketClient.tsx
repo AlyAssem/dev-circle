@@ -11,6 +11,15 @@ const SocketClient: React.FC = () => {
     }
   }, [socket, user.id]);
 
+  useEffect(() => {
+    socket.on(
+      'getNotification',
+      (data: { senderMail: string; senderId: string; type: number }) => {
+        console.log(`${data.senderMail} liked your post`);
+      }
+    );
+  }, [socket]);
+
   return <></>;
 };
 
