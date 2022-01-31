@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
 import MenuIcon from '../../icons/MenuIcon';
+import NotificationIcon from '../../icons/NotificationIcon';
 import { useAppDispatch, useAppSelector } from '../../redux-features/hooks';
 import { logout } from '../../redux-features/users';
+import NotificationsDialog from '../Notifications/NotificationsDialog';
 
 export const Header: React.FC = () => {
   const [isNavigationMenuOpen, setIsNavigationMenuOpen] = useState(false);
+  const [isNotificationsDialogOpen, setIsNotificationDialogOpen] =
+    useState(false);
   const dispatch = useAppDispatch();
 
   const userInfo = useAppSelector((reduxState) => reduxState.users.userInfo);
@@ -27,6 +31,22 @@ export const Header: React.FC = () => {
             isNavigationMenuOpen ? 'block' : 'hidden'
           } md:flex`}
         >
+          <button
+            id='notificationIcon'
+            type='button'
+            className='relative hover:text-green-600 mr-3 text-gray-400 rounded-full focus:ring-2
+             focus:ring-green-400 hover:bg-green-400 hover:bg-opacity-50 p-1'
+            onClick={(e) => {
+              if (isNotificationsDialogOpen) {
+                // unfocus the button when the modal is closed
+                e.currentTarget.blur();
+              }
+              setIsNotificationDialogOpen(!isNotificationsDialogOpen);
+            }}
+          >
+            <NotificationIcon />
+          </button>
+
           <li>
             <span
               id='logged-in-userName'
@@ -54,6 +74,7 @@ export const Header: React.FC = () => {
           <MenuIcon />
         </button>
       </nav>
+      {isNotificationsDialogOpen && <NotificationsDialog />}
     </header>
   );
 };

@@ -40,9 +40,14 @@
     "web-vitals": "^1.0.1",
     "yup": "^0.32.11"
   },
+  "nodemonConfig": {
+    "ignore": [
+      "server/data/*.json"
+    ]
+  },
   "scripts": {
     "start": "craco start",
-    "server": "nodemon ./server/server.js",
+    "server": "nodemon --verbose ./server/server.js",
     "build": "craco build",
     "test": "craco test",
     "eject": "react-scripts eject"
