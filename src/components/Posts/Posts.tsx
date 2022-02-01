@@ -1,4 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { Socket } from 'socket.io-client';
+import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import { useAppDispatch, useAppSelector } from '../../redux-features/hooks';
 import { IPost, removePostInfo } from '../../redux-features/posts';
 import { getUserLikedPosts } from '../../redux-features/users';
@@ -8,8 +10,9 @@ import PostModal from './PostModal/PostModal';
 
 interface IPosts {
   posts: Array<IPost>;
+  socket: Socket<DefaultEventsMap, DefaultEventsMap> | null;
 }
-const Posts: React.FC<IPosts> = ({ posts }) => {
+const Posts: React.FC<IPosts> = ({ posts, socket }) => {
   const [isEditPostModalOpen, setIsEditPostModalOpen] = useState(false);
   const [isCommentOnPostModalOpen, setIsCommentOnPostModalOpen] =
     useState(false);
@@ -66,6 +69,7 @@ const Posts: React.FC<IPosts> = ({ posts }) => {
           commentsCount={item.commentsCount}
           likesCount={item.likesCount}
           isPostLikedByUser={() => isPostLikedByUser(item.id)}
+          socket={socket}
         />
       ))}
 

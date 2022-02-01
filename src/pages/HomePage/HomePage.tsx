@@ -1,9 +1,10 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import React, { useEffect, useState, useRef } from 'react';
-import { io } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 
 import { History } from 'history';
 import { toast, ToastContainer } from 'react-toastify';
+import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 
 import { Header } from '../../components/Header/Header';
 import { useAppSelector, useAppDispatch } from '../../redux-features/hooks';
@@ -11,6 +12,8 @@ import Posts from '../../components/Posts/Posts';
 import PostModal from '../../components/Posts/PostModal/PostModal';
 import Loader from '../../components/Loader';
 import { getPosts } from '../../redux-features/posts';
+// import { deleteSocket, setSocket } from '../../redux-features/globals';
+import SocketClient from '../../SocketClient';
 
 interface IHomePageProps {
   history: History;
@@ -20,7 +23,10 @@ export const HomePage: React.FC<IHomePageProps> = ({
   history,
 }: IHomePageProps) => {
   const [isCreatePostModalOpen, setIsCreatePostModalOpen] = useState(false);
-  const [socket, setSocket] = useState<any>(null);
+  const [socket, setSocket] = useState<Socket<
+    DefaultEventsMap,
+    DefaultEventsMap
+  > | null>(null);
   const dispatch = useAppDispatch();
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   const fetchPosts = useRef(() => {});
@@ -28,6 +34,7 @@ export const HomePage: React.FC<IHomePageProps> = ({
   const userInfo = useAppSelector((state) => state.users.userInfo);
   const posts = useAppSelector((state) => state.posts.posts);
   const isLoading = useAppSelector((state) => state.posts.isLoading);
+  // const socket = useAppSelector((state) => state.globals.socket);
 
   fetchPosts.current = async () => {
     const resultAction = await dispatch(getPosts());
@@ -71,11 +78,20 @@ export const HomePage: React.FC<IHomePageProps> = ({
   }, []);
 
   useEffect(() => {
-    setSocket(io('http://localhost:5000'));
-  }, []);
+    const createdSocket = io('http://localhost:5000');
+    setSocket(createdSocket);
+    // dispatch(setSocket(createdSocket));
+
+    return () => {
+      // createdSocket.close();
+      // dispatch(deleteSocket());
+    };
+  }, [dispatch]);
 
   return (
     <>
+      {socket?.id && <SocketClient socket={socket} />}
+
       <Header socket={socket} />
       <div className='flex justify-end'>
         <button
@@ -86,7 +102,6 @@ export const HomePage: React.FC<IHomePageProps> = ({
           Create Post
         </button>
       </div>
-
       {isLoading ? (
         <Loader />
       ) : (

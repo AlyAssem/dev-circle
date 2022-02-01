@@ -1,17 +1,39 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { Socket } from 'socket.io-client';
+import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import MenuIcon from '../../icons/MenuIcon';
 import NotificationIcon from '../../icons/NotificationIcon';
 import { useAppDispatch, useAppSelector } from '../../redux-features/hooks';
 import { logout } from '../../redux-features/users';
 import NotificationsDialog from '../Notifications/NotificationsDialog';
 
-export const Header: React.FC = () => {
+interface IHeaderProps {
+  socket: Socket<DefaultEventsMap, DefaultEventsMap> | null;
+}
+
+interface INotificationData {
+  postTopic: string;
+  senderMail: string;
+  senderId: string;
+  type: number;
+}
+
+export const Header: React.FC<IHeaderProps> = ({ socket }) => {
+  const [notifications, setNotifications] = useState<Array<string>>([]);
   const [isNavigationMenuOpen, setIsNavigationMenuOpen] = useState(false);
   const [isNotificationsDialogOpen, setIsNotificationDialogOpen] =
     useState(false);
   const dispatch = useAppDispatch();
 
   const userInfo = useAppSelector((reduxState) => reduxState.users.userInfo);
+
+  useEffect(() => {
+    socket?.on('getNotification', (data: INotificationData) => {
+      console.log('getting notification in header', data);
+      const notification = `${data.senderMail} liked your post about ${data.postTopic}`;
+      setNotifications((prev) => [...prev, notification]);
+    });
+  }, [socket]);
 
   const handleLogout = () => {
     localStorage.removeItem('userInfo');
@@ -37,6 +59,7 @@ export const Header: React.FC = () => {
             className='relative hover:text-green-600 mr-3 text-gray-400 rounded-full focus:ring-2
              focus:ring-green-400 hover:bg-green-400 hover:bg-opacity-50 p-1'
             onClick={(e) => {
+              console.log('hello clicked');
               if (isNotificationsDialogOpen) {
                 // unfocus the button when the modal is closed
                 e.currentTarget.blur();
@@ -74,7 +97,9 @@ export const Header: React.FC = () => {
           <MenuIcon />
         </button>
       </nav>
-      {isNotificationsDialogOpen && <NotificationsDialog />}
+      {isNotificationsDialogOpen && (
+        <NotificationsDialog notifications={notifications} />
+      )}
     </header>
   );
 };

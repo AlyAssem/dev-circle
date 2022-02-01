@@ -1,8 +1,13 @@
 import React, { useEffect } from 'react';
+import { Socket } from 'socket.io-client';
+import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import { useAppSelector } from './redux-features/hooks';
 
-const SocketClient: React.FC = () => {
-  const socket = useAppSelector((state) => state.globals.socket);
+interface ISocketClientProps {
+  socket: Socket<DefaultEventsMap, DefaultEventsMap> | null;
+}
+
+const SocketClient: React.FC<ISocketClientProps> = ({ socket }) => {
   const user = useAppSelector((state) => state.users.userInfo);
 
   useEffect(() => {
@@ -10,15 +15,6 @@ const SocketClient: React.FC = () => {
       socket.emit('userJoined', { userId: user.id });
     }
   }, [socket, user.id]);
-
-  useEffect(() => {
-    socket.on(
-      'getNotification',
-      (data: { senderMail: string; senderId: string; type: number }) => {
-        console.log(`${data.senderMail} liked your post`);
-      }
-    );
-  }, [socket]);
 
   return <></>;
 };
