@@ -33,10 +33,11 @@ const SocketServer = (socket) => {
 
   socket.on(
     'sendNotification',
-    ({ senderMail, senderId, receiverId, type }) => {
+    ({ postTopic, senderMail, senderId, receiverId, type }) => {
       const receiverUser = getUser(receiverId);
       console.log('receiverUser', receiverUser);
       socket.to(receiverUser.socketId).emit('getNotification', {
+        postTopic,
         senderMail,
         senderId,
         type,

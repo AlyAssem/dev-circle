@@ -59,7 +59,6 @@ export const Header: React.FC<IHeaderProps> = ({ socket }) => {
             className='relative hover:text-green-600 mr-3 text-gray-400 rounded-full focus:ring-2
              focus:ring-green-400 hover:bg-green-400 hover:bg-opacity-50 p-1'
             onClick={(e) => {
-              console.log('hello clicked');
               if (isNotificationsDialogOpen) {
                 // unfocus the button when the modal is closed
                 e.currentTarget.blur();
