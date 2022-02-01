@@ -96,9 +96,27 @@ export const Header: React.FC<IHeaderProps> = ({ socket }) => {
           <MenuIcon />
         </button>
       </nav>
-      {isNotificationsDialogOpen && (
-        <NotificationsDialog notifications={notifications} />
-      )}
+      <div
+        onBlur={() => {
+          setIsNotificationDialogOpen(false);
+        }}
+      >
+        {isNotificationsDialogOpen && (
+          <div
+            onClick={() => setIsNotificationDialogOpen(false)}
+            role='button'
+            onKeyDown={(e) => {
+              if (e.key === 'Escape') {
+                setIsNotificationDialogOpen(false);
+              }
+            }}
+            className='cursor-default fixed inset-0 flex justify-center items-center'
+            tabIndex={0}
+          >
+            <NotificationsDialog notifications={notifications} />
+          </div>
+        )}
+      </div>
     </header>
   );
 };

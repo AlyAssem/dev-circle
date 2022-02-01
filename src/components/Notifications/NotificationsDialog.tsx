@@ -9,7 +9,11 @@ interface INotificationsDialogProps {
 const NotificationsDialog: React.FC<INotificationsDialogProps> = ({
   notifications,
 }) => (
-  <div className='z-10 absolute top-14 right-40 rounded-md bg-gray-100 shadow-lg p-2'>
+  <div
+    className='z-10 absolute top-14 right-40 rounded-md bg-gray-100 shadow-lg p-2'
+    onClick={(e) => e.stopPropagation()}
+    role='presentation'
+  >
     <h1 className='text-xl font-bold '>Notifications</h1>
     {notifications.map((notification, idx) => (
       // TODO: use notification id as the key.
