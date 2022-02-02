@@ -3,13 +3,13 @@
 
 ## Features: It's still under development but the current implemented features are the following.
 
+- Real time notification system with socket.io.
 - Register && login.
 - CRUD operations for posts.
 - form validation using formik.
 - unit tests for user registeration 
 
 ## Future-work:
-- Implementing websockets for real time notification for posts likes and comments between users.
 - Implementing LRU cache algorithm with searching for posts of an individual user
 - likes and comments on posts between users.
 - multi-theme support.
