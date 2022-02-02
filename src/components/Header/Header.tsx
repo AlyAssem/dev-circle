@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { v4 as uuidV4 } from 'uuid';
 import { Socket } from 'socket.io-client';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import MenuIcon from '../../icons/MenuIcon';
@@ -18,8 +19,13 @@ interface INotificationData {
   type: number;
 }
 
+export interface INotification {
+  id: string;
+  content: string;
+}
+
 export const Header: React.FC<IHeaderProps> = ({ socket }) => {
-  const [notifications, setNotifications] = useState<Array<string>>([]);
+  const [notifications, setNotifications] = useState<Array<INotification>>([]);
   const [isNavigationMenuOpen, setIsNavigationMenuOpen] = useState(false);
   const [isNotificationsDialogOpen, setIsNotificationDialogOpen] =
     useState(false);
@@ -30,7 +36,10 @@ export const Header: React.FC<IHeaderProps> = ({ socket }) => {
   useEffect(() => {
     socket?.on('getNotification', (data: INotificationData) => {
       console.log('getting notification in header', data);
-      const notification = `${data.senderMail} liked your post about ${data.postTopic}`;
+      const notification = {
+        id: uuidV4(),
+        content: `${data.senderMail} liked your post about ${data.postTopic}`,
+      };
       setNotifications((prev) => [...prev, notification]);
     });
   }, [socket]);
@@ -38,6 +47,13 @@ export const Header: React.FC<IHeaderProps> = ({ socket }) => {
   const handleLogout = () => {
     localStorage.removeItem('userInfo');
     dispatch(logout());
+  };
+
+  const removeNotification = (notificationId: string) => {
+    const filteredNotifications = notifications.filter(
+      (notification) => notification.id !== notificationId
+    );
+    setNotifications(filteredNotifications);
   };
 
   return (
@@ -66,6 +82,14 @@ export const Header: React.FC<IHeaderProps> = ({ socket }) => {
               setIsNotificationDialogOpen(!isNotificationsDialogOpen);
             }}
           >
+            {notifications?.length > 0 && (
+              <div
+                className='absolute bg-red-500 text-white -top-1 -right-1 flex justify-center items-center
+              rounded-full p-0.5 text-xs w-4 h-4 '
+              >
+                {notifications.length}
+              </div>
+            )}
             <NotificationIcon />
           </button>
 
@@ -110,10 +134,13 @@ export const Header: React.FC<IHeaderProps> = ({ socket }) => {
                 setIsNotificationDialogOpen(false);
               }
             }}
-            className='cursor-default fixed inset-0 flex justify-center items-center'
+            className='z-40 cursor-default fixed inset-0 flex justify-center items-center'
             tabIndex={0}
           >
-            <NotificationsDialog notifications={notifications} />
+            <NotificationsDialog
+              notifications={notifications}
+              onNotificationRead={removeNotification}
+            />
           </div>
         )}
       </div>
