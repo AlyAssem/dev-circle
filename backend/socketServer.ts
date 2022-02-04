@@ -1,6 +1,13 @@
-let userSocketObjects = [];
+import { Socket } from 'socket.io';
 
-const addUser = (userId, socketId) => {
+interface IuserSocketObject {
+  userId: string;
+  socketId: string;
+}
+
+let userSocketObjects: Array<IuserSocketObject> = [];
+
+const addUser = (userId: string, socketId: string) => {
   const wasSocketAssignedtToUser = userSocketObjects.some(
     (userSocketObj) => userSocketObj.userId === userId
   );
@@ -13,16 +20,16 @@ const addUser = (userId, socketId) => {
   }
 };
 
-const getUser = (userId) =>
+const getUser = (userId: string) =>
   userSocketObjects.find((user) => user.userId === userId);
 
-const deleteUser = (socketId) => {
+const deleteUser = (socketId: string) => {
   userSocketObjects = userSocketObjects.filter(
     (userSocketObj) => userSocketObj.socketId !== socketId
   );
 };
 
-const SocketServer = (socket) => {
+const SocketServer = (socket: Socket) => {
   // Connect - Disconnect
   socket.on('userJoined', ({ userId }) => {
     addUser(userId, socket.id);
@@ -36,7 +43,7 @@ const SocketServer = (socket) => {
     ({ postTopic, senderMail, senderId, receiverId, type }) => {
       const receiverUser = getUser(receiverId);
 
-      socket.to(receiverUser.socketId).emit('getNotification', {
+      socket.to(receiverUser?.socketId || '').emit('getNotification', {
         postTopic,
         senderMail,
         senderId,

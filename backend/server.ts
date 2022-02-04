@@ -1,23 +1,24 @@
 import dotenv from 'dotenv';
-import express from 'express';
+import express, { NextFunction } from 'express';
 import { Server } from 'socket.io';
 import fs from 'fs';
 import path from 'path';
 import bcrypt from 'bcrypt';
 import { createServer } from 'http';
-import SocketServer from './socketServer.js';
+import SocketServer from './socketServer';
+import { IPost, ILikeObj, IUser, IComment } from './interfaces';
 
 dotenv.config();
 
 const app = express();
 app.use(express.json());
 
-const __dirname = path.resolve(); // Because ES6 modules is used we cant use __dirname like in nodejs
+// const __dirname = path.resolve(); // Because ES6 modules is used we cant use __dirname like in nodejs
 
-const USERS_DATA_FILE = path.join(__dirname, '/backend/data/users.json');
-const POSTS_DATA_FILE = path.join(__dirname, '/backend/data/posts.json');
-const COMMENTS_DATA_FILE = path.join(__dirname, '/backend/data/comments.json');
-const LIKES_DATA_FILE = path.join(__dirname, '/backend/data/likes.json');
+const USERS_DATA_FILE = path.join(__dirname, '/data/users.json');
+const POSTS_DATA_FILE = path.join(__dirname, '/data/posts.json');
+const COMMENTS_DATA_FILE = path.join(__dirname, '/data/comments.json');
+const LIKES_DATA_FILE = path.join(__dirname, '/data/likes.json');
 const NOTIFICATIONS_DATA_FILE = path.join(
   __dirname,
   '/backend/data/notifications.json'
@@ -42,11 +43,11 @@ app.get('/', (req, res) => {
 
 app.get('/api/users', (req, res) => {
   const data = fs.readFileSync(USERS_DATA_FILE);
-  res.json({ users: JSON.parse(data) });
+  res.json({ users: JSON.parse(data.toString()) });
 });
 
 app.post('/api/users', async (req, res, next) => {
-  const users = JSON.parse(fs.readFileSync(USERS_DATA_FILE));
+  const users = JSON.parse(fs.readFileSync(USERS_DATA_FILE).toString());
 
   try {
     const salt = await bcrypt.genSalt(10);
@@ -59,7 +60,9 @@ app.post('/api/users', async (req, res, next) => {
       password: hashedPassword,
     };
 
-    const doesUserExist = users.some((user) => user.email === newUser.email);
+    const doesUserExist = users.some(
+      (user: IUser) => user.email === newUser.email
+    );
 
     if (doesUserExist) {
       res.status(400);
@@ -69,7 +72,7 @@ app.post('/api/users', async (req, res, next) => {
       users.push(newUser);
       fs.writeFileSync(USERS_DATA_FILE, JSON.stringify(users));
 
-      const responseUser = { ...newUser };
+      const responseUser: Partial<IUser> = { ...newUser };
       delete responseUser.password;
 
       res.status(201).json({ user: responseUser });
@@ -81,9 +84,9 @@ app.post('/api/users', async (req, res, next) => {
 
 app.post('/api/users/login', (req, res, next) => {
   const { email, password } = req.body;
-  const users = JSON.parse(fs.readFileSync(USERS_DATA_FILE));
+  const users = JSON.parse(fs.readFileSync(USERS_DATA_FILE).toString());
 
-  const registeredUser = users.find((user) => user.email === email);
+  const registeredUser = users.find((user: IUser) => user.email === email);
 
   if (registeredUser) {
     bcrypt
@@ -117,29 +120,32 @@ app.post('/api/users/login', (req, res, next) => {
 
 app.get('/api/users/:userId/likedPosts', async (req, res, next) => {
   // set likedPosts as an array for the authenticated user
-  const likesData = JSON.parse(fs.readFileSync(LIKES_DATA_FILE));
+  const likesData = JSON.parse(fs.readFileSync(LIKES_DATA_FILE).toString());
 
   const userLikedPosts = likesData.filter(
-    (likeObj) => likeObj.userId === req.params.userId
+    (likeObj: ILikeObj) => likeObj.userId === req.params.userId
   );
 
-  const likedPostsIds = userLikedPosts.map((likeObj) => likeObj.postId);
+  const likedPostsIds = userLikedPosts.map(
+    (likeObj: ILikeObj) => likeObj.postId
+  );
 
   return res.json({
     userLikedPosts: likedPostsIds,
   });
 });
+
 app.get('/api/posts', (req, res) => {
   const data = fs.readFileSync(POSTS_DATA_FILE);
   // using setTimeout so that the loader appears before loading data, like mocking a database.
   setTimeout(() => {
-    res.json({ posts: JSON.parse(data) });
+    res.json({ posts: JSON.parse(data.toString()) });
   }, 2000);
 });
 
 app.post('/api/posts', (req, res) => {
   const { id, postUserInfo, title, content } = req.body;
-  const posts = JSON.parse(fs.readFileSync(POSTS_DATA_FILE));
+  const posts = JSON.parse(fs.readFileSync(POSTS_DATA_FILE).toString());
 
   const newPost = {
     id,
@@ -151,7 +157,7 @@ app.post('/api/posts', (req, res) => {
   };
 
   const isNewPostAlreadyWritten = posts.some(
-    (post) =>
+    (post: IPost) =>
       post.postUserInfo.id === newPost.postUserInfo.id && post.title === title
   );
 
@@ -168,9 +174,11 @@ app.post('/api/posts', (req, res) => {
 
 app.put('/api/posts/:id', (req, res) => {
   const { postUserInfo, title, content } = req.body;
-  const posts = JSON.parse(fs.readFileSync(POSTS_DATA_FILE));
+  const posts = JSON.parse(fs.readFileSync(POSTS_DATA_FILE).toString());
 
-  const foundPostIndex = posts.findIndex((post) => post.id === req.params.id);
+  const foundPostIndex = posts.findIndex(
+    (post: IPost) => post.id === req.params.id
+  );
 
   if (foundPostIndex !== -1) {
     if (posts[foundPostIndex].postUserInfo.id !== postUserInfo.id) {
@@ -189,9 +197,9 @@ app.put('/api/posts/:id', (req, res) => {
 });
 
 app.get('/api/posts/:id', (req, res) => {
-  const posts = JSON.parse(fs.readFileSync(POSTS_DATA_FILE));
+  const posts = JSON.parse(fs.readFileSync(POSTS_DATA_FILE).toString());
 
-  const foundPost = posts.find((post) => post.id === req.params.id);
+  const foundPost = posts.find((post: IPost) => post.id === req.params.id);
 
   if (foundPost) {
     res.json({ post: foundPost });
@@ -201,12 +209,14 @@ app.get('/api/posts/:id', (req, res) => {
 });
 
 app.delete('/api/posts/:id', (req, res) => {
-  const posts = JSON.parse(fs.readFileSync(POSTS_DATA_FILE));
+  const posts = JSON.parse(fs.readFileSync(POSTS_DATA_FILE).toString());
 
-  const postToDelete = posts.find((post) => post.id === req.params.id);
+  const postToDelete = posts.find((post: IPost) => post.id === req.params.id);
 
   // to update the json file.
-  const filteredPosts = posts.filter((post) => post.id !== req.params.id);
+  const filteredPosts = posts.filter(
+    (post: IPost) => post.id !== req.params.id
+  );
 
   if (postToDelete) {
     fs.writeFileSync(POSTS_DATA_FILE, JSON.stringify(filteredPosts));
@@ -218,11 +228,11 @@ app.delete('/api/posts/:id', (req, res) => {
 });
 
 app.post('/api/posts/:postId/like', (req, res) => {
-  const likesData = JSON.parse(fs.readFileSync(LIKES_DATA_FILE));
-  const posts = JSON.parse(fs.readFileSync(POSTS_DATA_FILE));
+  const likesData = JSON.parse(fs.readFileSync(LIKES_DATA_FILE).toString());
+  const posts = JSON.parse(fs.readFileSync(POSTS_DATA_FILE).toString());
 
   const isPostLikedByUser = likesData.some(
-    (likeObj) =>
+    (likeObj: ILikeObj) =>
       likeObj.userId === req.body.userId && likeObj.postId === req.params.postId
   );
 
@@ -235,7 +245,7 @@ app.post('/api/posts/:postId/like', (req, res) => {
 
     // increment the liked post likesCount.
     const likedPostId = posts.findIndex(
-      (post) => post.id === req.params.postId
+      (post: IPost) => post.id === req.params.postId
     );
 
     const updatedPost = {
@@ -252,11 +262,11 @@ app.post('/api/posts/:postId/like', (req, res) => {
 });
 
 app.post('/api/posts/:postId/unlike', (req, res) => {
-  const likesData = JSON.parse(fs.readFileSync(LIKES_DATA_FILE));
-  const posts = JSON.parse(fs.readFileSync(POSTS_DATA_FILE));
+  const likesData = JSON.parse(fs.readFileSync(LIKES_DATA_FILE).toString());
+  const posts = JSON.parse(fs.readFileSync(POSTS_DATA_FILE).toString());
 
   const isPostLikedByUser = likesData.some(
-    (likeObj) =>
+    (likeObj: ILikeObj) =>
       likeObj.userId === req.body.userId && likeObj.postId === req.params.postId
   );
 
@@ -265,7 +275,7 @@ app.post('/api/posts/:postId/unlike', (req, res) => {
   }
 
   const likeToDeleteIndex = likesData.findIndex(
-    (likeObj) =>
+    (likeObj: ILikeObj) =>
       likeObj.userId === req.body.userId && likeObj.postId === req.params.postId
   );
 
@@ -276,7 +286,9 @@ app.post('/api/posts/:postId/unlike', (req, res) => {
   fs.writeFileSync(LIKES_DATA_FILE, JSON.stringify(updatedLikesData));
 
   // decrement the liked post likesCount && update the POSTS_DATA_FILE.
-  const likedPostId = posts.findIndex((post) => post.id === req.params.postId);
+  const likedPostId = posts.findIndex(
+    (post: IPost) => post.id === req.params.postId
+  );
 
   const updatedPost = {
     ...posts[likedPostId],
@@ -292,7 +304,7 @@ app.post('/api/posts/:postId/unlike', (req, res) => {
 app.post('/api/posts/:postId/comments', (req, res) => {
   const { id, userId, text, createdAt } = req.body;
 
-  const comments = JSON.parse(fs.readFileSync(COMMENTS_DATA_FILE));
+  const comments = JSON.parse(fs.readFileSync(COMMENTS_DATA_FILE).toString());
 
   const newComment = {
     id,
@@ -303,12 +315,12 @@ app.post('/api/posts/:postId/comments', (req, res) => {
   };
 
   const isNewCommentAlreadyWritten = comments.some(
-    (comment) =>
+    (comment: IComment) =>
       comment.userId === newComment.userId && comment.text === newComment.text
   );
 
   const isCommentWritteOnSamePost = comments.some(
-    (comment) => comment.postId === newComment.postId
+    (comment: IComment) => comment.postId === newComment.postId
   );
 
   if (isNewCommentAlreadyWritten && isCommentWritteOnSamePost) {
@@ -320,10 +332,10 @@ app.post('/api/posts/:postId/comments', (req, res) => {
   fs.writeFileSync(COMMENTS_DATA_FILE, JSON.stringify(comments));
 
   // increase the commentsCount for the relevant post.
-  const posts = JSON.parse(fs.readFileSync(POSTS_DATA_FILE));
+  const posts = JSON.parse(fs.readFileSync(POSTS_DATA_FILE).toString());
 
   const commentedOnPostId = posts.findIndex(
-    (post) => post.id === req.params.postId
+    (post: IPost) => post.id === req.params.postId
   );
 
   const updatedPost = {
@@ -338,16 +350,16 @@ app.post('/api/posts/:postId/comments', (req, res) => {
 });
 
 app.get('/api/posts/:postId/comments', (req, res) => {
-  const comments = fs.readFileSync(COMMENTS_DATA_FILE);
-  const users = JSON.parse(fs.readFileSync(USERS_DATA_FILE));
+  const comments = JSON.parse(fs.readFileSync(COMMENTS_DATA_FILE).toString());
+  const users = JSON.parse(fs.readFileSync(USERS_DATA_FILE).toString());
 
-  const postComments = JSON.parse(comments).filter(
-    (comment) => comment.postId === req.params.postId
+  const postComments = comments.filter(
+    (comment: IComment) => comment.postId === req.params.postId
   );
 
   // populate userInfo for the comments
-  const userPopulatedComments = postComments.map((comment) => {
-    const commentUser = users.find((user) => user.id === comment.userId);
+  const userPopulatedComments = postComments.map((comment: IComment) => {
+    const commentUser = users.find((user: IUser) => user.id === comment.userId);
     return {
       ...comment,
       userInfo: {
@@ -366,9 +378,11 @@ app.put('/api/comments/:id', (req, res) => {
   const { text } = req.body;
   const { id } = req.params;
 
-  const comments = JSON.parse(fs.readFileSync(COMMENTS_DATA_FILE));
+  const comments = JSON.parse(fs.readFileSync(COMMENTS_DATA_FILE).toString());
 
-  const foundCommentIndex = comments.findIndex((comment) => comment.id === id);
+  const foundCommentIndex = comments.findIndex(
+    (comment: IComment) => comment.id === id
+  );
   if (foundCommentIndex !== -1) {
     const updatedComment = { ...comments[foundCommentIndex], text };
 
@@ -384,32 +398,32 @@ app.put('/api/comments/:id', (req, res) => {
 });
 
 app.delete('/api/comments/:id', (req, res) => {
-  const comments = JSON.parse(fs.readFileSync(COMMENTS_DATA_FILE));
+  const comments = JSON.parse(fs.readFileSync(COMMENTS_DATA_FILE).toString());
 
   const commentToDelete = comments.find(
-    (comment) => comment.id === req.params.id
+    (comment: IComment) => comment.id === req.params.id
   );
 
   // to update the json file.
   const filteredComments = comments.filter(
-    (comment) => comment.id !== req.params.id
+    (comment: IComment) => comment.id !== req.params.id
   );
 
   if (commentToDelete) {
     fs.writeFileSync(COMMENTS_DATA_FILE, JSON.stringify(filteredComments));
 
     // decrease the commentsCount for the relevant post.
-    const posts = JSON.parse(fs.readFileSync(POSTS_DATA_FILE));
+    const posts = JSON.parse(fs.readFileSync(POSTS_DATA_FILE).toString());
 
     const deletedCommentPostId = commentToDelete.postId;
 
     // the id in the array for the post that was commented on.
     const modifiedPostId = posts.findIndex(
-      (post) => post.id === commentToDelete.postId
+      (post: IPost) => post.id === commentToDelete.postId
     );
 
     const commentedOnPost = posts.find(
-      (post) => post.id === deletedCommentPostId
+      (post: IPost) => post.id === deletedCommentPostId
     );
 
     const updatedPost = {
@@ -427,7 +441,9 @@ app.delete('/api/comments/:id', (req, res) => {
 });
 
 app.get('/api/notifications', (req, res) => {
-  const notifications = JSON.parse(fs.readFileSync(NOTIFICATIONS_DATA_FILE));
+  const notifications = JSON.parse(
+    fs.readFileSync(NOTIFICATIONS_DATA_FILE).toString()
+  );
   res.json({ notifications });
 });
 
@@ -435,11 +451,12 @@ app.post('/api/notifications', (req, res) => {
   const { id, content } = req.body;
 
   const notificationsData = JSON.parse(
-    fs.readFileSync(NOTIFICATIONS_DATA_FILE)
+    fs.readFileSync(NOTIFICATIONS_DATA_FILE).toString()
   );
 
   const doesNotificationExist = notificationsData.some(
-    (notification) => notification.id === id || notification.content === content
+    (notification: any) =>
+      notification.id === id || notification.content === content
   );
   if (!doesNotificationExist) {
     notificationsData.push({
@@ -457,14 +474,14 @@ app.post('/api/notifications', (req, res) => {
   return res.status(201).json({ success: 'Notification sent' });
 });
 
-const notFound = (req, res, next) => {
+const notFound = (req: any, res: any, next: any) => {
   console.log('NOT FOUND ERROR');
   const error = new Error(`Not Found - ${req.originalUrl}`);
   res.status(404);
   next(error);
 };
 
-const errorHandler = (err, req, res, next) => {
+const errorHandler = (err: any, req: any, res: any, next: any) => {
   const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
 
   res.status(statusCode).json({
