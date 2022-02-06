@@ -7,10 +7,12 @@ import bcrypt from 'bcrypt';
 import { createServer } from 'http';
 import SocketServer from './socketServer';
 import { IPost, ILikeObj, IUser, IComment } from './interfaces';
+import { connectDB } from './config/db';
 
 dotenv.config();
 
-const app = express();
+connectDB();
+
 app.use(express.json());
 
 // const __dirname = path.resolve(); // Because ES6 modules is used we cant use __dirname like in nodejs
