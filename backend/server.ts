@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import express, { NextFunction } from 'express';
+import express from 'express';
 import { Server } from 'socket.io';
 import fs from 'fs';
 import path from 'path';
@@ -8,6 +8,9 @@ import { createServer } from 'http';
 import SocketServer from './socketServer';
 import { IPost, ILikeObj, IUser, IComment } from './interfaces';
 import { connectDB } from './config/db';
+import userRoutes from './routes/userRoutes';
+
+const app = express();
 
 dotenv.config();
 
@@ -15,7 +18,7 @@ connectDB();
 
 app.use(express.json());
 
-// const __dirname = path.resolve(); // Because ES6 modules is used we cant use __dirname like in nodejs
+app.use('/api/users', userRoutes);
 
 const USERS_DATA_FILE = path.join(__dirname, '/data/users.json');
 const POSTS_DATA_FILE = path.join(__dirname, '/data/posts.json');
