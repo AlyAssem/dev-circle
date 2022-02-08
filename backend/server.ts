@@ -9,6 +9,7 @@ import SocketServer from './socketServer';
 import { IPost, ILikeObj, IUser, IComment } from './interfaces';
 import { connectDB } from './config/db';
 import userRoutes from './routes/userRoutes';
+import postRoutes from './routes/postRoutes';
 
 const app = express();
 
@@ -19,6 +20,7 @@ connectDB();
 app.use(express.json());
 
 app.use('/api/users', userRoutes);
+app.use('/api/posts', postRoutes);
 
 const USERS_DATA_FILE = path.join(__dirname, '/data/users.json');
 const POSTS_DATA_FILE = path.join(__dirname, '/data/posts.json');
