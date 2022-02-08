@@ -1,11 +1,13 @@
 # Dev-Circle Web Application
-> A web application for developers to share posts, comment and like others' posts and have a knowledge sharing community, Built with React-Hooks, Typescript, Redux-toolkit, Tailwindcss, nodejs(A simple backend with  json files as mock data to handle frontend services).
+> PERN stack Social networking web application for developers to share posts, comment and like others' posts and have a knowledge sharing community, Built with React-Hooks, Typescript, Redux-toolkit, Tailwindcss, Nodejs, Expressjs,Postgres, TypeOrm, Socket.io (for real time notification).
 
 ## Features: It's still under development but the current implemented features are the following.
 
 - Real time notification system with socket.io.
-- Register && login.
-- CRUD operations for posts.
+- Responsive web design.
+- Authentication and authorization.(using JWT)
+- CRUD operations for (posts & comments).
+- post likes and notifications when a post is liked.
 - form validation using formik.
 - unit tests for user registeration 
 
@@ -25,7 +27,12 @@
 - Formik.
 - Jest & Enzyme.(for unit testing)
 
-### Back-End: Used a simple backend with no architecture in mind just to handle the frontend services
+### Back-End:
 - Nodejs & Express.
-- bcrypt.js.
-- Json for storing data.
+- express-async-handler
+- JSON Web Token (JWT).
+- dotenv.
+- bcrypt.
+- TypeOrm
+- postgresql
+
