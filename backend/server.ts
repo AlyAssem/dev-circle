@@ -10,17 +10,18 @@ import { IPost, ILikeObj, IUser, IComment } from './interfaces';
 import { connectDB } from './config/db';
 import userRoutes from './routes/userRoutes';
 import postRoutes from './routes/postRoutes';
+import commentRoutes from './routes/commentRoutes';
 
 const app = express();
 
 dotenv.config();
-
 connectDB();
 
 app.use(express.json());
 
 app.use('/api/users', userRoutes);
 app.use('/api/posts', postRoutes);
+app.use('/api/comments', commentRoutes);
 
 const USERS_DATA_FILE = path.join(__dirname, '/data/users.json');
 const POSTS_DATA_FILE = path.join(__dirname, '/data/posts.json');
