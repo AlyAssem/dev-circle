@@ -4,9 +4,11 @@ import { toast } from 'react-toastify';
 import { v4 as uuidV4 } from 'uuid';
 
 import CloseIcon from '../../icons/CloseIcon';
-import { createPostComment } from '../../redux-features/comments';
-import { useAppDispatch, useAppSelector } from '../../redux-features/hooks';
-import { getPosts } from '../../redux-features/posts';
+import {
+  createPostComment,
+  getPostComments,
+} from '../../redux-features/comments';
+import { useAppDispatch } from '../../redux-features/hooks';
 import { CommentForm } from './CommentForm';
 import { Comments } from './Comments';
 
@@ -51,8 +53,7 @@ export const CommentsModal: React.FC<ICommentsModalProps> = ({
         }
       );
 
-      await dispatch(getPosts());
-      onClose();
+      await dispatch(getPostComments(postId));
     }
 
     if (createPostComment.rejected.match(resultAction)) {

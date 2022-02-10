@@ -2,19 +2,10 @@
 /* eslint-disable no-param-reassign */
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios, { AxiosError } from 'axios';
-import { User } from './users';
+import { IComment } from '../interfaces';
 
 interface ValidationErrors {
   errorMessage: string;
-}
-
-export interface IComment {
-  id: string;
-  userId: string;
-  postId: string;
-  text: string;
-  createdAt: string;
-  userInfo?: User; // i get the userInfo when getting comments only, gets populated before getting sent from server.
 }
 
 interface commentsState {
@@ -58,40 +49,46 @@ export const createPostComment = createAsyncThunk<
   // Return type of the payload creator
   IComment,
   //   type of commentData used as  an argument to async function.
-  IComment,
+  { postId: string; text: string },
   {
     // Optional fields for defining thunkApi field types
     rejectValue: ValidationErrors;
   }
->('/comments/createComment', async (commentData, { rejectWithValue }) => {
-  try {
-    const { id, userId, postId, text, createdAt } = commentData;
-    const config = {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    };
+>(
+  '/comments/createComment',
+  async (commentData, { getState, rejectWithValue }) => {
+    const {
+      users: { userInfo },
+    } = getState() as any;
 
-    const response = await axios.post<{ comment: IComment }>(
-      `/api/posts/${postId}/comments`,
-      {
-        id,
-        userId,
-        text,
-        createdAt,
-      },
-      config
-    );
+    try {
+      const { postId, text } = commentData;
+      const config = {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${userInfo.token}`,
+        },
+      };
 
-    return response.data.comment;
-  } catch (err: any) {
-    const error: AxiosError<ValidationErrors> = err;
-    if (!error.response) {
-      throw err;
+      const response = await axios.post<{ comment: IComment }>(
+        '/api/comments',
+        {
+          postId,
+          text,
+        },
+        config
+      );
+
+      return response.data.comment;
+    } catch (err: any) {
+      const error: AxiosError<ValidationErrors> = err;
+      if (!error.response) {
+        throw err;
+      }
+      return rejectWithValue(error.response.data);
     }
-    return rejectWithValue(error.response.data);
   }
-});
+);
 
 const commentsSlice = createSlice({
   name: 'comments',

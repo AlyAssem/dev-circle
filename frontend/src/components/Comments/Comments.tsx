@@ -63,9 +63,9 @@ export const Comments: React.FC<ICommentsProps> = ({ postId }) => {
 
   const actualComments = comments.map((comment) => (
     <div id='user-comment' className='flex flex-col'>
-      <span className='text-green-600'>@{comment?.userInfo?.userName}</span>
+      <span className='text-green-600'>@{comment?.user?.name}</span>
       <div className='m-3'>{comment.text}</div>
-      <span>{comment.createdAt}</span>
+      <span>{new Date(comment.createdAt).toLocaleDateString()}</span>
       <hr className='w-full border-b-2 border-black opacity-10 mb-5' />
     </div>
   ));

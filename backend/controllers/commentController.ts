@@ -64,7 +64,7 @@ const createCommentOnPost = asyncHandler(
       .where('id = :id', { id: postId })
       .execute();
 
-    res.send({ message: 'You commented on the post!' });
+    res.send({ comment });
   }
 );
 

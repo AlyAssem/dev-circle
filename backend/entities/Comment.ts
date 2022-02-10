@@ -4,6 +4,8 @@ import {
   BaseEntity,
   PrimaryGeneratedColumn,
   Column,
+  CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { Post } from './Post';
 import { User } from './User';
@@ -15,6 +17,12 @@ export class Comment extends BaseEntity {
 
   @Column({ type: 'text' })
   text: String;
+
+  @CreateDateColumn()
+  createdAt!: Date;
+
+  @UpdateDateColumn()
+  updatedAt!: Date;
 
   @ManyToOne(() => User, (user) => user.comments)
   user: User;
