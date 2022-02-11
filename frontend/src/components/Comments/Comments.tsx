@@ -1,56 +1,15 @@
-import React, { useEffect, useRef } from 'react';
-import { toast, ToastContainer } from 'react-toastify';
+import React from 'react';
+import { ToastContainer } from 'react-toastify';
+import { IComment } from '../../interfaces';
 
-import { getPostComments } from '../../redux-features/comments';
-import { useAppDispatch, useAppSelector } from '../../redux-features/hooks';
+import { useAppSelector } from '../../redux-features/hooks';
 
 interface ICommentsProps {
-  postId: string;
+  postComments: Array<IComment>;
 }
 
-export const Comments: React.FC<ICommentsProps> = ({ postId }) => {
-  const dispatch = useAppDispatch();
-
-  const comments = useAppSelector((state) => state.comments.comments);
+export const Comments: React.FC<ICommentsProps> = ({ postComments }) => {
   const isLoading = useAppSelector((state) => state.comments.isLoading);
-
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  const fetchPostComments = useRef(() => {});
-
-  fetchPostComments.current = async () => {
-    const resultAction = await dispatch(getPostComments(postId));
-    if (getPostComments.rejected.match(resultAction)) {
-      if (resultAction.payload) {
-        // if the error is sent from server payload
-        toast.error(
-          <div>
-            Error
-            <br />
-            {resultAction.payload.errorMessage}
-          </div>,
-
-          {
-            position: toast.POSITION.BOTTOM_RIGHT,
-          }
-        );
-      } else {
-        toast.error(
-          <div>
-            Error
-            <br />
-            {resultAction.error}
-          </div>,
-          {
-            position: toast.POSITION.BOTTOM_RIGHT,
-          }
-        );
-      }
-    }
-  };
-
-  useEffect(() => {
-    fetchPostComments.current();
-  }, []);
 
   const skeletonComments = ['skeleton1', 'skeleton2'].map((skeletonName) => (
     <div key={skeletonName}>
@@ -61,7 +20,7 @@ export const Comments: React.FC<ICommentsProps> = ({ postId }) => {
     </div>
   ));
 
-  const actualComments = comments.map((comment) => (
+  const actualComments = postComments.map((comment) => (
     <div id='user-comment' className='flex flex-col'>
       <span className='text-green-600'>@{comment?.user?.name}</span>
       <div className='m-3'>{comment.text}</div>

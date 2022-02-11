@@ -44,7 +44,6 @@ export const Header: React.FC<IHeaderProps> = ({ socket }) => {
   }, [socket]);
 
   const handleLogout = () => {
-    localStorage.removeItem('userInfo');
     dispatch(logout());
   };
 
@@ -97,7 +96,7 @@ export const Header: React.FC<IHeaderProps> = ({ socket }) => {
               id='logged-in-userName'
               className='text-green-500 font-medium text-lg mr-4'
             >
-              {userInfo.userName}
+              {userInfo.name}
             </span>
           </li>
           <li>

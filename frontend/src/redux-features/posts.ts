@@ -2,16 +2,7 @@
 /* eslint-disable no-param-reassign */
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios, { AxiosError } from 'axios';
-import { User } from './users';
-
-export interface IPost {
-  id: string;
-  title: string;
-  content: string;
-  postUserInfo: Partial<User>;
-  commentsCount: number;
-  likesCount: number;
-}
+import { IPost } from '../interfaces';
 
 interface PostsState {
   error: string | null | undefined;
@@ -147,12 +138,18 @@ export const createPost = createAsyncThunk<
     // Optional fields for defining thunkApi field types
     rejectValue: ValidationErrors;
   }
->('posts/createPost', async (postData, { rejectWithValue }) => {
+>('posts/createPost', async (postData, { getState, rejectWithValue }) => {
   try {
-    const { id, title, content, postUserInfo } = postData;
+    const { id, title, content, user } = postData;
+
+    const {
+      users: { userInfo },
+    } = getState() as any;
+
     const config = {
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${userInfo.token}`,
       },
     };
 
@@ -164,7 +161,7 @@ export const createPost = createAsyncThunk<
         id,
         title,
         content,
-        postUserInfo,
+        user,
         likesCount: 0,
         commentsCount: 0,
       },
@@ -191,12 +188,18 @@ export const editPost = createAsyncThunk<
     // Optional fields for defining thunkApi field types
     rejectValue: ValidationErrors;
   }
->('posts/editPost', async (postData, { rejectWithValue }) => {
+>('posts/editPost', async (postData, { getState, rejectWithValue }) => {
   try {
-    const { id, title, content, postUserInfo } = postData;
+    const { id, title, content, user } = postData;
+
+    const {
+      users: { userInfo },
+    } = getState() as any;
+
     const config = {
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${userInfo.token}`,
       },
     };
 
@@ -208,7 +211,7 @@ export const editPost = createAsyncThunk<
         id,
         title,
         content,
-        postUserInfo,
+        user,
       },
       config
     );
@@ -233,9 +236,20 @@ export const deletePost = createAsyncThunk<
     // Optional fields for defining thunkApi field types
     rejectValue: ValidationErrors;
   }
->('posts/deletePost', async (postId, { rejectWithValue }) => {
+>('posts/deletePost', async (postId, { getState, rejectWithValue }) => {
   try {
-    const response = await axios.delete(`/api/posts/${postId}`);
+    const {
+      users: { userInfo },
+    } = getState() as any;
+
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+    };
+
+    const response = await axios.delete(`/api/posts/${postId}`, config);
 
     return response.data;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

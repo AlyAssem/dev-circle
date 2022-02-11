@@ -12,9 +12,9 @@ import { Comment } from '../entities/Comment';
  * @access public
  */
 const getPosts = asyncHandler(async (req: Request, res: Response) => {
-  const posts = Post.find({});
+  const posts = await Post.find({ relations: ['user'] });
 
-  res.json(posts);
+  res.json({ posts });
 });
 
 /**
@@ -27,8 +27,18 @@ const createPost = asyncHandler(async (req: Request, res: Response) => {
 
   const user = await User.findOne(req.currentUser?.id);
 
+  const postWithSameGivenTitle = await Post.findOne(
+    { title },
+    { relations: ['user'] }
+  );
+
   if (!user) {
     throw new Error('User not found');
+  }
+
+  if (req.currentUser?.id === postWithSameGivenTitle?.user.id) {
+    // if the logged in user has already written this post title before.
+    throw new Error('You have posted about this before, please do not spam.');
   }
 
   const post = await Post.create({
@@ -83,7 +93,7 @@ const updatePost = asyncHandler(async (req: Request, res: Response) => {
 
     const updatedPost = await post.save();
 
-    res.json(updatedPost);
+    res.json({ post: updatedPost });
   } else {
     res.status(404);
     throw new Error('Post not found');
@@ -105,7 +115,7 @@ const deletePost = asyncHandler(async (req: Request, res: Response) => {
       throw new Error('logged in user is not the post owner.');
     } else {
       await post.remove();
-      res.json({ message: 'Post removed' });
+      res.json({ message: 'Post removed', postId: id });
     }
   } else {
     res.status(404);
@@ -202,6 +212,30 @@ const unlikePost = asyncHandler(async (req: Request, res: Response) => {
   return;
 });
 
+/**
+ * @desc get all comments on a post
+ * @route GET /api/posts/:id/comments
+ * @access public
+ */
+const getPostComments = asyncHandler(async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  const post = await Post.findOne({ id });
+
+  if (!post) {
+    res.status(404).send({ message: 'Post not found!' });
+    return;
+  }
+
+  const comments = await Comment.createQueryBuilder('comment')
+    .innerJoin('comment.post', 'post')
+    .where('post.id = :id', { id })
+    .innerJoinAndSelect('comment.user', 'user')
+    .getMany();
+
+  res.send({ comments });
+});
+
 export {
   getPosts,
   createPost,
@@ -210,4 +244,5 @@ export {
   deletePost,
   likePost,
   unlikePost,
+  getPostComments,
 };

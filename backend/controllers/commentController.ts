@@ -41,11 +41,10 @@ const createCommentOnPost = asyncHandler(
       isCommentAlreadyWrittenByUserForPost &&
       Object.keys(isCommentAlreadyWrittenByUserForPost).length > 0
     ) {
-      res.status(400).send({
-        message:
-          'You commented this comment on the same post before, please do not spam.',
-      });
-      return;
+      res.status(400);
+      throw new Error(
+        'You commented this comment on the same post before, please do not spam.'
+      );
     }
 
     // add a comment object to the comment table with userId and postId reference.

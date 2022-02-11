@@ -1,20 +1,16 @@
 /* eslint-disable react/self-closing-comp */
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
-import { v4 as uuidV4 } from 'uuid';
-
 import CloseIcon from '../../icons/CloseIcon';
 import {
   createPostComment,
   getPostComments,
 } from '../../redux-features/comments';
-import { useAppDispatch } from '../../redux-features/hooks';
+import { useAppDispatch, useAppSelector } from '../../redux-features/hooks';
 import { CommentForm } from './CommentForm';
 import { Comments } from './Comments';
 
 interface ICommentsModalProps {
-  // eslint-disable-next-line react/require-default-props
-  // commentId?: string;
   postId: string;
   title: string;
   onClose: () => void;
@@ -27,17 +23,52 @@ export const CommentsModal: React.FC<ICommentsModalProps> = ({
   onClose,
 }) => {
   const dispatch = useAppDispatch();
-  const userInfo = useAppSelector((reduxState) => reduxState.users.userInfo);
+
+  const comments = useAppSelector((state) => state.comments.comments);
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  const fetchPostComments = useRef(() => {});
+
+  fetchPostComments.current = async () => {
+    const resultAction = await dispatch(getPostComments(postId));
+    if (getPostComments.rejected.match(resultAction)) {
+      if (resultAction.payload) {
+        // if the error is sent from server payload
+        toast.error(
+          <div>
+            Error
+            <br />
+            {resultAction.payload.errorMessage}
+          </div>,
+
+          {
+            position: toast.POSITION.BOTTOM_RIGHT,
+          }
+        );
+      } else {
+        toast.error(
+          <div>
+            Error
+            <br />
+            {resultAction.error}
+          </div>,
+          {
+            position: toast.POSITION.BOTTOM_RIGHT,
+          }
+        );
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchPostComments.current();
+  }, []);
 
   const handleCommentAdd = async (comment: string) => {
-    const { id: userId } = userInfo;
     const resultAction = await dispatch(
       createPostComment({
-        id: uuidV4(),
         postId,
-        userId: userId || '',
         text: comment,
-        createdAt: new Date().toLocaleString(),
       })
     );
 
@@ -52,8 +83,6 @@ export const CommentsModal: React.FC<ICommentsModalProps> = ({
           position: toast.POSITION.BOTTOM_RIGHT,
         }
       );
-
-      await dispatch(getPostComments(postId));
     }
 
     if (createPostComment.rejected.match(resultAction)) {
@@ -94,7 +123,7 @@ export const CommentsModal: React.FC<ICommentsModalProps> = ({
           onClose();
         }
       }}
-      className='bg-black bg-opacity-40 fixed inset-0 flex justify-center items-center'
+      className='z-30 bg-black bg-opacity-40 fixed inset-0 flex justify-center items-center'
       tabIndex={0}
     >
       <div
@@ -118,7 +147,7 @@ export const CommentsModal: React.FC<ICommentsModalProps> = ({
           <CommentForm onCommentAdd={(comment) => handleCommentAdd(comment)} />
           <hr className='w-full border-b-2 border-black opacity-10 mb-5' />
           <div className='max-h-64 overflow-y-auto overflow-x-hidden'>
-            <Comments postId={postId} />
+            <Comments postComments={comments} />
           </div>
         </div>
       </div>

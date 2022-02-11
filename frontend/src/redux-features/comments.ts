@@ -116,7 +116,7 @@ const commentsSlice = createSlice({
     });
 
     builder.addCase(createPostComment.fulfilled, (state, { payload }) => {
-      state.comments = [...state.comments, payload];
+      state.comments = [payload, ...state.comments];
     });
     builder.addCase(createPostComment.rejected, (state, action) => {
       if (action.payload) {
