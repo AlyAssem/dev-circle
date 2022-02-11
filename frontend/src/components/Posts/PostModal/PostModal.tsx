@@ -1,81 +1,42 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import { v4 as uuidV4 } from 'uuid';
 
 import { useAppDispatch, useAppSelector } from '../../../redux-features/hooks';
-import { createPost, editPost, getPost } from '../../../redux-features/posts';
+import { createPost, editPost } from '../../../redux-features/posts';
 import { ResizableTextArea } from '../../common/ResizableTextArea';
 
 interface IPostModalProps {
   // eslint-disable-next-line react/require-default-props
-  postId?: string; // when creating a post the id is not determined yet.
+  post?: {
+    id: string;
+    title: string;
+    content: string;
+  };
   title: string;
   action: string;
   onClose: () => void;
 }
 
 const PostModal: React.FC<IPostModalProps> = ({
-  postId,
   title,
   action,
+  post,
   onClose,
 }) => {
+  const [postTitle, setPostTitle] = useState(post?.title || '');
+  const [postContent, setPostContent] = useState(post?.content || '');
+
   const dispatch = useAppDispatch();
   const userInfo = useAppSelector((reduxState) => reduxState.users.userInfo);
-  const [postTitle, setPostTitle] = useState('');
-  const [postContent, setPostContent] = useState('');
-
-  // eslint-disable-next-line @typescript-eslint/no-empty-function , @typescript-eslint/no-unused-vars
-  const fetchPost = useRef((_curentPostId: string) => {});
-
-  fetchPost.current = async (curentPostId: string) => {
-    const resultAction = await dispatch(getPost({ postId: curentPostId }));
-    if (getPost.fulfilled.match(resultAction)) {
-      setPostTitle(resultAction.payload.title);
-      setPostContent(resultAction.payload.content);
-    }
-    if (getPost.rejected.match(resultAction)) {
-      if (resultAction.payload) {
-        // if the error is sent from server payload
-        toast.error(
-          <div>
-            Error
-            <br />
-            {resultAction.payload.errorMessage}
-          </div>,
-
-          {
-            position: toast.POSITION.BOTTOM_RIGHT,
-          }
-        );
-      } else {
-        toast.error(
-          <div>
-            Error
-            <br />
-            {resultAction.error}
-          </div>,
-          {
-            position: toast.POSITION.BOTTOM_RIGHT,
-          }
-        );
-      }
-    }
-  };
-
-  useEffect(() => {
-    if (action === 'Edit') {
-      fetchPost.current(postId || '');
-    }
-  }, [action, postId]);
 
   const handlePostCreate = async () => {
     if (userInfo) {
-      const { id, userName } = userInfo;
+      const { id, name } = userInfo;
       const resultAction = await dispatch(
         createPost({
           id: uuidV4(),
-          postUserInfo: { id: id || '', userName: userName || '' },
+          user: { id: id || '', name },
           title: postTitle,
           content: postContent,
         })
@@ -126,13 +87,13 @@ const PostModal: React.FC<IPostModalProps> = ({
   };
 
   const handlePostEdit = async () => {
-    const { id, userName } = userInfo;
+    const { id, name } = userInfo;
     const resultAction = await dispatch(
       editPost({
-        postUserInfo: { id: id || '', userName: userName || '' },
+        user: { id: id || '', name },
         title: postTitle,
         content: postContent,
-        id: postId || '',
+        id: post?.id || '',
       })
     );
 
@@ -161,7 +122,19 @@ const PostModal: React.FC<IPostModalProps> = ({
           }
         );
       }
-    } else {
+    }
+
+    if (editPost.fulfilled.match(resultAction)) {
+      toast.success(
+        <div>
+          Success
+          <br />
+          Post updated
+        </div>,
+        {
+          position: toast.POSITION.BOTTOM_RIGHT,
+        }
+      );
       onClose();
     }
   };
@@ -175,7 +148,7 @@ const PostModal: React.FC<IPostModalProps> = ({
           onClose();
         }
       }}
-      className='bg-black bg-opacity-40 fixed inset-0 flex justify-center items-center'
+      className='z-30 bg-black bg-opacity-40 fixed inset-0 flex justify-center items-center'
       tabIndex={0}
     >
       <div

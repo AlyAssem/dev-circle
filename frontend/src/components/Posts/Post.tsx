@@ -7,16 +7,12 @@ import EditIcon from '../../icons/EditIcon';
 import FilledLikeIcon from '../../icons/FilledLikeIcon';
 import LikeIcon from '../../icons/LikeIcon';
 import { useAppDispatch, useAppSelector } from '../../redux-features/hooks';
-import {
-  deletePost,
-  IPost,
-  likePost,
-  unlikePost,
-} from '../../redux-features/posts';
+import { deletePost, likePost, unlikePost } from '../../redux-features/posts';
+import { IPost } from '../../interfaces';
+import PostModal from './PostModal/PostModal';
+import { CommentsModal } from '../Comments/CommentsModal';
 
 interface IPostProps extends IPost {
-  openPostEditModal: (id: string) => void;
-  openPostCommentModal: (id: string) => void;
   isPostLikedByUser: () => boolean;
   socket: Socket | null;
 }
@@ -25,11 +21,9 @@ const Post: React.FC<IPostProps> = ({
   title,
   content,
   id,
-  postUserInfo,
+  user,
   likesCount,
   commentsCount,
-  openPostEditModal,
-  openPostCommentModal,
   isPostLikedByUser,
   socket,
 }) => {
@@ -37,6 +31,9 @@ const Post: React.FC<IPostProps> = ({
 
   const [numberOfLikes, setNumberOfLikes] = useState(likesCount);
   const [isPostLiked, setIsPostLiked] = useState(isPostLikedByUserResult);
+  const [isEditPostModalOpen, setIsEditPostModalOpen] = useState(false);
+  const [isCommentOnPostModalOpen, setIsCommentOnPostModalOpen] =
+    useState(false);
 
   const dispatch = useAppDispatch();
 
@@ -103,7 +100,7 @@ const Post: React.FC<IPostProps> = ({
         postTopic: title,
         senderMail: loggedInUserInfo.email,
         senderId: loggedInUserInfo.id,
-        receiverId: postUserInfo.id, // the owner of the post.
+        receiverId: user.id, // the owner of the post.
         type: 1, // eventType is like clicked and for comment would be 2.
       });
     }
@@ -141,7 +138,7 @@ const Post: React.FC<IPostProps> = ({
                   id='commentOnPostIcon'
                   type='button'
                   className='hover:text-green-600'
-                  onClick={() => openPostCommentModal(id)}
+                  onClick={() => setIsCommentOnPostModalOpen(true)}
                 >
                   <CommentIcon />
                 </button>
@@ -150,13 +147,13 @@ const Post: React.FC<IPostProps> = ({
           </div>
           <div className='p-4'>
             <span className='block text-green-600 font-medium'>
-              {postUserInfo.userName}
+              {user.name}
             </span>
             <div className='flex justify-between'>
               <span className='text-gray-600'>
                 {new Date().toLocaleString()}
               </span>
-              {loggedInUserInfo.id === postUserInfo.id && (
+              {loggedInUserInfo.id === user.id && (
                 <div>
                   <button
                     id='deletePostIcon'
@@ -170,7 +167,9 @@ const Post: React.FC<IPostProps> = ({
                     id='editPostIcon'
                     type='button'
                     className='ml-3 hover:text-green-600'
-                    onClick={() => openPostEditModal(id)}
+                    onClick={() => {
+                      setIsEditPostModalOpen(true);
+                    }}
                   >
                     <EditIcon />
                   </button>
@@ -180,6 +179,29 @@ const Post: React.FC<IPostProps> = ({
           </div>
         </div>
       </div>
+      {isEditPostModalOpen && (
+        <PostModal
+          title='Edit Post'
+          post={{
+            id,
+            title,
+            content,
+          }}
+          action='Edit'
+          onClose={() => {
+            setIsEditPostModalOpen(false);
+          }}
+        />
+      )}
+      {isCommentOnPostModalOpen && (
+        <CommentsModal
+          postId={id}
+          title='Comments'
+          onClose={() => {
+            setIsCommentOnPostModalOpen(false);
+          }}
+        />
+      )}
       <ToastContainer />
     </>
   );
