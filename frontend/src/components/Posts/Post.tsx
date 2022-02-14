@@ -32,6 +32,7 @@ const Post: React.FC<IPostProps> = ({
 
   const [state, setState] = useState({
     numberOfLikes: like_count,
+    numberOfComments: comment_count,
     isPostLiked: isPostLikedByUser,
   });
   const [isEditPostModalOpen, setIsEditPostModalOpen] = useState(false);
@@ -136,7 +137,7 @@ const Post: React.FC<IPostProps> = ({
                 </button>
               </div>
               <div className='flex flex-col items-center'>
-                <span>{comment_count}</span>
+                <span>{state.numberOfComments}</span>
                 <button
                   id='commentOnPostIcon'
                   type='button'
@@ -200,6 +201,12 @@ const Post: React.FC<IPostProps> = ({
         <CommentsModal
           postId={id}
           title='Comments'
+          onComment={() => {
+            setState((curr) => ({
+              ...curr,
+              numberOfComments: curr.numberOfComments + 1,
+            }));
+          }}
           onClose={() => {
             setIsCommentOnPostModalOpen(false);
           }}
