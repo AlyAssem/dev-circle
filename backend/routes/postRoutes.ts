@@ -21,9 +21,9 @@ router
   .put(protect, updatePost)
   .delete(protect, deletePost);
 
-router.route('/:id/like').post(protect, likePost);
+router.route('/:id/like').get(protect, likePost);
 
-router.route('/:id/unlike').post(protect, unlikePost);
+router.route('/:id/unlike').get(protect, unlikePost);
 
 router.route('/:id/comments').get(getPostComments);
 

@@ -13,6 +13,7 @@ import Loader from '../../components/Loader';
 import { getPosts } from '../../redux-features/posts';
 // import { deleteSocket, setSocket } from '../../redux-features/globals';
 import SocketClient from '../../SocketClient';
+import { getUserLikedPosts } from '../../redux-features/users';
 
 interface IHomePageProps {
   history: History;
@@ -24,13 +25,25 @@ export const HomePage: React.FC<IHomePageProps> = ({
   const [isCreatePostModalOpen, setIsCreatePostModalOpen] = useState(false);
   const [socket, setSocket] = useState<Socket | null>(null);
   const dispatch = useAppDispatch();
+
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   const fetchPosts = useRef(() => {});
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  const fetchUserLikedPosts = useRef(() => {});
 
   const userInfo = useAppSelector((state) => state.users.userInfo);
-  const posts = useAppSelector((state) => state.posts.posts);
   const isLoading = useAppSelector((state) => state.posts.isLoading);
   // const socket = useAppSelector((state) => state.globals.socket);
+
+  fetchUserLikedPosts.current = async () => {
+    if (userInfo && userInfo.id) {
+      const resultAction = await dispatch(getUserLikedPosts(userInfo.id));
+      if (getUserLikedPosts.fulfilled.match(resultAction)) {
+        // fetch posts only after the likedPosts for the loggedin user has been fetched to avoid re-rendering.
+        fetchPosts.current();
+      }
+    }
+  };
 
   fetchPosts.current = async () => {
     const resultAction = await dispatch(getPosts());
@@ -64,14 +77,14 @@ export const HomePage: React.FC<IHomePageProps> = ({
   };
 
   useEffect(() => {
+    fetchUserLikedPosts.current();
+  }, []);
+
+  useEffect(() => {
     if (userInfo && Object.keys(userInfo).length === 0) {
       history.push('/register');
     }
   }, [history, userInfo]);
-
-  useEffect(() => {
-    fetchPosts.current();
-  }, []);
 
   useEffect(() => {
     const createdSocket = io('http://localhost:5000');
@@ -102,7 +115,7 @@ export const HomePage: React.FC<IHomePageProps> = ({
         <Loader />
       ) : (
         <div className='w-full flex flex-col items-center'>
-          <Posts posts={posts} socket={socket} />
+          <Posts socket={socket} />
         </div>
       )}
       {isCreatePostModalOpen && (

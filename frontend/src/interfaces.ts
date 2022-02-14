@@ -16,8 +16,8 @@ export interface IPost {
   user: Partial<IUser>;
   title: string;
   content: string;
-  likesCount: number;
-  commentsCount: number;
+  like_count: number;
+  comment_count: number;
 }
 
 export interface IComment {

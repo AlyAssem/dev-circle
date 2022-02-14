@@ -4,6 +4,7 @@ import {
   registerUser,
   getUsers,
   authUser,
+  getLikedPosts,
 } from '../controllers/userController';
 import { protect } from '../middleware/authMiddleware';
 
@@ -22,5 +23,7 @@ router
   .get(getUsers);
 
 router.route('/login').post(authUser);
+
+router.route('/:id/likedPosts').get(protect, getLikedPosts);
 
 export default router;

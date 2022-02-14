@@ -4,6 +4,7 @@ import asyncHandler from 'express-async-handler';
 import { validationResult } from 'express-validator';
 import { User } from '../entities/User';
 import generateToken from '../utils/generateToken';
+import { Like } from '../entities/Like';
 
 /**
  * @desc Register a user
@@ -36,10 +37,12 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
   await user.save();
 
   res.status(201).json({
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    token: generateToken(user.id),
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      token: generateToken(user.id),
+    },
   });
 });
 
@@ -61,10 +64,12 @@ const authUser = asyncHandler(async (req: Request, res: Response) => {
 
     if (isPasswordCorrect) {
       res.json({
-        id: registeredUser.id,
-        name: registeredUser.name,
-        email: registeredUser.email,
-        token: generateToken(registeredUser.id),
+        user: {
+          id: registeredUser.id,
+          name: registeredUser.name,
+          email: registeredUser.email,
+          token: generateToken(registeredUser.id),
+        },
       });
     } else {
       res.status(401);
@@ -88,4 +93,34 @@ const getUsers = asyncHandler(async (req: Request, res: Response) => {
   res.json({ users });
 });
 
-export { registerUser, getUsers, authUser };
+/**
+ * @desc fetch all posts that are liked by user.
+ * @route GET /api/users/:id/likedPosts
+ * @access private
+ */
+const getLikedPosts = asyncHandler(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const user = await User.findOne({ id });
+
+  if (user) {
+    if (req.currentUser?.id !== user.id) {
+      res.status(401);
+      throw new Error('logged in user is not the owner of these likes');
+    } else {
+      const userLikedPosts = await Like.createQueryBuilder('like')
+        .innerJoin('like.user', 'user')
+        .where('user.id = :id', { id })
+        .innerJoinAndSelect('like.post', 'post')
+        .getMany();
+
+      const likedPostsIds = userLikedPosts.map((likeObj) => likeObj.post.id);
+
+      res.send({ userLikedPosts: likedPostsIds });
+    }
+  } else {
+    res.status(404);
+    throw new Error('User not found');
+  }
+});
+
+export { registerUser, getUsers, authUser, getLikedPosts };

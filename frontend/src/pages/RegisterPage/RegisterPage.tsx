@@ -66,7 +66,7 @@ export const RegisterPage: React.FC<IRegisterPageProps> = ({
         registerUser({
           id: uuidV4(),
           email: values.email,
-          userName: values.userName,
+          name: values.userName,
           password: values.password,
         })
       );

@@ -13,7 +13,7 @@ import PostModal from './PostModal/PostModal';
 import { CommentsModal } from '../Comments/CommentsModal';
 
 interface IPostProps extends IPost {
-  isPostLikedByUser: () => boolean;
+  isPostLikedByUser: boolean;
   socket: Socket | null;
 }
 
@@ -22,22 +22,21 @@ const Post: React.FC<IPostProps> = ({
   content,
   id,
   user,
-  likesCount,
-  commentsCount,
+  like_count,
+  comment_count,
   isPostLikedByUser,
   socket,
 }) => {
-  const isPostLikedByUserResult = isPostLikedByUser();
+  const dispatch = useAppDispatch();
+  const loggedInUserInfo = useAppSelector((state) => state.users.userInfo);
 
-  const [numberOfLikes, setNumberOfLikes] = useState(likesCount);
-  const [isPostLiked, setIsPostLiked] = useState(isPostLikedByUserResult);
+  const [state, setState] = useState({
+    numberOfLikes: like_count,
+    isPostLiked: isPostLikedByUser,
+  });
   const [isEditPostModalOpen, setIsEditPostModalOpen] = useState(false);
   const [isCommentOnPostModalOpen, setIsCommentOnPostModalOpen] =
     useState(false);
-
-  const dispatch = useAppDispatch();
-
-  const loggedInUserInfo = useAppSelector((state) => state.users.userInfo);
 
   const handlePostDelete = async () => {
     const resultAction = await dispatch(deletePost(id));
@@ -84,17 +83,24 @@ const Post: React.FC<IPostProps> = ({
   };
 
   const handlePostLike = async () => {
-    if (!isPostLiked) {
-      await dispatch(
-        likePost({ postId: id, userId: loggedInUserInfo.id || '' })
-      );
+    if (!state.isPostLiked) {
+      await dispatch(likePost({ postId: id }));
+
+      setState((curr) => ({
+        ...curr,
+        numberOfLikes: curr.numberOfLikes + 1,
+        isPostLiked: true,
+      }));
     } else {
-      await dispatch(
-        unlikePost({ postId: id, userId: loggedInUserInfo.id || '' })
-      );
+      await dispatch(unlikePost({ postId: id }));
+      setState((curr) => ({
+        ...curr,
+        numberOfLikes: curr.numberOfLikes - 1,
+        isPostLiked: false,
+      }));
     }
 
-    if (!isPostLiked) {
+    if (!state.isPostLiked) {
       // emit an event for the socket when the post is liked, the state would be false before it being liked.
       socket?.emit('sendNotification', {
         postTopic: title,
@@ -104,9 +110,6 @@ const Post: React.FC<IPostProps> = ({
         type: 1, // eventType is like clicked and for comment would be 2.
       });
     }
-
-    setNumberOfLikes(isPostLiked ? numberOfLikes - 1 : numberOfLikes + 1);
-    setIsPostLiked(!isPostLiked);
   };
 
   return (
@@ -122,18 +125,18 @@ const Post: React.FC<IPostProps> = ({
             </div>
             <div className='flex gap-x-2 pr-4'>
               <div className='flex flex-col items-center'>
-                <span>{numberOfLikes}</span>
+                <span>{state.numberOfLikes}</span>
                 <button
                   id='likePostIcon'
                   type='button'
                   className='hover:text-green-600'
                   onClick={handlePostLike}
                 >
-                  {isPostLiked ? <FilledLikeIcon /> : <LikeIcon />}
+                  {state.isPostLiked ? <FilledLikeIcon /> : <LikeIcon />}
                 </button>
               </div>
               <div className='flex flex-col items-center'>
-                <span>{commentsCount}</span>
+                <span>{comment_count}</span>
                 <button
                   id='commentOnPostIcon'
                   type='button'

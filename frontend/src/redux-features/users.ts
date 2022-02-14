@@ -5,7 +5,7 @@ import axios, { AxiosError } from 'axios';
 
 export interface User {
   id: string;
-  userName: string;
+  name: string;
   email: string;
   password: string;
   likedPosts?: Array<string>;
@@ -18,7 +18,7 @@ interface ValidationErrors {
 interface UserResponse {
   user: {
     id: string;
-    userName: string;
+    name: string;
     email: string;
   };
 }
@@ -38,11 +38,21 @@ export const getUserLikedPosts = createAsyncThunk<
     // Optional fields for defining thunkApi field types
     rejectValue: ValidationErrors;
   }
->('/users/getUserLikedPosts', async (userId, { rejectWithValue }) => {
+>('/users/getUserLikedPosts', async (userId, { getState, rejectWithValue }) => {
   try {
+    const {
+      users: { userInfo },
+    } = getState() as any;
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+    };
+
     const response = await axios.get<{
       userLikedPosts: Array<string>;
-    }>(`/api/users/${userId}/likedPosts`);
+    }>(`/api/users/${userId}/likedPosts`, config);
 
     return response.data.userLikedPosts;
   } catch (err: any) {
@@ -56,7 +66,7 @@ export const getUserLikedPosts = createAsyncThunk<
 
 export const registerUser = createAsyncThunk<
   // Return type of the payload creator
-  { id: string; userName: string; email: string },
+  { id: string; name: string; email: string },
   // userData object type
   User,
   // { id: string } & Partial<User>, // id is a must but the rest of User interface is optional
@@ -66,7 +76,7 @@ export const registerUser = createAsyncThunk<
   }
 >('users/register', async (userData, { rejectWithValue }) => {
   try {
-    const { id, userName, email, password } = userData;
+    const { id, name, email, password } = userData;
     const config = {
       headers: {
         'Content-Type': 'application/json',
@@ -75,7 +85,7 @@ export const registerUser = createAsyncThunk<
 
     const response = await axios.post<UserResponse>(
       '/api/users',
-      { id, userName, email, password },
+      { id, name, email, password },
       config
     );
 
@@ -93,7 +103,7 @@ export const registerUser = createAsyncThunk<
 
 export const loginUser = createAsyncThunk<
   // Return type of the payload creator
-  { id: string; userName: string; email: string },
+  { id: string; name: string; email: string },
   // userData object type
   { email: string; password: string },
   {

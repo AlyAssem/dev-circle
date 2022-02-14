@@ -125,7 +125,7 @@ const deletePost = asyncHandler(async (req: Request, res: Response) => {
 
 /**
  * @desc Like a post
- * @route POST /api/posts/:id/like
+ * @route GET /api/posts/:id/like
  * @access private
  */
 const likePost = asyncHandler(async (req: Request, res: Response) => {
@@ -135,9 +135,12 @@ const likePost = asyncHandler(async (req: Request, res: Response) => {
     id: req.currentUser?.id,
   })) as User;
 
-  const likedPost = (await Post.findOne({
-    id,
-  })) as Post;
+  const likedPost = (await Post.findOne(
+    {
+      id,
+    },
+    { relations: ['user'] }
+  )) as Post;
 
   if (!likedPost) {
     res.status(404).send({ message: 'Post does not exist.' });
@@ -166,12 +169,12 @@ const likePost = asyncHandler(async (req: Request, res: Response) => {
     .where('id = :id', { id })
     .execute();
 
-  res.send({ message: 'You liked the post!' });
+  res.send({ post: likedPost });
 });
 
 /**
  * @desc unlike a post
- * @route POST /api/posts/:id/unlike
+ * @route GET /api/posts/:id/unlike
  * @access private
  */
 const unlikePost = asyncHandler(async (req: Request, res: Response) => {
@@ -180,9 +183,12 @@ const unlikePost = asyncHandler(async (req: Request, res: Response) => {
     id: req.currentUser?.id,
   })) as User;
 
-  const unlikedPost = (await Post.findOne({
-    id,
-  })) as Post;
+  const unlikedPost = (await Post.findOne(
+    {
+      id,
+    },
+    { relations: ['user'] }
+  )) as Post;
 
   if (!unlikedPost) {
     res.status(404).send({ message: 'Post does not exist.' });
@@ -204,12 +210,11 @@ const unlikePost = asyncHandler(async (req: Request, res: Response) => {
       .where('id = :id', { id })
       .execute();
 
-    res.send({ message: 'You unliked the post!' });
+    res.send({ post: unlikedPost });
     return;
   }
 
   res.status(400).send({ message: 'Post is not liked' });
-  return;
 });
 
 /**

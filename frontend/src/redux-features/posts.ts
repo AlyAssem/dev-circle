@@ -24,22 +24,26 @@ interface ValidationErrors {
 export const likePost = createAsyncThunk<
   IPost,
   // action function parameter object type
-  { postId: string; userId: string },
+  { postId: string },
   {
     // Optional fields for defining thunkApi field types
     rejectValue: ValidationErrors;
   }
->('posts/likePost', async ({ postId, userId }, { rejectWithValue }) => {
+>('posts/likePost', async ({ postId }, { getState, rejectWithValue }) => {
   try {
+    const {
+      users: { userInfo },
+    } = getState() as any;
+
     const config = {
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${userInfo.token}`,
       },
     };
 
-    const response = await axios.post<{ post: IPost }>(
+    const response = await axios.get<{ post: IPost }>(
       `/api/posts/${postId}/like`,
-      { userId },
       config
     );
 
@@ -56,21 +60,26 @@ export const likePost = createAsyncThunk<
 export const unlikePost = createAsyncThunk<
   IPost,
   // action function parameter object type
-  { postId: string; userId: string },
+  { postId: string },
   {
     // Optional fields for defining thunkApi field types
     rejectValue: ValidationErrors;
   }
->('posts/unlikePost', async ({ postId, userId }, { rejectWithValue }) => {
+>('posts/unlikePost', async ({ postId }, { getState, rejectWithValue }) => {
   try {
+    const {
+      users: { userInfo },
+    } = getState() as any;
+
     const config = {
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${userInfo.token}`,
       },
     };
-    const response = await axios.post<{ post: IPost }>(
+
+    const response = await axios.get<{ post: IPost }>(
       `/api/posts/${postId}/unlike`,
-      { userId },
       config
     );
 
@@ -162,8 +171,8 @@ export const createPost = createAsyncThunk<
         title,
         content,
         user,
-        likesCount: 0,
-        commentsCount: 0,
+        like_count: 0,
+        comment_count: 0,
       },
       config
     );
@@ -273,26 +282,6 @@ const postsSlice = createSlice({
   extraReducers: (builder) => {
     // The `builder` callback form is used here
     // because it provides correctly typed reducers from the action creators
-    builder.addCase(likePost.fulfilled, (state, { payload }) => {
-      const { id } = payload;
-      state.posts = state.posts.map((post) => {
-        if (post.id === id) {
-          return { ...payload, likesCount: post.likesCount + 1 };
-        }
-        return post;
-      });
-    });
-
-    builder.addCase(unlikePost.fulfilled, (state, { payload }) => {
-      const { id } = payload;
-      state.posts = state.posts.map((post) => {
-        if (post.id === id) {
-          return { ...payload, likesCount: post.likesCount - 1 };
-        }
-        return post;
-      });
-    });
-
     builder.addCase(getPosts.fulfilled, (state, { payload }) => {
       state.posts = payload;
       state.isLoading = false;
