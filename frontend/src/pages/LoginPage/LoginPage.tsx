@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { Link } from 'react-router-dom';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { History } from 'history';
 
 import { useAppDispatch, useAppSelector } from '../../redux-features/hooks';
@@ -156,7 +156,6 @@ export const LoginPage: React.FC<ILoginPageProps> = ({
           .
         </p>
       </div>
-      <ToastContainer />
     </div>
   );
 };

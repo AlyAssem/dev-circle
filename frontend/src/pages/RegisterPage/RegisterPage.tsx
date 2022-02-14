@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useFormik } from 'formik';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { History } from 'history';
 import 'react-toastify/dist/ReactToastify.css';
 import { v4 as uuidV4 } from 'uuid';
@@ -263,7 +263,6 @@ export const RegisterPage: React.FC<IRegisterPageProps> = ({
           .
         </p>
       </div>
-      <ToastContainer />
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { v4 as uuidV4 } from 'uuid';
 
 import { useAppDispatch, useAppSelector } from '../../../redux-features/hooks';
@@ -209,7 +209,6 @@ const PostModal: React.FC<IPostModalProps> = ({
           </button>
         </div>
       </div>
-      <ToastContainer />
     </div>
   );
 };

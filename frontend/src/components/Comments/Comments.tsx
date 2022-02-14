@@ -1,5 +1,4 @@
 import React from 'react';
-import { ToastContainer } from 'react-toastify';
 import { IComment } from '../../interfaces';
 
 import { useAppSelector } from '../../redux-features/hooks';
@@ -29,10 +28,5 @@ export const Comments: React.FC<ICommentsProps> = ({ postComments }) => {
     </div>
   ));
 
-  return (
-    <>
-      {isLoading ? skeletonComments : actualComments}
-      <ToastContainer />
-    </>
-  );
+  return <>{isLoading ? skeletonComments : actualComments}</>;
 };

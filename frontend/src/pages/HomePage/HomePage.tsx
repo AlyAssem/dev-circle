@@ -3,7 +3,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
 
 import { History } from 'history';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 
 import { Header } from '../../components/Header/Header';
 import { useAppSelector, useAppDispatch } from '../../redux-features/hooks';
@@ -125,7 +125,6 @@ export const HomePage: React.FC<IHomePageProps> = ({
           onClose={() => setIsCreatePostModalOpen(false)}
         />
       )}
-      <ToastContainer />
     </>
   );
 };

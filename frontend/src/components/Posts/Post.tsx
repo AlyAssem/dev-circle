@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { Socket } from 'socket.io-client';
 import CommentIcon from '../../icons/CommentIcon';
 import DeleteIcon from '../../icons/DeleteIcon';
@@ -212,7 +212,6 @@ const Post: React.FC<IPostProps> = ({
           }}
         />
       )}
-      <ToastContainer />
     </>
   );
 };
