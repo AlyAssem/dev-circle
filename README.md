@@ -3,6 +3,7 @@
 
 ## Features: It's still under development but the current implemented features are the following.
 
+- Auto logout.(15 mins of idle, or expiration of access token which is 1h for security purposes)
 - Real time notification system with socket.io.
 - Responsive web design.
 - Authentication and authorization.(using JWT)
