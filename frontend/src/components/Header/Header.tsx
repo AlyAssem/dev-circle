@@ -124,22 +124,11 @@ export const Header: React.FC<IHeaderProps> = ({ socket }) => {
         }}
       >
         {isNotificationsDialogOpen && (
-          <div
-            onClick={() => setIsNotificationDialogOpen(false)}
-            role='button'
-            onKeyDown={(e) => {
-              if (e.key === 'Escape') {
-                setIsNotificationDialogOpen(false);
-              }
-            }}
-            className='z-40 cursor-default fixed inset-0 flex justify-center items-center'
-            tabIndex={0}
-          >
-            <NotificationsDialog
-              notifications={notifications}
-              onNotificationRead={removeNotification}
-            />
-          </div>
+          <NotificationsDialog
+            notifications={notifications}
+            onNotificationRead={removeNotification}
+            onClose={() => setIsNotificationDialogOpen(false)}
+          />
         )}
       </div>
     </header>

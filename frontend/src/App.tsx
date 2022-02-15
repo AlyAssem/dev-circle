@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useIdleTimer } from 'react-idle-timer';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
@@ -24,9 +24,9 @@ const App: React.FC = () => {
   return (
     <div className='h-screen'>
       <Router>
-        <Route path='/' component={HomePage} exact />
-        <Route path='/login' component={LoginPage} />
         <Route path='/register' component={RegisterPage} />
+        <Route path='/login' component={LoginPage} />
+        <Route path='/' component={HomePage} exact />
         <ToastContainer />
       </Router>
     </div>

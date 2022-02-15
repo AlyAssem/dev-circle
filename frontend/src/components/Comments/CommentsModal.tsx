@@ -63,6 +63,12 @@ export const CommentsModal: React.FC<ICommentsModalProps> = ({
   };
 
   useEffect(() => {
+    // Auto focus cancel button for keyboard close on ESC click.
+    const closeButton = document.getElementById('close-modal');
+    closeButton?.focus();
+  }, []);
+
+  useEffect(() => {
     fetchPostComments.current();
   }, []);
 

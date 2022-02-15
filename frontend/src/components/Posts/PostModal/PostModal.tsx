@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { v4 as uuidV4 } from 'uuid';
 
@@ -29,6 +29,12 @@ const PostModal: React.FC<IPostModalProps> = ({
 
   const dispatch = useAppDispatch();
   const userInfo = useAppSelector((reduxState) => reduxState.users.userInfo);
+
+  useEffect(() => {
+    // Auto focus close button for keyboard close on ESC click.
+    const closeButton = document.getElementById('modal-footer__close-btn');
+    closeButton?.focus();
+  }, []);
 
   const handlePostCreate = async () => {
     if (userInfo) {
@@ -194,8 +200,13 @@ const PostModal: React.FC<IPostModalProps> = ({
           </div>
         </div>
         <div id='modal-footer' className='flex justify-end'>
-          <button type='button' className='px-3 py-1' onClick={() => onClose()}>
-            Cancel
+          <button
+            id='modal-footer__close-btn'
+            type='button'
+            className='px-3 py-1'
+            onClick={() => onClose()}
+          >
+            Close
           </button>
           <button
             id='modal-action'
