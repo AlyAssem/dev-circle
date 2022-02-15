@@ -89,7 +89,15 @@ export const registerUser = createAsyncThunk<
       config
     );
 
-    localStorage.setItem('userInfo', JSON.stringify(response.data.user));
+    const tokenExpirationDate = new Date(new Date().getTime() + 1000 * 60 * 60);
+
+    localStorage.setItem(
+      'userInfo',
+      JSON.stringify({
+        ...response.data.user,
+        tokenExpirationDate: tokenExpirationDate.toISOString(),
+      })
+    );
 
     return response.data.user;
   } catch (err: any) {
@@ -125,7 +133,15 @@ export const loginUser = createAsyncThunk<
       config
     );
 
-    localStorage.setItem('userInfo', JSON.stringify(response.data.user));
+    const tokenExpirationDate = new Date(new Date().getTime() + 1000 * 60 * 60);
+
+    localStorage.setItem(
+      'userInfo',
+      JSON.stringify({
+        ...response.data.user,
+        tokenExpirationDate: tokenExpirationDate.toISOString(),
+      })
+    );
 
     return response.data.user;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

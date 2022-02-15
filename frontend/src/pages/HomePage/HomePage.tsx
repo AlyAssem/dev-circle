@@ -13,7 +13,9 @@ import Loader from '../../components/Loader';
 import { getPosts } from '../../redux-features/posts';
 // import { deleteSocket, setSocket } from '../../redux-features/globals';
 import SocketClient from '../../SocketClient';
-import { getUserLikedPosts } from '../../redux-features/users';
+import { getUserLikedPosts, logout } from '../../redux-features/users';
+
+let logoutTimer: NodeJS.Timeout;
 
 interface IHomePageProps {
   history: History;
@@ -38,6 +40,33 @@ export const HomePage: React.FC<IHomePageProps> = ({
   fetchUserLikedPosts.current = async () => {
     if (userInfo && userInfo.id) {
       const resultAction = await dispatch(getUserLikedPosts(userInfo.id));
+      if (getUserLikedPosts.rejected.match(resultAction)) {
+        if (resultAction.payload) {
+          // if the error is sent from server payload
+          toast.error(
+            <div>
+              Error
+              <br />
+              {resultAction.payload.errorMessage}
+            </div>,
+
+            {
+              position: toast.POSITION.BOTTOM_RIGHT,
+            }
+          );
+        } else {
+          toast.error(
+            <div>
+              Error
+              <br />
+              {resultAction.error}
+            </div>,
+            {
+              position: toast.POSITION.BOTTOM_RIGHT,
+            }
+          );
+        }
+      }
       if (getUserLikedPosts.fulfilled.match(resultAction)) {
         // fetch posts only after the likedPosts for the loggedin user has been fetched to avoid re-rendering.
         fetchPosts.current();
@@ -97,8 +126,27 @@ export const HomePage: React.FC<IHomePageProps> = ({
     };
   }, [dispatch]);
 
+  // Auto logout when token expires.
+  useEffect(() => {
+    const { token, tokenExpirationDate } = JSON.parse(
+      localStorage.getItem('userInfo') || '{}'
+    );
+
+    // when user is loggedin.
+    if (token && tokenExpirationDate) {
+      // remaining time for token to be valid in milliseconds.
+      const remainingTime =
+        new Date(tokenExpirationDate).getTime() - new Date().getTime();
+
+      logoutTimer = setTimeout(() => dispatch(logout()), remainingTime);
+    }
+    return () => {
+      clearTimeout(logoutTimer);
+    };
+  }, [dispatch]);
+
   return (
-    <>
+    <div className='h-full'>
       {socket?.id && <SocketClient socket={socket} />}
 
       <Header socket={socket} />
@@ -125,6 +173,6 @@ export const HomePage: React.FC<IHomePageProps> = ({
           onClose={() => setIsCreatePostModalOpen(false)}
         />
       )}
-    </>
+    </div>
   );
 };
