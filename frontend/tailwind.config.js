@@ -8,6 +8,12 @@ module.exports = {
       screens: {
         xs: '520px',
       },
+      boxShadow: {
+        commentMenu: '0 2px 5px 0 rgba(0, 0, 0, .1)',
+      },
+      height: {
+        fit: 'fit-content',
+      },
     },
   },
   variants: {

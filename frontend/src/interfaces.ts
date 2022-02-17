@@ -21,7 +21,7 @@ export interface IPost {
 }
 
 export interface IComment {
-  id: string;
+  id: number;
   user: Partial<IUser>;
   text: string;
   createdAt: string;

@@ -106,14 +106,17 @@ export const HomePage: React.FC<IHomePageProps> = ({
   };
 
   useEffect(() => {
-    fetchUserLikedPosts.current();
-  }, []);
-
-  useEffect(() => {
-    if (userInfo && Object.keys(userInfo).length === 0) {
+    if (userInfo && JSON.stringify(userInfo) === '{}') {
       history.push('/register');
     }
   }, [history, userInfo]);
+
+  useEffect(() => {
+    if (userInfo && JSON.stringify(userInfo) !== '{}') {
+      fetchUserLikedPosts.current();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const createdSocket = io('http://localhost:5000');

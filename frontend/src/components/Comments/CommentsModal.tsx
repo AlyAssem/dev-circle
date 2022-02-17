@@ -155,7 +155,7 @@ export const CommentsModal: React.FC<ICommentsModalProps> = ({
         </div>
         <div id='modal-body' className='p-4 my-2'>
           <CommentForm onCommentAdd={(comment) => handleCommentAdd(comment)} />
-          <hr className='w-full border-b-2 border-black opacity-10 mb-5' />
+          <hr className='border-b-2 border-black opacity-10' />
           <div className='max-h-64 overflow-y-auto overflow-x-hidden'>
             <Comments postComments={comments} />
           </div>
