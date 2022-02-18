@@ -76,19 +76,27 @@ const editCommentOnPost = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
   const { text } = req.body;
 
-  console.log('text', text);
-  console.log('id', id);
   const commentUpdateResult = await Comment.update(
     { id: Number(id) },
     { text }
   );
 
   if (commentUpdateResult.affected !== 0) {
-    res.send({ message: 'Comment has been updated.' });
+    res.send({
+      message: 'Comment has been updated.',
+      comment: {
+        id: Number(id),
+        text,
+      },
+    });
     return;
   }
 
-  res.status(404).send({ message: 'Comment does not exist.' });
+  const updatedComment = await Comment.findOne({ id: Number(id) });
+
+  res
+    .status(404)
+    .send({ message: 'Comment does not exist.', comment: updatedComment });
 });
 
 /**
@@ -98,7 +106,8 @@ const editCommentOnPost = asyncHandler(async (req: Request, res: Response) => {
  */
 const deleteCommentFromPost = asyncHandler(
   async (req: Request, res: Response) => {
-    const { postId, text } = req.body;
+    const { id } = req.params;
+    const { postId } = req.body;
 
     const user = (await User.findOne({
       id: req.currentUser?.id,
@@ -113,18 +122,15 @@ const deleteCommentFromPost = asyncHandler(
       return;
     }
 
-    const isCommentAlreadyWrittenByUserForPost = await Comment.findOne({
+    const deletedComment = await Comment.findOne({
+      id: Number(id),
       user,
       post,
-      text,
     });
 
-    if (
-      isCommentAlreadyWrittenByUserForPost &&
-      Object.keys(isCommentAlreadyWrittenByUserForPost).length > 0
-    ) {
+    if (deletedComment && Object.keys(deletedComment).length > 0) {
       // delete comment object from comment table.
-      await Comment.delete({ user, post, text });
+      await Comment.delete({ id: Number(id), user, post });
 
       // decrement the comment count for the post.
       await createQueryBuilder()
@@ -135,7 +141,10 @@ const deleteCommentFromPost = asyncHandler(
         .where('id = :id', { id: postId })
         .execute();
 
-      res.send({ message: 'Comment on the post has been removed.' });
+      res.send({
+        message: 'Comment on the post has been removed.',
+        comment: deletedComment,
+      });
       return;
     }
 

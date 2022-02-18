@@ -23,6 +23,7 @@ export interface IPost {
 export interface IComment {
   id: number;
   user: Partial<IUser>;
+  post: Partial<IPost>;
   text: string;
   createdAt: string;
 }

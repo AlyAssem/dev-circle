@@ -233,7 +233,7 @@ const getPostComments = asyncHandler(async (req: Request, res: Response) => {
   }
 
   const comments = await Comment.createQueryBuilder('comment')
-    .innerJoin('comment.post', 'post')
+    .innerJoinAndSelect('comment.post', 'post')
     .where('post.id = :id', { id })
     .innerJoinAndSelect('comment.user', 'user')
     .getMany();
