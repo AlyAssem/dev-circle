@@ -3,7 +3,6 @@ import asyncHandler from 'express-async-handler';
 import { User } from '../entities/User';
 import { Post } from '../entities/Post';
 import { Comment } from '../entities/Comment';
-import { createQueryBuilder } from 'typeorm';
 
 /**
  * @desc comment on a post
@@ -54,15 +53,6 @@ const createCommentOnPost = asyncHandler(
     comment.text = text;
     await comment.save();
 
-    // increment the comment count for the post.
-    await createQueryBuilder()
-      .update(Post)
-      .set({
-        comment_count: () => 'comment_count + 1',
-      })
-      .where('id = :id', { id: postId })
-      .execute();
-
     res.send({ comment });
   }
 );
@@ -82,21 +72,19 @@ const editCommentOnPost = asyncHandler(async (req: Request, res: Response) => {
   );
 
   if (commentUpdateResult.affected !== 0) {
+    const updatedComment = await Comment.findOne(
+      { id: Number(id) },
+      { relations: ['post'] }
+    );
+
     res.send({
       message: 'Comment has been updated.',
-      comment: {
-        id: Number(id),
-        text,
-      },
+      comment: updatedComment,
     });
     return;
   }
 
-  const updatedComment = await Comment.findOne({ id: Number(id) });
-
-  res
-    .status(404)
-    .send({ message: 'Comment does not exist.', comment: updatedComment });
+  res.status(404).send({ message: 'Comment does not exist.' });
 });
 
 /**
@@ -122,24 +110,20 @@ const deleteCommentFromPost = asyncHandler(
       return;
     }
 
-    const deletedComment = await Comment.findOne({
-      id: Number(id),
-      user,
-      post,
-    });
+    const deletedComment = await Comment.findOne(
+      {
+        id: Number(id),
+        user,
+        post,
+      },
+      {
+        relations: ['post'],
+      }
+    );
 
     if (deletedComment && Object.keys(deletedComment).length > 0) {
       // delete comment object from comment table.
       await Comment.delete({ id: Number(id), user, post });
-
-      // decrement the comment count for the post.
-      await createQueryBuilder()
-        .update(Post)
-        .set({
-          comment_count: () => 'comment_count - 1',
-        })
-        .where('id = :id', { id: postId })
-        .execute();
 
       res.send({
         message: 'Comment on the post has been removed.',

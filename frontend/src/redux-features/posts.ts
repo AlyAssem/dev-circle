@@ -2,19 +2,23 @@
 /* eslint-disable no-param-reassign */
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios, { AxiosError } from 'axios';
-import { IPost } from '../interfaces';
+import { IComment, IPost } from '../interfaces';
 
 interface PostsState {
   error: string | null | undefined;
-  isLoading: boolean | undefined;
+  isPostLoading: boolean | undefined;
   posts: Array<IPost> | [];
   postInfo: Partial<IPost>;
+  comments: Array<IComment> | [];
+  isCommentLoading: boolean | undefined;
 }
 const initialState: PostsState = {
   posts: [],
   postInfo: {},
   error: null,
-  isLoading: false,
+  isPostLoading: false,
+  comments: [],
+  isCommentLoading: false,
 };
 
 interface ValidationErrors {
@@ -271,6 +275,159 @@ export const deletePost = createAsyncThunk<
   }
 });
 
+export const getPostComments = createAsyncThunk<
+  // Return type of the payload creator
+  Array<IComment>,
+  //   type of postId used as  an argument to async function.
+  string,
+  {
+    // Optional fields for defining thunkApi field types
+    rejectValue: ValidationErrors;
+  }
+>('comments/getComments', async (postId, { rejectWithValue }) => {
+  try {
+    const response = await axios.get<{ comments: Array<IComment> }>(
+      `/api/posts/${postId}/comments`
+    );
+
+    return response.data.comments;
+  } catch (err: any) {
+    const error: AxiosError<ValidationErrors> = err;
+    if (!error.response) {
+      throw err;
+    }
+    return rejectWithValue(error.response.data);
+  }
+});
+
+export const createPostComment = createAsyncThunk<
+  // Return type of the payload creator
+  IComment,
+  //   type of commentData used as  an argument to async function.
+  { postId: string; text: string },
+  {
+    // Optional fields for defining thunkApi field types
+    rejectValue: ValidationErrors;
+  }
+>(
+  '/comments/createComment',
+  async (commentData, { getState, rejectWithValue }) => {
+    const {
+      users: { userInfo },
+    } = getState() as any;
+
+    try {
+      const { postId, text } = commentData;
+      const config = {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${userInfo.token}`,
+        },
+      };
+
+      const response = await axios.post<{ comment: IComment }>(
+        '/api/comments',
+        {
+          postId,
+          text,
+        },
+        config
+      );
+
+      return response.data.comment;
+    } catch (err: any) {
+      const error: AxiosError<ValidationErrors> = err;
+      if (!error.response) {
+        throw err;
+      }
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+export const editComment = createAsyncThunk<
+  // Return type of the payload creator
+  IComment,
+  //   type of comment used as an argument to async function.
+  { text: string; id: number },
+  {
+    // Optional fields for defining thunkApi field types
+    rejectValue: ValidationErrors;
+  }
+>('/comments/editComment', async (comment, { getState, rejectWithValue }) => {
+  const {
+    users: { userInfo },
+  } = getState() as any;
+
+  try {
+    const { id, text } = comment;
+
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+    };
+
+    const response = await axios.put<{ message: string; comment: IComment }>(
+      `/api/comments/${id}`,
+      {
+        text,
+      },
+      config
+    );
+
+    return response.data.comment;
+  } catch (err: any) {
+    const error: AxiosError<ValidationErrors> = err;
+    if (!error.response) {
+      throw err;
+    }
+    return rejectWithValue(error.response.data);
+  }
+});
+
+export const deleteComment = createAsyncThunk<
+  // Return type of the payload creator
+  IComment,
+  // type of data used as an argument to async function.
+  { commentId: number; postId: string },
+  {
+    // Optional fields for defining thunkApi field types
+    rejectValue: ValidationErrors;
+  }
+>('/comments/deleteComment', async (data, { getState, rejectWithValue }) => {
+  const {
+    users: { userInfo },
+  } = getState() as any;
+
+  try {
+    const { commentId, postId } = data;
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+      data: {
+        postId,
+      },
+    };
+
+    const response = await axios.delete<{ message: string; comment: IComment }>(
+      `/api/comments/${commentId}`,
+      config
+    );
+
+    return response.data.comment;
+  } catch (err: any) {
+    const error: AxiosError<ValidationErrors> = err;
+    if (!error.response) {
+      throw err;
+    }
+    return rejectWithValue(error.response.data);
+  }
+});
+
 const postsSlice = createSlice({
   name: 'posts',
   initialState,
@@ -284,15 +441,15 @@ const postsSlice = createSlice({
     // because it provides correctly typed reducers from the action creators
     builder.addCase(getPosts.fulfilled, (state, { payload }) => {
       state.posts = payload;
-      state.isLoading = false;
+      state.isPostLoading = false;
     });
 
     builder.addCase(getPosts.pending, (state) => {
-      state.isLoading = true;
+      state.isPostLoading = true;
     });
 
     builder.addCase(getPosts.rejected, (state, action) => {
-      state.isLoading = false;
+      state.isPostLoading = false;
       if (action.payload) {
         // Being that we passed in ValidationErrors to rejectType
         // in `createAsyncThunk`, the payload will be available here.
@@ -355,6 +512,103 @@ const postsSlice = createSlice({
     });
 
     builder.addCase(deletePost.rejected, (state, action) => {
+      if (action.payload) {
+        // Being that we passed in ValidationErrors to rejectType
+        // in `createAsyncThunk`, the payload will be available here.
+        state.error = action.payload.errorMessage;
+      } else {
+        state.error = action.error.message;
+      }
+    });
+
+    builder.addCase(getPostComments.fulfilled, (state, { payload }) => {
+      state.posts = state.posts.map((post) => ({
+        ...post,
+        comments: payload,
+      }));
+      state.isCommentLoading = false;
+    });
+    builder.addCase(getPostComments.pending, (state) => {
+      state.isCommentLoading = true;
+    });
+    builder.addCase(getPostComments.rejected, (state, action) => {
+      state.isCommentLoading = false;
+      if (action.payload) {
+        // Being that we passed in ValidationErrors to rejectType
+        // in `createAsyncThunk`, the payload will be available here.
+        state.error = action.payload.errorMessage;
+      } else {
+        state.error = action.error.message;
+      }
+    });
+
+    builder.addCase(createPostComment.fulfilled, (state, { payload }) => {
+      const { post } = payload;
+      state.posts = state.posts.map((p) => {
+        if (p.id === post.id) {
+          // if the post in redux state is the post in the comment created, then add the comment to post comments.
+          return { ...p, comments: [...p.comments, payload] };
+        }
+        return p;
+      });
+    });
+    builder.addCase(createPostComment.rejected, (state, action) => {
+      if (action.payload) {
+        // Being that we passed in ValidationErrors to rejectType
+        // in `createAsyncThunk`, the payload will be available here.
+        state.error = action.payload.errorMessage;
+      } else {
+        state.error = action.error.message;
+      }
+    });
+
+    builder.addCase(editComment.fulfilled, (state, { payload }) => {
+      const { id, text, post } = payload;
+
+      state.posts = state.posts.map((p) => {
+        if (p.id === post.id) {
+          // The post that contains the comment.
+          return {
+            ...p,
+            comments: p.comments.map((c) => {
+              if (c.id === id) {
+                // the comment being edited.
+                return { ...c, text };
+              }
+              return c;
+            }),
+          };
+        }
+        return p;
+      });
+    });
+
+    builder.addCase(editComment.rejected, (state, action) => {
+      if (action.payload) {
+        // Being that we passed in ValidationErrors to rejectType
+        // in `createAsyncThunk`, the payload will be available here.
+        state.error = action.payload.errorMessage;
+      } else {
+        state.error = action.error.message;
+      }
+    });
+
+    builder.addCase(deleteComment.fulfilled, (state, { payload }) => {
+      const { id, post } = payload;
+
+      state.posts = state.posts.map((p) => {
+        if (p.id === post.id) {
+          // The post that contains the comment.
+          return {
+            ...p,
+            comments: p.comments.filter((c) => c.id !== id), // delete the comment from the post comments.
+          };
+        }
+        return p;
+      });
+    });
+
+    builder.addCase(deleteComment.rejected, (state, action) => {
       if (action.payload) {
         // Being that we passed in ValidationErrors to rejectType
         // in `createAsyncThunk`, the payload will be available here.

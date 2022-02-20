@@ -27,6 +27,7 @@ const Posts: React.FC<IPosts> = ({ socket }) => {
             ) || false
           }
           user={item.user}
+          comments={item.comments}
           socket={socket}
         />
       ))}

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import { IComment } from '../../interfaces';
-import { deleteComment, editComment } from '../../redux-features/comments';
+import { deleteComment, editComment } from '../../redux-features/posts';
 import { useAppDispatch } from '../../redux-features/hooks';
 import CommentEditField from './CommentEditField';
 import CommentOperationsMenu from './CommentOperationsMenu';

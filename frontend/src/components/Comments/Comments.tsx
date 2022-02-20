@@ -9,7 +9,7 @@ interface ICommentsProps {
 }
 
 export const Comments: React.FC<ICommentsProps> = ({ postComments }) => {
-  const isLoading = useAppSelector((state) => state.comments.isLoading);
+  const isLoading = useAppSelector((state) => state.posts.isCommentLoading);
 
   const skeletonComments = ['skeleton1', 'skeleton2'].map((skeletonName) => (
     <div className='max-h-full mt-2' key={skeletonName}>

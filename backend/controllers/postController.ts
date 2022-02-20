@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import asyncHandler from 'express-async-handler';
-import { createQueryBuilder } from 'typeorm';
 import { Like } from '../entities/Like';
 import { Post } from '../entities/Post';
 import { User } from '../entities/User';
@@ -12,9 +11,15 @@ import { Comment } from '../entities/Comment';
  * @access public
  */
 const getPosts = asyncHandler(async (req: Request, res: Response) => {
-  const posts = await Post.find({ relations: ['user'] });
+  const posts = await Post.find({ relations: ['user', 'comments', 'likes'] });
 
-  res.json({ posts });
+  const responsePosts = posts.map((post) => ({
+    ...post,
+    comment_count: post.comments.length,
+    like_count: post.likes.length,
+  }));
+
+  res.json({ posts: responsePosts });
 });
 
 /**
@@ -160,15 +165,6 @@ const likePost = asyncHandler(async (req: Request, res: Response) => {
   like.post = likedPost;
   await like.save();
 
-  // increment the like count for the post.
-  await createQueryBuilder()
-    .update(Post)
-    .set({
-      like_count: () => 'like_count + 1',
-    })
-    .where('id = :id', { id })
-    .execute();
-
   res.send({ post: likedPost });
 });
 
@@ -200,15 +196,6 @@ const unlikePost = asyncHandler(async (req: Request, res: Response) => {
   if (wasPostLikedByUser && Object.keys(wasPostLikedByUser).length > 0) {
     // remove like object from like table.
     await Like.delete({ user, post: unlikedPost });
-
-    // decrement the like count for the post.
-    await createQueryBuilder()
-      .update(Post)
-      .set({
-        like_count: () => 'like_count - 1',
-      })
-      .where('id = :id', { id })
-      .execute();
 
     res.send({ post: unlikedPost });
     return;

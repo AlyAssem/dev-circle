@@ -34,7 +34,7 @@ export const HomePage: React.FC<IHomePageProps> = ({
   const fetchUserLikedPosts = useRef(() => {});
 
   const userInfo = useAppSelector((state) => state.users.userInfo);
-  const isLoading = useAppSelector((state) => state.posts.isLoading);
+  const isLoading = useAppSelector((state) => state.posts.isPostLoading);
   // const socket = useAppSelector((state) => state.globals.socket);
 
   fetchUserLikedPosts.current = async () => {

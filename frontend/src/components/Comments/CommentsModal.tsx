@@ -1,11 +1,9 @@
+/* eslint-disable function-paren-newline */
 /* eslint-disable react/self-closing-comp */
 import React, { useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
 import CloseIcon from '../../icons/CloseIcon';
-import {
-  createPostComment,
-  getPostComments,
-} from '../../redux-features/comments';
+import { createPostComment, getPostComments } from '../../redux-features/posts';
 import { useAppDispatch, useAppSelector } from '../../redux-features/hooks';
 import { CommentForm } from './CommentForm';
 import { Comments } from './Comments';
@@ -26,7 +24,9 @@ export const CommentsModal: React.FC<ICommentsModalProps> = ({
 }) => {
   const dispatch = useAppDispatch();
 
-  const comments = useAppSelector((state) => state.comments.comments);
+  const comments = useAppSelector(
+    (state) => state.posts?.posts?.find((post) => post.id === postId)?.comments
+  );
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   const fetchPostComments = useRef(() => {});
@@ -157,7 +157,7 @@ export const CommentsModal: React.FC<ICommentsModalProps> = ({
           <CommentForm onCommentAdd={(comment) => handleCommentAdd(comment)} />
           <hr className='border-b-2 border-black opacity-10' />
           <div className='max-h-64 overflow-y-auto overflow-x-hidden'>
-            <Comments postComments={comments} />
+            {comments && <Comments postComments={comments} />}
           </div>
         </div>
       </div>
