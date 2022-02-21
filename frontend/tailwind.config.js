@@ -14,6 +14,9 @@ module.exports = {
       height: {
         fit: 'fit-content',
       },
+      minHeight: {
+        1: '100px',
+      },
     },
   },
   variants: {

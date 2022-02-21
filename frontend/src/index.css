@@ -16,6 +16,6 @@
   }
 
   .post_card {
-    @apply break-all shadow-md mt-5 w-full xs:w-2/4 rounded border border-green-600 cursor-default transform transition duration-500 ease-in-out hover:scale-105 hover:shadow-lg;
+    @apply break-all shadow-md my-4 w-full mx-2 sm:w-2/4 rounded border border-green-600 cursor-default transform transition duration-500 ease-in-out hover:scale-105 hover:shadow-lg;
   }
 }

@@ -22,7 +22,7 @@ const App: React.FC = () => {
   });
 
   return (
-    <div className='h-screen'>
+    <div>
       <Router>
         <Route path='/register' component={RegisterPage} />
         <Route path='/login' component={LoginPage} />

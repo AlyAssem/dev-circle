@@ -149,7 +149,7 @@ export const HomePage: React.FC<IHomePageProps> = ({
   }, [dispatch]);
 
   return (
-    <div className='h-full'>
+    <div className='max-h-screen flex flex-col overflow-y-hidden'>
       {socket?.id && <SocketClient socket={socket} />}
 
       <Header socket={socket} />
@@ -165,7 +165,7 @@ export const HomePage: React.FC<IHomePageProps> = ({
       {isLoading ? (
         <Loader />
       ) : (
-        <div className='w-full flex flex-col items-center'>
+        <div className='max-h-full w-full flex flex-col items-center overflow-y-auto'>
           <Posts socket={socket} />
         </div>
       )}

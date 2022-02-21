@@ -122,7 +122,9 @@ const Post: React.FC<IPostProps> = ({
               <div className='text-gray-900 font-bold text-xl mb-2'>
                 {title}
               </div>
-              <div className='text-gray-700 text-base'>{content}</div>
+              <div className='text-gray-700 text-base whitespace-pre-wrap'>
+                {content}
+              </div>
             </div>
             <div className='flex gap-x-2 pr-4'>
               <div className='flex flex-col items-center'>
@@ -200,7 +202,7 @@ const Post: React.FC<IPostProps> = ({
       {isCommentOnPostModalOpen && (
         <CommentsModal
           postId={id}
-          title='Comments'
+          title={title}
           onComment={() => {
             setState((curr) => ({
               ...curr,
