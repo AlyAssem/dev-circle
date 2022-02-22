@@ -5,6 +5,7 @@ import { validationResult } from 'express-validator';
 import { User } from '../entities/User';
 import generateToken from '../utils/generateToken';
 import { Like } from '../entities/Like';
+import { Notification } from '../entities/Notification';
 
 /**
  * @desc Register a user
@@ -123,4 +124,34 @@ const getLikedPosts = asyncHandler(async (req: Request, res: Response) => {
   }
 });
 
-export { registerUser, getUsers, authUser, getLikedPosts };
+/**
+ * @desc fetch all notifications for user.
+ * @route GET /api/users/:id/notifications
+ * @access private
+ */
+const getNotifications = asyncHandler(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const user = await User.findOne({ id });
+
+  if (user) {
+    if (req.currentUser?.id !== user.id) {
+      res.status(401);
+      throw new Error('logged in user is not the owner of these notifications');
+    } else {
+      const userNotifications = await Notification.find({
+        where: {
+          recipient: req.currentUser?.id,
+        },
+
+        relations: ['sender', 'post'],
+      });
+
+      res.send({ notifications: userNotifications });
+    }
+  } else {
+    res.status(404);
+    throw new Error('User not found');
+  }
+});
+
+export { registerUser, getUsers, authUser, getLikedPosts, getNotifications };

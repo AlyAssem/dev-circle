@@ -11,6 +11,7 @@ import {
 import { Like } from './Like';
 import { User } from './User';
 import { Comment } from './Comment';
+import { Notification } from './Notification';
 
 @Entity()
 export class Post extends BaseEntity {
@@ -43,4 +44,7 @@ export class Post extends BaseEntity {
 
   @OneToMany(() => Comment, (comment) => comment.post)
   comments: Comment[];
+
+  @OneToMany(() => Notification, (notification) => notification.post)
+  notifications: Notification[];
 }

@@ -3,12 +3,18 @@ export interface IUser {
   name: string;
   email: string;
   password: string;
-  likedPosts?: Array<ILikeObj>;
+  likedPosts?: Array<string>;
+  notifications?: Array<INotification>;
 }
 
-export interface ILikeObj {
-  userId: string;
-  postId: string;
+export interface INotification {
+  id: number;
+  sender: Partial<IUser>;
+  post: Partial<IPost>;
+  recipientId: string;
+  type: string;
+  read: boolean;
+  created_at: Date;
 }
 
 export interface IPost {
