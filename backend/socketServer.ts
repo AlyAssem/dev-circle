@@ -1,4 +1,5 @@
 import { Socket } from 'socket.io';
+import { Notification } from './entities/Notification';
 
 interface IuserSocketObject {
   userId: string;
@@ -40,14 +41,39 @@ const SocketServer = (socket: Socket) => {
 
   socket.on(
     'sendNotification',
-    ({ postTopic, senderMail, senderId, receiverId, type }) => {
-      const receiverUser = getUser(receiverId);
+    async ({ postId, senderId, recipientId, type }) => {
+      console.log('SENDNOTIFICATION RECEIVED FROM SERVER');
+      const isNotificationStored = (await Notification.findOne({
+        sender: senderId,
+        recipient: recipientId,
+        post: postId,
+      })) as Notification;
 
-      socket.to(receiverUser?.socketId || '').emit('getNotification', {
-        postTopic,
-        senderMail,
-        senderId,
+      if (!isNotificationStored) {
+        const notification = Notification.create({
+          sender: senderId,
+          recipient: recipientId,
+          post: postId,
+          type,
+        });
+
+        await notification.save();
+      }
+
+      const recipientUser = getUser(recipientId);
+      const storedNotification = await Notification.findOne(
+        { sender: senderId, post: postId },
+        { relations: ['sender', 'post'] }
+      );
+
+      socket.to(recipientUser?.socketId || '').emit('getNotification', {
+        id: storedNotification?.id,
+        read: storedNotification?.read,
+        post: storedNotification?.post,
+        sender: storedNotification?.sender,
+        recipientId,
         type,
+        created_at: storedNotification?.created_at,
       });
     }
   );

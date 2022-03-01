@@ -2,14 +2,7 @@
 /* eslint-disable no-param-reassign */
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios, { AxiosError } from 'axios';
-
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  password: string;
-  likedPosts?: Array<string>;
-}
+import { INotification, IUser } from '../interfaces';
 
 interface ValidationErrors {
   errorMessage: string;
@@ -25,8 +18,8 @@ interface UserResponse {
 
 interface UsersState {
   error: string | null | undefined;
-  userInfo: Partial<User>;
-  users: Array<User>;
+  userInfo: Partial<IUser>;
+  users: Array<IUser>;
 }
 
 export const getUserLikedPosts = createAsyncThunk<
@@ -64,11 +57,49 @@ export const getUserLikedPosts = createAsyncThunk<
   }
 });
 
+export const getUserNotifications = createAsyncThunk<
+  // Return type of the payload creator
+  Array<INotification>,
+  // type of userId passed as param.
+  string,
+  {
+    // Optional fields for defining thunkApi field types
+    rejectValue: ValidationErrors;
+  }
+>(
+  '/users/getUserNotifications',
+  async (userId, { getState, rejectWithValue }) => {
+    try {
+      const {
+        users: { userInfo },
+      } = getState() as any;
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${userInfo.token}`,
+        },
+      };
+
+      const response = await axios.get<{
+        notifications: Array<INotification>;
+      }>(`/api/users/${userId}/notifications`, config);
+
+      return response.data.notifications;
+    } catch (err: any) {
+      const error: AxiosError<ValidationErrors> = err;
+      if (!error.response) {
+        throw err;
+      }
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
 export const registerUser = createAsyncThunk<
   // Return type of the payload creator
   { id: string; name: string; email: string },
   // userData object type
-  User,
+  IUser,
   // { id: string } & Partial<User>, // id is a must but the rest of User interface is optional
   {
     // Optional fields for defining thunkApi field types
@@ -168,6 +199,10 @@ const usersSlice = createSlice({
       localStorage.removeItem('userInfo');
       state.userInfo = {};
     },
+    addNotification: (state, action) => {
+      console.log('ADD NOTIFICATION ', action.payload);
+      state.userInfo.notifications?.push(action.payload);
+    },
   },
   extraReducers: (builder) => {
     // The `builder` callback form is used here
@@ -178,6 +213,14 @@ const usersSlice = createSlice({
         likedPosts: payload,
       };
     });
+
+    builder.addCase(getUserNotifications.fulfilled, (state, { payload }) => {
+      state.userInfo = {
+        ...state.userInfo,
+        notifications: payload,
+      };
+    });
+
     builder.addCase(registerUser.fulfilled, (state, { payload }) => {
       state.userInfo = payload;
     });
@@ -206,6 +249,6 @@ const usersSlice = createSlice({
   },
 });
 
-export const { logout } = usersSlice.actions;
+export const { logout, addNotification } = usersSlice.actions;
 
 export default usersSlice.reducer;

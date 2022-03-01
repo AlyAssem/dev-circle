@@ -105,9 +105,10 @@ const Post: React.FC<IPostProps> = ({
       // emit an event for the socket when the post is liked, the state would be false before it being liked.
       socket?.emit('sendNotification', {
         postTopic: title,
+        postId: id,
         senderMail: loggedInUserInfo.email,
         senderId: loggedInUserInfo.id,
-        receiverId: user.id, // the owner of the post.
+        recipientId: user.id, // the owner of the post.
         type: 1, // eventType is like clicked and for comment would be 2.
       });
     }

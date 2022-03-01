@@ -13,7 +13,11 @@ import Loader from '../../components/Loader';
 import { getPosts } from '../../redux-features/posts';
 // import { deleteSocket, setSocket } from '../../redux-features/globals';
 import SocketClient from '../../SocketClient';
-import { getUserLikedPosts, logout } from '../../redux-features/users';
+import {
+  getUserLikedPosts,
+  getUserNotifications,
+  logout,
+} from '../../redux-features/users';
 
 let logoutTimer: NodeJS.Timeout;
 
@@ -32,6 +36,9 @@ export const HomePage: React.FC<IHomePageProps> = ({
   const fetchPosts = useRef(() => {});
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   const fetchUserLikedPosts = useRef(() => {});
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  const fetchUserNotifications = useRef(() => {});
 
   const userInfo = useAppSelector((state) => state.users.userInfo);
   const isLoading = useAppSelector((state) => state.posts.isPostLoading);
@@ -70,6 +77,40 @@ export const HomePage: React.FC<IHomePageProps> = ({
       if (getUserLikedPosts.fulfilled.match(resultAction)) {
         // fetch posts only after the likedPosts for the loggedin user has been fetched to avoid re-rendering.
         fetchPosts.current();
+      }
+    }
+  };
+
+  fetchUserNotifications.current = async () => {
+    if (userInfo && userInfo.id) {
+      const resultAction = await dispatch(getUserNotifications(userInfo.id));
+
+      if (getUserNotifications.rejected.match(resultAction)) {
+        if (resultAction.payload) {
+          // if the error is sent from server payload
+          toast.error(
+            <div>
+              Error
+              <br />
+              {resultAction.payload.errorMessage}
+            </div>,
+
+            {
+              position: toast.POSITION.BOTTOM_RIGHT,
+            }
+          );
+        } else {
+          toast.error(
+            <div>
+              Error
+              <br />
+              {resultAction.error}
+            </div>,
+            {
+              position: toast.POSITION.BOTTOM_RIGHT,
+            }
+          );
+        }
       }
     }
   };
@@ -114,6 +155,7 @@ export const HomePage: React.FC<IHomePageProps> = ({
   useEffect(() => {
     if (userInfo && JSON.stringify(userInfo) !== '{}') {
       fetchUserLikedPosts.current();
+      fetchUserNotifications.current();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

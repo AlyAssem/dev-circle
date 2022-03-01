@@ -1,54 +1,61 @@
 import React, { useEffect, useState } from 'react';
 import { Socket } from 'socket.io-client';
-import { v4 as uuidV4 } from 'uuid';
 
 import NotificationIcon from '../../icons/NotificationIcon';
-import { RenderCounter } from '../common/RenderCounter';
+import { INotification } from '../../interfaces';
+import { useAppSelector, useAppDispatch } from '../../redux-features/hooks';
+import { addNotification } from '../../redux-features/users';
 import NotificationsDialog from './NotificationsDialog';
 
 interface INotificationsProps {
   socket: Socket | null;
 }
 
-interface INotificationData {
-  postTopic: string;
-  senderMail: string;
-  senderId: string;
-  type: number;
-}
-
-export interface INotification {
-  id: string;
-  sender: string;
-  postTopic: string;
-}
-
 const Notifications: React.FC<INotificationsProps> = ({ socket }) => {
-  const [notifications, setNotifications] = useState<Array<INotification>>([]);
+  const dispatch = useAppDispatch();
+
+  const userNotifications = useAppSelector(
+    (state) => state.users.userInfo.notifications
+  ) as Array<INotification>;
+
+  console.log('usernotifications', userNotifications);
 
   const [isNotificationsDialogOpen, setIsNotificationDialogOpen] =
     useState(false);
 
   useEffect(() => {
-    console.log('use effect');
-    socket?.on('getNotification', (data: INotificationData) => {
-      console.log('socket');
-      const notification = {
-        id: uuidV4(),
-        sender: data.senderMail,
-        postTopic: data.postTopic,
-      };
+    socket?.on('getNotification', async (data: INotification) => {
+      const { id, sender, post, recipientId, type, read, created_at } = data;
 
-      setNotifications((prev) => [...prev, notification]);
+      if (userNotifications) {
+        const doesNotificationExist = userNotifications?.find(
+          (n) => n.id === id
+        );
+
+        if (!doesNotificationExist) {
+          console.log('notification does not exist');
+          const notification = {
+            id,
+            sender,
+            post,
+            recipientId,
+            type,
+            read,
+            created_at,
+          };
+
+          dispatch(addNotification(notification));
+        }
+      }
     });
-  }, [socket]);
+  }, [userNotifications, dispatch, socket]);
 
-  const removeNotification = (notificationId: string) => {
-    const filteredNotifications = notifications.filter(
-      (notification) => notification.id !== notificationId
-    );
-    setNotifications(filteredNotifications);
-  };
+  // const removeNotification = (notificationId: number) => {
+  //   const filteredNotifications = notifications.filter(
+  //     (notification) => notification.id !== notificationId
+  //   );
+  //   setNotifications(filteredNotifications);
+  // };
   return (
     <>
       <button
@@ -64,20 +71,20 @@ const Notifications: React.FC<INotificationsProps> = ({ socket }) => {
           setIsNotificationDialogOpen(!isNotificationsDialogOpen);
         }}
       >
-        {notifications?.length > 0 && (
+        {userNotifications?.length > 0 && (
           <div
             className='absolute bg-red-500 text-white -top-1 -right-1 flex justify-center items-center
               rounded-full p-0.5 text-xs w-4 h-4'
           >
-            {notifications.length}
+            {userNotifications.length}
           </div>
         )}
         <NotificationIcon />
       </button>
       {isNotificationsDialogOpen && (
         <NotificationsDialog
-          notifications={notifications}
-          onNotificationRead={removeNotification}
+          notifications={userNotifications}
+          // onNotificationRead={removeNotification}
           onClose={() => setIsNotificationDialogOpen(false)}
         />
       )}

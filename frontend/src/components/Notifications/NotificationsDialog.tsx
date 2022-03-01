@@ -1,17 +1,17 @@
 import React from 'react';
 import NotificationReadIcon from '../../icons/NotificationReadIcon';
 import Tooltip from '../common/Tooltip';
-import { INotification } from './Notifications';
+import { INotification } from '../../interfaces';
 
 interface INotificationsDialogProps {
   notifications: Array<INotification>;
-  onNotificationRead: (notificationId: string) => void;
+  // onNotificationRead: (notificationId: number) => void;
   onClose: () => void;
 }
 
 const NotificationsDialog: React.FC<INotificationsDialogProps> = ({
   notifications,
-  onNotificationRead,
+  // onNotificationRead,
   onClose,
 }) => (
   <div
@@ -24,13 +24,15 @@ const NotificationsDialog: React.FC<INotificationsDialogProps> = ({
     <h1 className='text-xl font-bold '>Notifications</h1>
     {notifications.map((notification) => (
       <div key={notification.id} className='flex gap-x-3'>
-        <span className='w-full'>{`${notification.sender} liked your post about ${notification.postTopic}`}</span>
+        <span className='w-full'>
+          {`${notification.sender?.email} liked your post about ${notification.post?.title}`}
+        </span>
         <Tooltip content='mark as read' delay={200}>
           <button
             type='button'
             className='text-green-400 hover:text-green-600'
             onClick={() => {
-              onNotificationRead(notification.id);
+              // onNotificationRead(notification.id);
             }}
           >
             <NotificationReadIcon />
