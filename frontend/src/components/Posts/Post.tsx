@@ -26,6 +26,7 @@ const Post: React.FC<IPostProps> = ({
   comment_count,
   isPostLikedByUser,
   socket,
+  created_at,
 }) => {
   const dispatch = useAppDispatch();
   const loggedInUserInfo = useAppSelector((state) => state.users.userInfo);
@@ -101,8 +102,9 @@ const Post: React.FC<IPostProps> = ({
       }));
     }
 
-    if (!state.isPostLiked) {
+    if (!state.isPostLiked && loggedInUserInfo.id !== user.id) {
       // emit an event for the socket when the post is liked, the state would be false before it being liked.
+      // the sender can't be the recipient also
       socket?.emit('sendNotification', {
         postTopic: title,
         postId: id,
@@ -157,9 +159,7 @@ const Post: React.FC<IPostProps> = ({
               {user.name}
             </span>
             <div className='flex justify-between'>
-              <span className='text-gray-600'>
-                {new Date().toLocaleString()}
-              </span>
+              <span className='text-gray-600'>{created_at}</span>
               {loggedInUserInfo.id === user.id && (
                 <div>
                   <button

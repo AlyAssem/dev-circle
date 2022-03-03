@@ -25,6 +25,7 @@ export interface IPost {
   comments: Array<IComment>;
   comment_count: number;
   like_count: number;
+  created_at: string;
 }
 
 export interface IComment {

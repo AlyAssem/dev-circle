@@ -199,10 +199,6 @@ const usersSlice = createSlice({
       localStorage.removeItem('userInfo');
       state.userInfo = {};
     },
-    addNotification: (state, action) => {
-      console.log('ADD NOTIFICATION ', action.payload);
-      state.userInfo.notifications?.push(action.payload);
-    },
   },
   extraReducers: (builder) => {
     // The `builder` callback form is used here
@@ -249,6 +245,6 @@ const usersSlice = createSlice({
   },
 });
 
-export const { logout, addNotification } = usersSlice.actions;
+export const { logout } = usersSlice.actions;
 
 export default usersSlice.reducer;

@@ -21,6 +21,7 @@ const Posts: React.FC<IPosts> = ({ socket }) => {
           content={item.content}
           comment_count={item.comment_count}
           like_count={item.like_count}
+          created_at={new Date(item.created_at).toLocaleString()}
           isPostLikedByUser={
             loggedInUserInfo?.likedPosts?.some(
               (likedPostId) => likedPostId === item.id
