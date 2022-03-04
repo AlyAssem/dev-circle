@@ -1,13 +1,12 @@
-import { createConnection, Connection } from 'typeorm';
+import { createConnection } from 'typeorm';
 import dotenv from 'dotenv';
 import path from 'path';
-import { Post } from '../entities/Post';
 
 dotenv.config();
 
 export const connectDB = async () => {
   try {
-    const connection: Connection = await createConnection({
+    await createConnection({
       type: 'postgres',
       database: 'devcircle',
       username: process.env.DB_USERNAME,

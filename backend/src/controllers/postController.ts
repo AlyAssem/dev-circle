@@ -10,7 +10,7 @@ import { Comment } from '../entities/Comment';
  * @route GET /api/posts
  * @access public
  */
-const getPosts = asyncHandler(async (req: Request, res: Response) => {
+const getPosts = asyncHandler(async (_, res: Response) => {
   const posts = await Post.find({ relations: ['user', 'comments', 'likes'] });
 
   const responsePosts = posts.map((post) => ({

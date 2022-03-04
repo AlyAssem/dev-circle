@@ -88,7 +88,7 @@ const authUser = asyncHandler(async (req: Request, res: Response) => {
  * @route GET /api/users
  * @access public
  */
-const getUsers = asyncHandler(async (req: Request, res: Response) => {
+const getUsers = asyncHandler(async (_, res: Response) => {
   const users = await User.find({});
 
   res.json({ users });

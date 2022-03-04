@@ -33,7 +33,7 @@ io.on('connection', (socket) => {
   SocketServer(socket);
 });
 
-app.get('/', (req, res) => {
+app.get('/', (_, res) => {
   res.send('API IS RUNNING...');
 });
 
