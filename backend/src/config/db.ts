@@ -13,7 +13,7 @@ export const connectDB = async () => {
       password: process.env.DB_PASSWORD,
       logging: true,
       synchronize: true,
-      entities: [path.join(__dirname, '../entities/*.ts')],
+      entities: [path.join(__dirname, '../entities/*')],
     });
     console.log('Database connected successfully');
   } catch (error: any) {

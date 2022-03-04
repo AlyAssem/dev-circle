@@ -12,7 +12,7 @@ import { Like } from './Like';
 import { Comment } from './Comment';
 import { Notification } from './Notification';
 
-@Entity()
+@Entity('user')
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
