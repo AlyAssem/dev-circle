@@ -11,7 +11,6 @@ import Posts from '../../components/Posts/Posts';
 import PostModal from '../../components/Posts/PostModal/PostModal';
 import Loader from '../../components/Loader';
 import { getPosts } from '../../redux-features/posts';
-// import { deleteSocket, setSocket } from '../../redux-features/globals';
 import SocketClient from '../../SocketClient';
 import {
   getUserLikedPosts,
@@ -161,13 +160,12 @@ export const HomePage: React.FC<IHomePageProps> = ({
   }, []);
 
   useEffect(() => {
-    const createdSocket = io('http://localhost:5000');
+    const createdSocket = io(`${process.env.REACT_APP_API_URL}`);
     setSocket(createdSocket);
     // dispatch(setSocket(createdSocket));
 
     return () => {
-      // createdSocket.close();
-      // dispatch(deleteSocket());
+      createdSocket.close();
     };
   }, [dispatch]);
 

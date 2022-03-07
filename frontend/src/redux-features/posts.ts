@@ -47,7 +47,7 @@ export const likePost = createAsyncThunk<
     };
 
     const response = await axios.get<{ post: IPost }>(
-      `/api/posts/${postId}/like`,
+      `${process.env.REACT_APP_API_URL}/api/posts/${postId}/like`,
       config
     );
 
@@ -83,7 +83,7 @@ export const unlikePost = createAsyncThunk<
     };
 
     const response = await axios.get<{ post: IPost }>(
-      `/api/posts/${postId}/unlike`,
+      `${process.env.REACT_APP_API_URL}/api/posts/${postId}/unlike`,
       config
     );
 
@@ -107,7 +107,9 @@ export const getPosts = createAsyncThunk<
   }
 >('posts/getPosts', async (_, { rejectWithValue }) => {
   try {
-    const response = await axios.get<{ posts: Array<IPost> }>('/api/posts');
+    const response = await axios.get<{ posts: Array<IPost> }>(
+      `${process.env.REACT_APP_API_URL}/api/posts`
+    );
 
     return response.data.posts;
   } catch (err: any) {
@@ -130,7 +132,9 @@ export const getPost = createAsyncThunk<
   }
 >('posts/getPost', async ({ postId }, { rejectWithValue }) => {
   try {
-    const response = await axios.get<{ post: IPost }>(`/api/posts/${postId}`);
+    const response = await axios.get<{ post: IPost }>(
+      `${process.env.REACT_APP_API_URL}/api/posts/${postId}`
+    );
 
     return response.data.post;
   } catch (err: any) {
@@ -169,7 +173,7 @@ export const createPost = createAsyncThunk<
     const response = await axios.post<{
       post: IPost;
     }>(
-      '/api/posts',
+      `${process.env.REACT_APP_API_URL}/api/posts`,
       {
         id,
         title,
@@ -219,7 +223,7 @@ export const editPost = createAsyncThunk<
     const response = await axios.put<{
       post: IPost;
     }>(
-      `/api/posts/${id}`,
+      `${process.env.REACT_APP_API_URL}/api/posts/${id}`,
       {
         id,
         title,
@@ -262,7 +266,10 @@ export const deletePost = createAsyncThunk<
       },
     };
 
-    const response = await axios.delete(`/api/posts/${postId}`, config);
+    const response = await axios.delete(
+      `${process.env.REACT_APP_API_URL}/api/posts/${postId}`,
+      config
+    );
 
     return response.data;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -287,7 +294,7 @@ export const getPostComments = createAsyncThunk<
 >('comments/getComments', async (postId, { rejectWithValue }) => {
   try {
     const response = await axios.get<{ comments: Array<IComment> }>(
-      `/api/posts/${postId}/comments`
+      `${process.env.REACT_APP_API_URL}/api/posts/${postId}/comments`
     );
 
     return response.data.comments;
@@ -326,7 +333,7 @@ export const createPostComment = createAsyncThunk<
       };
 
       const response = await axios.post<{ comment: IComment }>(
-        '/api/comments',
+        `${process.env.REACT_APP_API_URL}/api/comments`,
         {
           postId,
           text,
@@ -370,7 +377,7 @@ export const editComment = createAsyncThunk<
     };
 
     const response = await axios.put<{ message: string; comment: IComment }>(
-      `/api/comments/${id}`,
+      `${process.env.REACT_APP_API_URL}/api/comments/${id}`,
       {
         text,
       },
@@ -414,7 +421,7 @@ export const deleteComment = createAsyncThunk<
     };
 
     const response = await axios.delete<{ message: string; comment: IComment }>(
-      `/api/comments/${commentId}`,
+      `${process.env.REACT_APP_API_URL}/api/comments/${commentId}`,
       config
     );
 

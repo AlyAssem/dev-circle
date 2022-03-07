@@ -14,7 +14,7 @@ describe('Header', () => {
     wrapper = mount(
       <Router>
         <Provider store={store}>
-          <Header loggedInUserName={loggedInUserName} />
+          <Header socket={null} />
         </Provider>
       </Router>
     );

@@ -45,7 +45,10 @@ export const getUserLikedPosts = createAsyncThunk<
 
     const response = await axios.get<{
       userLikedPosts: Array<string>;
-    }>(`/api/users/${userId}/likedPosts`, config);
+    }>(
+      `${process.env.REACT_APP_API_URL}/api/users/${userId}/likedPosts`,
+      config
+    );
 
     return response.data.userLikedPosts;
   } catch (err: any) {
@@ -82,7 +85,10 @@ export const getUserNotifications = createAsyncThunk<
 
       const response = await axios.get<{
         notifications: Array<INotification>;
-      }>(`/api/users/${userId}/notifications`, config);
+      }>(
+        `${process.env.REACT_APP_API_URL}/api/users/${userId}/notifications`,
+        config
+      );
 
       return response.data.notifications;
     } catch (err: any) {
@@ -115,7 +121,7 @@ export const registerUser = createAsyncThunk<
     };
 
     const response = await axios.post<UserResponse>(
-      '/api/users',
+      `${process.env.REACT_APP_API_URL}/api/users`,
       { id, name, email, password },
       config
     );
@@ -159,7 +165,7 @@ export const loginUser = createAsyncThunk<
     };
 
     const response = await axios.post<UserResponse>(
-      '/api/users/login',
+      `${process.env.REACT_APP_API_URL}/api/users/login`,
       { email, password },
       config
     );

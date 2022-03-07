@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 import express from 'express';
 import { Server } from 'socket.io';
 import { createServer } from 'http';
+import cors from 'cors';
 import SocketServer from './socketServer';
 import { connectDB } from './config/db';
 import userRoutes from './routes/userRoutes';
@@ -15,6 +16,11 @@ dotenv.config();
 connectDB();
 
 app.use(express.json());
+app.use(
+  cors({
+    origin: process.env.CORS_ORIGIN,
+  })
+);
 
 app.use('/api/users', userRoutes);
 app.use('/api/posts', postRoutes);
@@ -25,7 +31,7 @@ const httpServer = createServer(app);
 // eslint-disable-next-line import/order
 const io = new Server(httpServer, {
   cors: {
-    origin: 'http://localhost:3000',
+    origin: process.env.CORS_ORIGIN,
   },
 });
 
