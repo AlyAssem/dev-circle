@@ -12,36 +12,28 @@ import { IPost } from '../../interfaces';
 import PostModal from './PostModal/PostModal';
 import { CommentsModal } from '../Comments/CommentsModal';
 
-interface IPostProps extends IPost {
+interface IPostProps {
   isPostLikedByUser: boolean;
+  post: IPost;
   socket: Socket | null;
 }
 
-const Post: React.FC<IPostProps> = ({
-  title,
-  content,
-  id,
-  user,
-  like_count,
-  comment_count,
-  isPostLikedByUser,
-  socket,
-  created_at,
-}) => {
+const Post: React.FC<IPostProps> = ({ post, isPostLikedByUser, socket }) => {
   const dispatch = useAppDispatch();
   const loggedInUserInfo = useAppSelector((state) => state.users.userInfo);
 
   const [state, setState] = useState({
-    numberOfLikes: like_count,
-    numberOfComments: comment_count,
     isPostLiked: isPostLikedByUser,
   });
+
   const [isEditPostModalOpen, setIsEditPostModalOpen] = useState(false);
   const [isCommentOnPostModalOpen, setIsCommentOnPostModalOpen] =
     useState(false);
 
+  const formattedPostDate = new Date(post.created_at).toLocaleString();
+
   const handlePostDelete = async () => {
-    const resultAction = await dispatch(deletePost(id));
+    const resultAction = await dispatch(deletePost(post.id));
     if (deletePost.fulfilled.match(resultAction)) {
       toast.success(
         <div>
@@ -86,31 +78,29 @@ const Post: React.FC<IPostProps> = ({
 
   const handlePostLike = async () => {
     if (!state.isPostLiked) {
-      await dispatch(likePost({ postId: id }));
+      await dispatch(likePost({ postId: post.id }));
 
       setState((curr) => ({
         ...curr,
-        numberOfLikes: curr.numberOfLikes + 1,
         isPostLiked: true,
       }));
     } else {
-      await dispatch(unlikePost({ postId: id }));
+      await dispatch(unlikePost({ postId: post.id }));
       setState((curr) => ({
         ...curr,
-        numberOfLikes: curr.numberOfLikes - 1,
         isPostLiked: false,
       }));
     }
 
-    if (!state.isPostLiked && loggedInUserInfo.id !== user.id) {
+    if (!state.isPostLiked && loggedInUserInfo.id !== post.user.id) {
       // emit an event for the socket when the post is liked, the state would be false before it being liked.
       // the sender can't be the recipient also
       socket?.emit('sendNotification', {
-        postTopic: title,
-        postId: id,
+        postTopic: post.title,
+        postId: post.id,
         senderMail: loggedInUserInfo.email,
         senderId: loggedInUserInfo.id,
-        recipientId: user.id, // the owner of the post.
+        recipientId: post.user.id, // the owner of the post.
         type: 1, // eventType is like clicked and for comment would be 2.
       });
     }
@@ -123,15 +113,15 @@ const Post: React.FC<IPostProps> = ({
           <div className='flex justify-between'>
             <div className='p-3'>
               <div className='text-gray-900 font-bold text-xl mb-2'>
-                {title}
+                {post.title}
               </div>
               <div className='text-gray-700 text-base whitespace-pre-wrap'>
-                {content}
+                {post.content}
               </div>
             </div>
             <div className='flex gap-x-2 pr-4'>
               <div className='flex flex-col items-center'>
-                <span>{state.numberOfLikes}</span>
+                <span>{post.like_count}</span>
                 <button
                   id='likePostIcon'
                   type='button'
@@ -142,7 +132,7 @@ const Post: React.FC<IPostProps> = ({
                 </button>
               </div>
               <div className='flex flex-col items-center'>
-                <span>{state.numberOfComments}</span>
+                <span>{post.comment_count}</span>
                 <button
                   id='commentOnPostIcon'
                   type='button'
@@ -156,11 +146,11 @@ const Post: React.FC<IPostProps> = ({
           </div>
           <div className='p-4'>
             <span className='block text-green-600 font-medium'>
-              {user.name}
+              {post.user.name}
             </span>
             <div className='flex justify-between'>
-              <span className='text-gray-600'>{created_at}</span>
-              {loggedInUserInfo.id === user.id && (
+              <span className='text-gray-600'>{formattedPostDate}</span>
+              {loggedInUserInfo.id === post.user.id && (
                 <div>
                   <button
                     id='deletePostIcon'
@@ -190,9 +180,7 @@ const Post: React.FC<IPostProps> = ({
         <PostModal
           title='Edit Post'
           post={{
-            id,
-            title,
-            content,
+            ...post,
           }}
           action='Edit'
           onClose={() => {
@@ -202,14 +190,8 @@ const Post: React.FC<IPostProps> = ({
       )}
       {isCommentOnPostModalOpen && (
         <CommentsModal
-          postId={id}
-          title={title}
-          onComment={() => {
-            setState((curr) => ({
-              ...curr,
-              numberOfComments: curr.numberOfComments + 1,
-            }));
-          }}
+          postId={post.id}
+          title={post.title}
           onClose={() => {
             setIsCommentOnPostModalOpen(false);
           }}

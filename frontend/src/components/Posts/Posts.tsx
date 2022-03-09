@@ -1,6 +1,5 @@
 import React from 'react';
 import { Socket } from 'socket.io-client';
-// import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import { useAppSelector } from '../../redux-features/hooks';
 import Post from './Post';
 
@@ -15,20 +14,12 @@ const Posts: React.FC<IPosts> = ({ socket }) => {
     <>
       {posts.map((item) => (
         <Post
-          id={item.id}
-          key={item.id}
-          title={item.title}
-          content={item.content}
-          comment_count={item.comment_count}
-          like_count={item.like_count}
-          created_at={new Date(item.created_at).toLocaleString()}
+          post={item}
           isPostLikedByUser={
             loggedInUserInfo?.likedPosts?.some(
               (likedPostId) => likedPostId === item.id
             ) || false
           }
-          user={item.user}
-          comments={item.comments}
           socket={socket}
         />
       ))}

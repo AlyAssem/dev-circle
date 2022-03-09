@@ -513,6 +513,26 @@ const postsSlice = createSlice({
       }
     });
 
+    builder.addCase(likePost.fulfilled, (state, { payload }) => {
+      const { id } = payload;
+      state.posts = state.posts.map((post) => {
+        if (post.id === id) {
+          return { ...payload };
+        }
+        return post;
+      });
+    });
+
+    builder.addCase(unlikePost.fulfilled, (state, { payload }) => {
+      const { id } = payload;
+      state.posts = state.posts.map((post) => {
+        if (post.id === id) {
+          return { ...payload };
+        }
+        return post;
+      });
+    });
+
     builder.addCase(deletePost.fulfilled, (state, { payload }) => {
       const { postId } = payload;
       state.posts = state.posts.filter((post) => post.id !== postId);
@@ -554,7 +574,11 @@ const postsSlice = createSlice({
       state.posts = state.posts.map((p) => {
         if (p.id === post.id) {
           // if the post in redux state is the post in the comment created, then add the comment to post comments.
-          return { ...p, comments: [...p.comments, payload] };
+          return {
+            ...p,
+            comments: [...p.comments, payload], // add the comment to the post comments.
+            comment_count: p.comment_count + 1, // increment the comment count
+          };
         }
         return p;
       });
@@ -609,6 +633,7 @@ const postsSlice = createSlice({
           return {
             ...p,
             comments: p.comments.filter((c) => c.id !== id), // delete the comment from the post comments.
+            comment_count: p.comment_count - 1, // decrement the comment count
           };
         }
         return p;

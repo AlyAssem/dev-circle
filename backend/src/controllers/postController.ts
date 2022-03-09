@@ -17,6 +17,7 @@ const getPosts = asyncHandler(async (_, res: Response) => {
     ...post,
     comment_count: post.comments.length,
     like_count: post.likes.length,
+    created_at: post.created_at,
   }));
 
   res.json({ posts: responsePosts });
@@ -159,13 +160,17 @@ const likePost = asyncHandler(async (req: Request, res: Response) => {
     return;
   }
 
+  // increment like_count in the likedPost and update it in db.
+  likedPost.like_count += 1;
+  const updatedPost = await likedPost.save();
+
   // add a like object to the Like table with userId and postId reference.
   const like = new Like();
   like.user = user;
-  like.post = likedPost;
+  like.post = updatedPost;
   await like.save();
 
-  res.send({ post: likedPost });
+  res.send({ post: like.post });
 });
 
 /**
@@ -194,10 +199,14 @@ const unlikePost = asyncHandler(async (req: Request, res: Response) => {
   const wasPostLikedByUser = await Like.findOne({ user, post: unlikedPost });
 
   if (wasPostLikedByUser && Object.keys(wasPostLikedByUser).length > 0) {
-    // remove like object from like table.
-    await Like.delete({ user, post: unlikedPost });
+    // decrement like_count in the unlikedPost and update it in db.
+    unlikedPost.like_count -= 1;
+    const updatedPost = await unlikedPost.save();
 
-    res.send({ post: unlikedPost });
+    // remove like object from like table.
+    await Like.delete({ user, post: updatedPost });
+
+    res.send({ post: updatedPost });
     return;
   }
 

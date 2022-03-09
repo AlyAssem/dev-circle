@@ -11,7 +11,6 @@ import { Comments } from './Comments';
 interface ICommentsModalProps {
   postId: string;
   title: string;
-  onComment: () => void;
   onClose: () => void;
 }
 
@@ -19,7 +18,6 @@ export const CommentsModal: React.FC<ICommentsModalProps> = ({
   // commentId,
   postId,
   title,
-  onComment,
   onClose,
 }) => {
   const dispatch = useAppDispatch();
@@ -81,8 +79,6 @@ export const CommentsModal: React.FC<ICommentsModalProps> = ({
     );
 
     if (createPostComment.fulfilled.match(resultAction)) {
-      // call the function to increment the commentCount for the post.
-      onComment();
       toast.success(
         <div>
           Success

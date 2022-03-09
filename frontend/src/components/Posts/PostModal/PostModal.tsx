@@ -19,9 +19,9 @@ interface IPostModalProps {
 }
 
 const PostModal: React.FC<IPostModalProps> = ({
+  post,
   title,
   action,
-  post,
   onClose,
 }) => {
   const [postTitle, setPostTitle] = useState(post?.title || '');
