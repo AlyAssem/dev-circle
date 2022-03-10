@@ -5,6 +5,8 @@ export interface IUser {
   password: string;
   likedPosts?: Array<string>;
   notifications?: Array<INotification>;
+  token?: string;
+  tokenExpirationDate?: string;
 }
 
 export interface INotification {

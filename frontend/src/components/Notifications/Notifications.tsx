@@ -12,7 +12,7 @@ interface INotificationsProps {
 
 const Notifications: React.FC<INotificationsProps> = ({ socket }) => {
   const userNotifications = useAppSelector(
-    (state) => state.users.userInfo.notifications
+    (state) => state.users.userInfo?.notifications
   ) as Array<INotification>;
 
   const [notifications, setNotification] = useState<Array<INotification>>([]);

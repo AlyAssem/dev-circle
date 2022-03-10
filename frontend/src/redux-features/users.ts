@@ -128,15 +128,14 @@ export const registerUser = createAsyncThunk<
 
     const tokenExpirationDate = new Date(new Date().getTime() + 1000 * 60 * 60);
 
-    localStorage.setItem(
-      'userInfo',
-      JSON.stringify({
-        ...response.data.user,
-        tokenExpirationDate: tokenExpirationDate.toISOString(),
-      })
-    );
+    const userWithTokenExpiration = {
+      ...response.data.user,
+      tokenExpirationDate: tokenExpirationDate.toISOString(),
+    };
 
-    return response.data.user;
+    localStorage.setItem('userInfo', JSON.stringify(userWithTokenExpiration));
+
+    return userWithTokenExpiration;
   } catch (err: any) {
     const error: AxiosError<ValidationErrors> = err;
     if (!error.response) {
@@ -172,15 +171,14 @@ export const loginUser = createAsyncThunk<
 
     const tokenExpirationDate = new Date(new Date().getTime() + 1000 * 60 * 60);
 
-    localStorage.setItem(
-      'userInfo',
-      JSON.stringify({
-        ...response.data.user,
-        tokenExpirationDate: tokenExpirationDate.toISOString(),
-      })
-    );
+    const userWithTokenExpiration = {
+      ...response.data.user,
+      tokenExpirationDate: tokenExpirationDate.toISOString(),
+    };
 
-    return response.data.user;
+    localStorage.setItem('userInfo', JSON.stringify(userWithTokenExpiration));
+
+    return userWithTokenExpiration;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {
     const error: AxiosError<ValidationErrors> = err;

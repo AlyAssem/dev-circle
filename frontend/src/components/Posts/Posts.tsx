@@ -14,6 +14,7 @@ const Posts: React.FC<IPosts> = ({ socket }) => {
     <>
       {posts.map((item) => (
         <Post
+          key={item.id}
           post={item}
           isPostLikedByUser={
             loggedInUserInfo?.likedPosts?.some(

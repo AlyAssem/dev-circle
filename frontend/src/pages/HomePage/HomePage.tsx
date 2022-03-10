@@ -145,30 +145,6 @@ export const HomePage: React.FC<IHomePageProps> = ({
     }
   };
 
-  useEffect(() => {
-    if (userInfo && JSON.stringify(userInfo) === '{}') {
-      history.push('/register');
-    }
-  }, [history, userInfo]);
-
-  useEffect(() => {
-    if (userInfo && JSON.stringify(userInfo) !== '{}') {
-      fetchUserLikedPosts.current();
-      fetchUserNotifications.current();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    const createdSocket = io(`${process.env.REACT_APP_API_URL}`);
-    setSocket(createdSocket);
-    // dispatch(setSocket(createdSocket));
-
-    return () => {
-      createdSocket.close();
-    };
-  }, [dispatch]);
-
   // Auto logout when token expires.
   useEffect(() => {
     const { token, tokenExpirationDate } = JSON.parse(
@@ -185,6 +161,24 @@ export const HomePage: React.FC<IHomePageProps> = ({
     }
     return () => {
       clearTimeout(logoutTimer);
+    };
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (!userInfo || JSON.stringify(userInfo) === '{}') {
+      history.push('/register');
+    } else if (userInfo && !userInfo.likedPosts && !userInfo.notifications) {
+      fetchUserLikedPosts.current();
+      fetchUserNotifications.current();
+    }
+  }, [history, userInfo, userInfo?.notifications, userInfo?.likedPosts]);
+
+  useEffect(() => {
+    const createdSocket = io(`${process.env.REACT_APP_API_URL}`);
+    setSocket(createdSocket);
+
+    return () => {
+      createdSocket.close();
     };
   }, [dispatch]);
 

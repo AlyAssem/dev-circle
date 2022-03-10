@@ -38,7 +38,7 @@ export const Header: React.FC<IHeaderProps> = ({ socket }) => {
               id='logged-in-userName'
               className='text-green-500 font-medium text-lg mr-4'
             >
-              {userInfo.name}
+              {userInfo?.name}
             </span>
           </li>
           <li>

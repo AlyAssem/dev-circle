@@ -24,9 +24,9 @@ const App: React.FC = () => {
   return (
     <div>
       <Router>
+        <Route path='/' component={HomePage} exact />
         <Route path='/register' component={RegisterPage} />
         <Route path='/login' component={LoginPage} />
-        <Route path='/' component={HomePage} exact />
         <ToastContainer />
       </Router>
     </div>
