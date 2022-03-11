@@ -1,8 +1,8 @@
-import { createConnection } from 'typeorm';
+import { createTypeormConn } from '../utils/createTypeormConn';
 
 export const connectDB = async () => {
   try {
-    await createConnection();
+    await createTypeormConn();
     console.log('Database connected successfully');
   } catch (error: any) {
     console.error(error.message);

@@ -1,33 +1,19 @@
 import dotenv from 'dotenv';
-import express from 'express';
 import { Server } from 'socket.io';
-import { createServer } from 'http';
-import cors from 'cors';
+import { createServer as httpCreateServer } from 'http';
+
+import createServer from './utils/createServer';
 import SocketServer from './socketServer';
 import { connectDB } from './config/db';
-import userRoutes from './routes/userRoutes';
-import postRoutes from './routes/postRoutes';
-import commentRoutes from './routes/commentRoutes';
 import { notFound, errorHandler } from './middleware/errorMiddleware';
 
-const app = express();
+const app = createServer();
 
 dotenv.config();
 connectDB();
 
-app.use(express.json());
-app.use(
-  cors({
-    origin: process.env.CORS_ORIGIN,
-  })
-);
-
-app.use('/api/users', userRoutes);
-app.use('/api/posts', postRoutes);
-app.use('/api/comments', commentRoutes);
-
 // socket configs.
-const httpServer = createServer(app);
+const httpServer = httpCreateServer(app);
 // eslint-disable-next-line import/order
 const io = new Server(httpServer, {
   cors: {
