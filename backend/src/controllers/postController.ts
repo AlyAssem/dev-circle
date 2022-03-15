@@ -44,6 +44,7 @@ const createPost = asyncHandler(async (req: Request, res: Response) => {
 
   if (req.currentUser?.id === postWithSameGivenTitle?.user.id) {
     // if the logged in user has already written this post title before.
+    res.status(409);
     throw new Error('You have posted about this before, please do not spam.');
   }
 
