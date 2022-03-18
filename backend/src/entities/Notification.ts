@@ -24,7 +24,7 @@ export class Notification extends BaseEntity {
   @JoinColumn({ name: 'recipientId' })
   recipient: User;
 
-  @ManyToOne(() => Post, (post) => post.notifications)
+  @ManyToOne(() => Post, (post) => post.notifications, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'postId' })
   post: Post;
 

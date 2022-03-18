@@ -25,7 +25,6 @@ describe('HomePage', () => {
   });
 
   it('should contain a logout button', () => {
-    console.log(wrapper.debug());
-    // expect(wrapper.find('#logout-button').exists).toBeTruthy();
+    expect(wrapper.find('#logout-button').exists).toBeTruthy();
   });
 });

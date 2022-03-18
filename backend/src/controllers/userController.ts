@@ -73,7 +73,7 @@ const authUser = asyncHandler(async (req: Request, res: Response) => {
         },
       });
     } else {
-      res.status(401);
+      res.status(403);
       throw new Error('Invalid password');
     }
   } else {
@@ -91,7 +91,7 @@ const authUser = asyncHandler(async (req: Request, res: Response) => {
 const getUsers = asyncHandler(async (_, res: Response) => {
   const users = await User.find({});
 
-  res.json({ users });
+  res.status(200).send({ users });
 });
 
 /**

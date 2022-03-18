@@ -103,9 +103,9 @@ export const getUserNotifications = createAsyncThunk<
 
 export const registerUser = createAsyncThunk<
   // Return type of the payload creator
-  { id: string; name: string; email: string },
+  { name: string; email: string },
   // userData object type
-  IUser,
+  Omit<IUser, 'id'>,
   // { id: string } & Partial<User>, // id is a must but the rest of User interface is optional
   {
     // Optional fields for defining thunkApi field types
@@ -113,7 +113,7 @@ export const registerUser = createAsyncThunk<
   }
 >('users/register', async (userData, { rejectWithValue }) => {
   try {
-    const { id, name, email, password } = userData;
+    const { name, email, password } = userData;
     const config = {
       headers: {
         'Content-Type': 'application/json',
@@ -122,7 +122,7 @@ export const registerUser = createAsyncThunk<
 
     const response = await axios.post<UserResponse>(
       `${process.env.REACT_APP_API_URL}/api/users`,
-      { id, name, email, password },
+      { name, email, password },
       config
     );
 
