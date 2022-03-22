@@ -36,10 +36,10 @@ describe('PostModal', () => {
     expect(modalAction.props().disabled).toBe(true);
   });
 
-  describe('the user enters the post title and post content', () => {
+  describe('user fills the post title and post content', () => {
     beforeEach(() => {
       const postTitleInput = wrapper.find({ id: 'post-title' });
-      const postContentInput = wrapper.find({ id: 'post-content' });
+      const postContentInput = wrapper.find('textarea#post-content');
 
       postTitleInput.simulate('change', {
         target: { value: 'test title' },
