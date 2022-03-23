@@ -2,6 +2,8 @@
 
 > PERN stack Social networking web application for developers to share posts, comment and like others' posts and have a knowledge sharing community, Built with React-Hooks, Typescript, Redux-toolkit, Tailwindcss, Nodejs, Expressjs,Postgres, TypeOrm, Socket.io (for real time notification).
 
+Application Demo: https://hardcore-panini-35872f.netlify.app
+
 ## Features: It's still under development but the current implemented features are the following.
 
 - Auto logout.(15 mins of idle, or expiration of access token which is 1h for security purposes)
