@@ -2,6 +2,13 @@ export interface ILoginFormValues {
   email: string;
   password: string;
 }
+
+export interface IRegisterFormValues {
+  userName: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
 export interface IUser {
   id: string;
   name: string;

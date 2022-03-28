@@ -1,31 +1,17 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useFormik } from 'formik';
 import { toast } from 'react-toastify';
 import { History } from 'history';
 import 'react-toastify/dist/ReactToastify.css';
-import * as Yup from 'yup';
 
 import { useAppDispatch, useAppSelector } from '../../redux-features/hooks';
 import { registerUser } from '../../redux-features/users';
-import EyeIcon from '../../icons/EyeIcon';
-import EyeOffIcon from '../../icons/EyeOffIcon';
+import { RegisterForm } from '../../components/RegisterForm/RegisterForm';
+import { IRegisterFormValues } from '../../interfaces';
 
 interface IRegisterPageProps {
   history: History;
-}
-
-interface IRegisterPageState {
-  shouldShowPassword: boolean;
-  shouldShowConfirmPassword: boolean;
-}
-
-interface IFormValues {
-  userName: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
 }
 
 export const RegisterPage: React.FC<IRegisterPageProps> = ({
@@ -35,89 +21,49 @@ export const RegisterPage: React.FC<IRegisterPageProps> = ({
 
   const userInfo = useAppSelector((state) => state.users.userInfo);
 
-  const [state, setState] = useState<IRegisterPageState>({
-    shouldShowPassword: false,
-    shouldShowConfirmPassword: false,
-  });
+  const handleFormSubmit = async (formValues: IRegisterFormValues) => {
+    const resultAction = await dispatch(
+      registerUser({
+        email: formValues.email,
+        name: formValues.userName,
+        password: formValues.password,
+      })
+    );
 
-  const initialValues: IFormValues = {
-    userName: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-  };
+    if (registerUser.rejected.match(resultAction)) {
+      if (resultAction.payload) {
+        // if the error is sent from server payload
+        toast.error(
+          <div>
+            Error
+            <br />
+            {resultAction.payload.errorMessage}
+          </div>,
 
-  const formik = useFormik({
-    initialValues,
-    validationSchema: Yup.object({
-      userName: Yup.string().required('Required'),
-      email: Yup.string().email('Invalid email address').required('Required'),
-      password: Yup.string()
-        .min(8, 'Must be 8 characters or more')
-        .max(15, 'Must be 15 characters or less')
-        .required('Required'),
-      confirmPassword: Yup.string()
-        .oneOf([Yup.ref('password')], 'Passwords must match')
-        .required('Required'),
-    }),
-    onSubmit: async (values) => {
-      const resultAction = await dispatch(
-        registerUser({
-          email: values.email,
-          name: values.userName,
-          password: values.password,
-        })
-      );
-
-      if (registerUser.rejected.match(resultAction)) {
-        if (resultAction.payload) {
-          // if the error is sent from server payload
-          toast.error(
-            <div>
-              Error
-              <br />
-              {resultAction.payload.errorMessage}
-            </div>,
-
-            {
-              position: toast.POSITION.BOTTOM_RIGHT,
-            }
-          );
-        } else {
-          toast.error(
-            <div>
-              Error
-              <br />
-              {resultAction.error}
-            </div>,
-            {
-              position: toast.POSITION.BOTTOM_RIGHT,
-            }
-          );
-        }
+          {
+            position: toast.POSITION.BOTTOM_RIGHT,
+          }
+        );
+      } else {
+        toast.error(
+          <div>
+            Error
+            <br />
+            {resultAction.error}
+          </div>,
+          {
+            position: toast.POSITION.BOTTOM_RIGHT,
+          }
+        );
       }
-    },
-  });
+    }
+  };
 
   useEffect(() => {
     if (userInfo && Object.keys(userInfo).length !== 0) {
       history.push('/');
     }
   }, [history, userInfo]);
-
-  const handleShowPasswordToggle = () => {
-    setState((currState) => ({
-      ...currState,
-      shouldShowPassword: !currState.shouldShowPassword,
-    }));
-  };
-
-  const handleShowConfirmPasswordToggle = () => {
-    setState((currState) => ({
-      ...currState,
-      shouldShowConfirmPassword: !currState.shouldShowConfirmPassword,
-    }));
-  };
 
   return (
     <div className='pt-24 pb-6 min-h-screen bg-gray-100 '>
@@ -132,121 +78,7 @@ export const RegisterPage: React.FC<IRegisterPageProps> = ({
           <p className='text-gray-600 pt-2'>Sign up to your account.</p>
         </section>
 
-        <form
-          id='register-form'
-          className='flex flex-col'
-          onSubmit={formik.handleSubmit}
-        >
-          <div className='mb-3 pt-3 rounded bg-gray-200'>
-            <label
-              className='block text-gray-700 text-sm font-bold mb-2 ml-3'
-              htmlFor='userName'
-            >
-              User Name
-            </label>
-            <input
-              id='userName'
-              type='text'
-              className='card__input'
-              value={formik.values.userName}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-            />
-          </div>
-          {formik.touched.userName && formik.errors.userName ? (
-            <div className='text-red-500 mb-3'>{formik.errors.userName}</div>
-          ) : null}
-          <div className='mb-3 pt-3 rounded bg-gray-200'>
-            <label
-              className='block text-gray-700 text-sm font-bold mb-2 ml-3'
-              htmlFor='email'
-            >
-              Email
-            </label>
-            <input
-              id='email'
-              type='email'
-              className='card__input'
-              value={formik.values.email}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-            />
-          </div>
-          {formik.touched.email && formik.errors.email ? (
-            <div id='emailError' className='text-red-500 mb-3'>
-              {formik.errors.email}
-            </div>
-          ) : null}
-
-          <div className='mb-3 pt-3 rounded bg-gray-200 relative'>
-            <label
-              className='block text-gray-700 text-sm font-bold mb-2 ml-3'
-              htmlFor='password'
-            >
-              Password
-            </label>
-            <input
-              id='password'
-              type={state.shouldShowPassword ? 'text' : 'password'}
-              className='card__input'
-              value={formik.values.password}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-            />
-            <button
-              id='showPasswordIcon'
-              type='button'
-              className='text-green-600 absolute right-3'
-              onClick={handleShowPasswordToggle}
-            >
-              {state.shouldShowPassword ? <EyeOffIcon /> : <EyeIcon />}
-            </button>
-          </div>
-          {formik.touched.password && formik.errors.password ? (
-            <div id='passwordError' className='text-red-500 mb-3'>
-              {formik.errors.password}
-            </div>
-          ) : null}
-
-          <div className='mb-3 pt-3 rounded bg-gray-200 relative'>
-            <label
-              className='block text-gray-700 text-sm font-bold mb-2 ml-3'
-              htmlFor='confirmPassword'
-            >
-              Confirm Password
-            </label>
-            <input
-              id='confirmPassword'
-              type={state.shouldShowConfirmPassword ? 'text' : 'password'}
-              className='card__input'
-              value={formik.values.confirmPassword}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-            />
-            <button
-              type='button'
-              className='text-green-600 absolute right-3'
-              onClick={handleShowConfirmPasswordToggle}
-            >
-              {state.shouldShowConfirmPassword ? <EyeOffIcon /> : <EyeIcon />}
-            </button>
-          </div>
-          {formik.touched.confirmPassword && formik.errors.confirmPassword ? (
-            <div className='text-red-500 mb-3'>
-              {formik.errors.confirmPassword}
-            </div>
-          ) : null}
-          <div className='flex justify-center items-center'>
-            <button
-              id='registerBtn'
-              className='auth-card__submit-btn'
-              type='submit'
-              disabled={!formik.isValid}
-            >
-              Sign Up
-            </button>
-          </div>
-        </form>
+        <RegisterForm onSubmit={(values) => handleFormSubmit(values)} />
       </div>
       <div className='max-w-lg mx-auto text-center mt-12 mb-6'>
         <p>

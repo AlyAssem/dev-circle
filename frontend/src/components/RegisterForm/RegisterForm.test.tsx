@@ -1,12 +1,8 @@
 import React from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
 import { act } from '@testing-library/react';
 import { mount, ReactWrapper, shallow } from 'enzyme';
-import { Provider } from 'react-redux';
-import { createMemoryHistory } from 'history';
 
-import { RegisterPage } from './RegisterPage';
-import { store } from '../../store';
+import { RegisterForm } from './RegisterForm';
 
 const updateFormikField = async (
   // eslint-disable-next-line
@@ -27,19 +23,17 @@ const updateFormikField = async (
 };
 
 describe('RegisterPage', () => {
-  let wrapper: ReactWrapper<React.FC>;
+  let wrapper: ReactWrapper;
+  const onSubmit = jest.fn();
 
   beforeEach(() => {
-    const history = createMemoryHistory({
-      initialEntries: ['/register'],
-    });
-    wrapper = mount(
-      <Router>
-        <Provider store={store}>
-          <RegisterPage history={history} />
-        </Provider>
-      </Router>
-    );
+    // mount needs to be used here instead of shallow,
+    // because of how useFormik onSubmit works the mock onsubmit is not called without the dive into components.
+    wrapper = mount(<RegisterForm onSubmit={onSubmit} />);
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   it('should have a "register" form', () => {
