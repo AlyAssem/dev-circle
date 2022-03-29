@@ -55,7 +55,10 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
 const authUser = asyncHandler(async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
-  const registeredUser = await User.findOne({ email });
+  const registeredUser = await User.createQueryBuilder('user')
+    .where('user.email = :email', { email })
+    .addSelect('user.password')
+    .getOne();
 
   if (registeredUser) {
     const isPasswordCorrect = await bcrypt.compare(

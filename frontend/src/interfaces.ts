@@ -35,7 +35,7 @@ export interface IPost {
   user: Partial<IUser>;
   title: string;
   content: string;
-  comments: Array<IComment>;
+  comments?: Array<IComment>;
   comment_count: number;
   like_count: number;
   created_at: string;
