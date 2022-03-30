@@ -46,7 +46,6 @@ const Post: React.FC<IPostProps> = ({ post, isPostLikedByUser, socket }) => {
         }
       );
     }
-
     if (deletePost.rejected.match(resultAction)) {
       if (resultAction.payload) {
         // if the error is sent from server payload
@@ -56,7 +55,6 @@ const Post: React.FC<IPostProps> = ({ post, isPostLikedByUser, socket }) => {
             <br />
             {resultAction.payload.errorMessage}
           </div>,
-
           {
             position: toast.POSITION.BOTTOM_RIGHT,
           }
@@ -121,9 +119,9 @@ const Post: React.FC<IPostProps> = ({ post, isPostLikedByUser, socket }) => {
             </div>
             <div className='flex gap-x-2 pr-4'>
               <div className='flex flex-col items-center'>
-                <span>{post.like_count}</span>
+                <span id='likeCount'>{post.like_count}</span>
                 <button
-                  id='likePostIcon'
+                  id='likeButton'
                   type='button'
                   className='hover:text-green-600'
                   onClick={handlePostLike}
@@ -132,7 +130,7 @@ const Post: React.FC<IPostProps> = ({ post, isPostLikedByUser, socket }) => {
                 </button>
               </div>
               <div className='flex flex-col items-center'>
-                <span>{post.comment_count}</span>
+                <span id='commentCount'>{post.comment_count}</span>
                 <button
                   id='commentOnPostIcon'
                   type='button'

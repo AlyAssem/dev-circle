@@ -32,7 +32,7 @@ describe('Header', () => {
     expect(logoutButton.exists()).toBeTruthy();
   });
 
-  it('should contain the correct passed logged in userName prop', async () => {
+  it('should contain the correct passed logged in user name.', async () => {
     const mockedStore = mockStore({
       users: {
         userInfo: {
