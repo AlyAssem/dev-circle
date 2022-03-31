@@ -16,11 +16,15 @@ export class Notification extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, (user) => user.sentNotifications)
+  @ManyToOne(() => User, (user) => user.sentNotifications, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'senderId' })
   sender: User;
 
-  @ManyToOne(() => User, (user) => user.receivedNotifications)
+  @ManyToOne(() => User, (user) => user.receivedNotifications, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'recipientId' })
   recipient: User;
 

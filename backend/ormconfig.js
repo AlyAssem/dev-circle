@@ -12,7 +12,6 @@ module.exports = [
       process.env.NODE_ENV === 'production'
         ? { rejectUnauthorized: false }
         : false,
-    entities: [path.join(__dirname, './dist/entities/*')],
     migrations: [path.join(__dirname, './dist/migration/*')],
     cli: {
       migrationsDir: './src/migration',
@@ -22,8 +21,7 @@ module.exports = [
     name: 'test',
     type: 'postgres',
     url: process.env.DATABASE_URL_TEST,
-    entities: [path.join(__dirname, './src/entities/*')],
-    migrations: [path.join(__dirname, './dist/migration/*')],
+    migrations: [path.join(__dirname, 'dist/migration/*.js')],
     synchronize: true, // synchronize database with entities.
     dropSchema: true, // refresh db before connection.
     cli: {

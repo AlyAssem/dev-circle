@@ -10,7 +10,7 @@ import { notFound, errorHandler } from './middleware/errorMiddleware';
 const app = createServer();
 
 dotenv.config();
-connectDB();
+const conn = connectDB();
 
 // socket configs.
 const httpServer = httpCreateServer(app);
@@ -27,6 +27,11 @@ io.on('connection', (socket) => {
 
 app.get('/', (_, res) => {
   res.send('API IS RUNNING...');
+});
+
+app.get('/test_db/user/clear', async (_, res) => {
+  conn.then((connection) => connection.getRepository('user').delete({}));
+  res.send();
 });
 
 app.use(notFound);
