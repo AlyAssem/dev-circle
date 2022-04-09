@@ -24,7 +24,7 @@ export default (on, config) => {
   on('task', {
     'db:user-clear': async () => {
       await axios.get('http://localhost:5000/test_db/user/clear');
-      return '';
+      return null;
     },
   });
 };
