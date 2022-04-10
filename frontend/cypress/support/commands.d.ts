@@ -5,5 +5,6 @@ declare namespace Cypress {
       email: string,
       password: string
     ): Chainable<Element>;
+    loginUser(email: string, password: string): Chainable<Element>;
   }
 }

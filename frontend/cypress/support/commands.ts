@@ -25,6 +25,8 @@
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 
 Cypress.Commands.add(
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   'registerUser',
   (username: string, email: string, password: string) => {
     cy.visit('http://localhost:3000/register');
@@ -35,3 +37,11 @@ Cypress.Commands.add(
     cy.get('button#registerBtn').click();
   }
 );
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+Cypress.Commands.add('loginUser', (email: string, password: string) => {
+  cy.visit('http://localhost:3000/login');
+  cy.get('input#email').type(email);
+  cy.get('input#password').type(password);
+  cy.get('button#login-button').click();
+});
