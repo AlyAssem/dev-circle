@@ -1,3 +1,4 @@
+/// <reference types="cypress" />
 // ***********************************************
 // This example commands.js shows you how to
 // create various custom commands and overwrite
@@ -37,6 +38,7 @@ Cypress.Commands.add(
     cy.get('button#registerBtn').click();
   }
 );
+
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 Cypress.Commands.add('loginUser', (email: string, password: string) => {
@@ -44,4 +46,16 @@ Cypress.Commands.add('loginUser', (email: string, password: string) => {
   cy.get('input#email').type(email);
   cy.get('input#password').type(password);
   cy.get('button#login-button').click();
+});
+
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+Cypress.Commands.add('createPost', (title: string, content: string) => {
+  //   open create post modal.
+  cy.get('button#createPost-button').click();
+
+  //   create a post.
+  cy.get('input#post-title').type(title);
+  cy.get('textarea#post-content').type(content);
+  cy.get('button#modal-action').click();
 });

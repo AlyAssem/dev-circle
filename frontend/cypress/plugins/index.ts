@@ -26,5 +26,10 @@ export default (on, config) => {
       await axios.get('http://localhost:5000/test_db/user/clear');
       return null;
     },
+
+    'db:post-clear': async () => {
+      await axios.get('http://localhost:5000/test_db/post/clear');
+      return null;
+    },
   });
 };

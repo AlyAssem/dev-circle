@@ -33,6 +33,10 @@ app.get('/test_db/user/clear', async (_, res) => {
   conn.then((connection) => connection.getRepository('user').delete({}));
   res.send();
 });
+app.get('/test_db/post/clear', async (_, res) => {
+  conn.then((connection) => connection.getRepository('post').delete({}));
+  res.send();
+});
 
 app.use(notFound);
 app.use(errorHandler);
