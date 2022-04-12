@@ -46,10 +46,14 @@ const createCommentOnPost = asyncHandler(
       );
     }
 
+    // increment comment_count in the posted commented on and update it in db.
+    post.comment_count += 1;
+    const updatedPost = await post.save();
+
     // add a comment object to the comment table with userId and postId reference.
     const comment = new Comment();
     comment.user = user;
-    comment.post = post;
+    comment.post = updatedPost;
     comment.text = text;
     await comment.save();
 
@@ -66,10 +70,14 @@ const editCommentOnPost = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
   const { text } = req.body;
 
-  const commentUpdateResult = await Comment.update(
-    { id: Number(id) },
-    { text }
-  );
+  const commentUpdateResult = await Comment.createQueryBuilder()
+    .update(Comment)
+    .set({
+      text,
+    })
+    .where('id = :id', { id })
+    .andWhere('user = :userId', { userId: req.currentUser?.id })
+    .execute();
 
   if (commentUpdateResult.affected !== 0) {
     const updatedComment = await Comment.findOne(
@@ -82,9 +90,13 @@ const editCommentOnPost = asyncHandler(async (req: Request, res: Response) => {
       comment: updatedComment,
     });
     return;
+  } else {
+    res
+      .status(403)
+      .send({
+        errorMessage: 'You are not allowed to edit a comment you do not own.',
+      });
   }
-
-  res.status(404).send({ message: 'Comment does not exist.' });
 });
 
 /**
@@ -121,7 +133,7 @@ const deleteCommentFromPost = asyncHandler(
       }
     );
 
-    if (deletedComment && Object.keys(deletedComment).length > 0) {
+    if (deletedComment) {
       // delete comment object from comment table.
       await Comment.delete({ id: Number(id), user, post });
 
@@ -130,11 +142,11 @@ const deleteCommentFromPost = asyncHandler(
         comment: deletedComment,
       });
       return;
+    } else {
+      res.status(403).send({
+        errorMessage: 'You are not allowed to delete a comment you do not own.',
+      });
     }
-
-    res.status(404).send({
-      message: 'You do not have this comment on the post.',
-    });
   }
 );
 export { createCommentOnPost, editCommentOnPost, deleteCommentFromPost };

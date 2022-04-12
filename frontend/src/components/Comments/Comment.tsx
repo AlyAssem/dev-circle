@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import { IComment } from '../../interfaces';
 import { deleteComment, editComment } from '../../redux-features/posts';
-import { useAppDispatch } from '../../redux-features/hooks';
+import { useAppDispatch, useAppSelector } from '../../redux-features/hooks';
 import CommentEditField from './CommentEditField';
 import CommentOperationsMenu from './CommentOperationsMenu';
 
@@ -13,6 +13,10 @@ const Comment: React.FC<ICommentProps> = ({ comment }) => {
   const dispatch = useAppDispatch();
 
   const [isCommentEditable, setIsCommentEditable] = useState(false);
+
+  const loggedInUser = useAppSelector(
+    (reduxState) => reduxState.users.userInfo
+  );
 
   const handleCommentEdit = async (commentEditText: string) => {
     const resultAction = await dispatch(
@@ -86,6 +90,33 @@ const Comment: React.FC<ICommentProps> = ({ comment }) => {
         }
       );
     }
+    if (deleteComment.rejected.match(resultAction)) {
+      if (resultAction.payload) {
+        // if the error is sent from server payload
+        toast.error(
+          <div>
+            Error
+            <br />
+            {resultAction.payload.errorMessage}
+          </div>,
+
+          {
+            position: toast.POSITION.BOTTOM_RIGHT,
+          }
+        );
+      } else {
+        toast.error(
+          <div>
+            Error
+            <br />
+            {resultAction.error}
+          </div>,
+          {
+            position: toast.POSITION.BOTTOM_RIGHT,
+          }
+        );
+      }
+    }
   };
 
   const handleCommentEditClose = () => {
@@ -96,14 +127,16 @@ const Comment: React.FC<ICommentProps> = ({ comment }) => {
     <div className='flex flex-col mt-2'>
       <div className='flex justify-between'>
         <span className='text-green-600'>@{comment?.user?.name}</span>
-        <div>
-          <CommentOperationsMenu
-            onCommentEditPermit={() => {
-              setIsCommentEditable(true);
-            }}
-            onCommentDelete={handleCommentDelete}
-          />
-        </div>
+        {loggedInUser?.id === comment?.user?.id && (
+          <div>
+            <CommentOperationsMenu
+              onCommentEditPermit={() => {
+                setIsCommentEditable(true);
+              }}
+              onCommentDelete={handleCommentDelete}
+            />
+          </div>
+        )}
       </div>
       <div className='m-3'>
         {isCommentEditable ? (
