@@ -9,8 +9,7 @@ import { Header } from '../../components/Header/Header';
 import { useAppSelector, useAppDispatch } from '../../redux-features/hooks';
 import Posts from '../../components/Posts/Posts';
 import PostModal from '../../components/Posts/PostModal/PostModal';
-import Loader from '../../components/Loader';
-import { getPosts } from '../../redux-features/posts';
+import { getPosts, resetPostsState } from '../../redux-features/posts';
 import SocketClient from '../../SocketClient';
 import {
   getUserLikedPosts,
@@ -40,7 +39,6 @@ export const HomePage: React.FC<IHomePageProps> = ({
   const fetchUserNotifications = useRef(() => {});
 
   const userInfo = useAppSelector((state) => state.users.userInfo);
-  const isLoading = useAppSelector((state) => state.posts.isPostLoading);
   // const socket = useAppSelector((state) => state.globals.socket);
 
   fetchUserLikedPosts.current = async () => {
@@ -157,7 +155,10 @@ export const HomePage: React.FC<IHomePageProps> = ({
       const remainingTime =
         new Date(tokenExpirationDate).getTime() - new Date().getTime();
 
-      logoutTimer = setTimeout(() => dispatch(logout()), remainingTime);
+      logoutTimer = setTimeout(() => {
+        dispatch(resetPostsState());
+        dispatch(logout());
+      }, remainingTime);
     }
     return () => {
       clearTimeout(logoutTimer);
@@ -196,13 +197,8 @@ export const HomePage: React.FC<IHomePageProps> = ({
           Create Post
         </button>
       </div>
-      {isLoading ? (
-        <Loader />
-      ) : (
-        <div className='max-h-full w-full flex flex-col items-center overflow-y-auto'>
-          <Posts socket={socket} />
-        </div>
-      )}
+
+      <Posts socket={socket} />
       {isCreatePostModalOpen && (
         <PostModal
           title='Add Post'

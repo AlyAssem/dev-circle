@@ -3,6 +3,7 @@ import { Socket } from 'socket.io-client';
 import MenuIcon from '../../icons/MenuIcon';
 import { useAppDispatch, useAppSelector } from '../../redux-features/hooks';
 import { logout } from '../../redux-features/users';
+import { resetPostsState } from '../../redux-features/posts';
 import Notifications from '../Notifications/Notifications';
 
 interface IHeaderProps {
@@ -16,6 +17,7 @@ export const Header: React.FC<IHeaderProps> = ({ socket }) => {
   const userInfo = useAppSelector((reduxState) => reduxState.users.userInfo);
 
   const handleLogout = () => {
+    dispatch(resetPostsState());
     dispatch(logout());
   };
 

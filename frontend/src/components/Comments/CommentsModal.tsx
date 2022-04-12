@@ -15,7 +15,6 @@ interface ICommentsModalProps {
 }
 
 export const CommentsModal: React.FC<ICommentsModalProps> = ({
-  // commentId,
   postId,
   title,
   onClose,

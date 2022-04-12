@@ -442,6 +442,7 @@ const postsSlice = createSlice({
     removePostInfo: (state) => {
       state.postInfo = {};
     },
+    resetPostsState: () => initialState,
   },
   extraReducers: (builder) => {
     // The `builder` callback form is used here
@@ -514,20 +515,20 @@ const postsSlice = createSlice({
     });
 
     builder.addCase(likePost.fulfilled, (state, { payload }) => {
-      const { id } = payload;
+      const { id, like_count } = payload;
       state.posts = state.posts.map((post) => {
         if (post.id === id) {
-          return { ...payload };
+          return { ...post, like_count };
         }
         return post;
       });
     });
 
     builder.addCase(unlikePost.fulfilled, (state, { payload }) => {
-      const { id } = payload;
+      const { id, like_count } = payload;
       state.posts = state.posts.map((post) => {
         if (post.id === id) {
-          return { ...payload };
+          return { ...post, like_count };
         }
         return post;
       });
@@ -618,6 +619,7 @@ const postsSlice = createSlice({
       if (action.payload) {
         // Being that we passed in ValidationErrors to rejectType
         // in `createAsyncThunk`, the payload will be available here.
+
         state.error = action.payload.errorMessage;
       } else {
         state.error = action.error.message;
@@ -652,6 +654,6 @@ const postsSlice = createSlice({
   },
 });
 
-export const { removePostInfo } = postsSlice.actions;
+export const { removePostInfo, resetPostsState } = postsSlice.actions;
 
 export default postsSlice.reducer;

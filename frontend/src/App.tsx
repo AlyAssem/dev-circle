@@ -7,12 +7,14 @@ import { HomePage } from './pages/HomePage/HomePage';
 import { LoginPage } from './pages/LoginPage/LoginPage';
 import { RegisterPage } from './pages/RegisterPage/RegisterPage';
 import { useAppDispatch } from './redux-features/hooks';
+import { resetPostsState } from './redux-features/posts';
 import { logout } from './redux-features/users';
 
 const App: React.FC = () => {
   const dispatch = useAppDispatch();
 
   const handleOnIdle = () => {
+    dispatch(resetPostsState());
     dispatch(logout());
   };
 
