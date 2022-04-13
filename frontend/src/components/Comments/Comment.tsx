@@ -148,7 +148,7 @@ const Comment: React.FC<ICommentProps> = ({ comment }) => {
             }}
           />
         ) : (
-          comment.text
+          <div className='whitespace-pre-wrap'>{comment.text}</div>
         )}
       </div>
       <span>{new Date(comment.createdAt).toLocaleDateString()}</span>

@@ -52,7 +52,7 @@ Cypress.Commands.add('loginUser', (email: string, password: string) => {
 // @ts-ignore
 Cypress.Commands.add('createPost', (title: string, content: string) => {
   //   open create post modal.
-  cy.get('button#createPost-button').click();
+  cy.get('button#create-post-button').click();
 
   //   create a post.
   cy.get('input#post-title').type(title);

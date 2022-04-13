@@ -106,14 +106,20 @@ const Post: React.FC<IPostProps> = ({ post, isPostLikedByUser, socket }) => {
 
   return (
     <>
-      <div className='post_card'>
+      <div className='post-card'>
         <div className='flex flex-col h-full justify-between'>
           <div className='flex justify-between'>
             <div className='p-3'>
-              <div className='text-gray-900 font-bold text-xl mb-2'>
+              <div
+                id='post-title'
+                className='text-gray-900 font-bold text-xl mb-2'
+              >
                 {post.title}
               </div>
-              <div className='text-gray-700 text-base whitespace-pre-wrap'>
+              <div
+                id='post-content'
+                className='text-gray-700 text-base whitespace-pre-wrap'
+              >
                 {post.content}
               </div>
             </div>

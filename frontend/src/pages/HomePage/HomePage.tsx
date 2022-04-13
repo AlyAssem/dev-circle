@@ -190,6 +190,7 @@ export const HomePage: React.FC<IHomePageProps> = ({
       <Header socket={socket} />
       <div className='flex justify-end'>
         <button
+          id='create-post-button'
           type='button'
           className='bg-green-600 m-4 px-4 py-2 text-gray-100 rounded shadow'
           onClick={() => setIsCreatePostModalOpen(true)}
