@@ -31,6 +31,7 @@ Application Demo: https://hardcore-panini-35872f.netlify.app
 - Tailwindcss.
 - Formik.
 - Jest & Enzyme.(for unit testing)
+- Cypress.(end to end tests)
 - dotenv.
 
 ### Back-End:
