@@ -36,7 +36,7 @@ const Post: React.FC<IPostProps> = ({ post, isPostLikedByUser, socket }) => {
     const resultAction = await dispatch(deletePost(post.id));
     if (deletePost.fulfilled.match(resultAction)) {
       toast.success(
-        <div>
+        <div id='post-delete-success'>
           Success
           <br />
           {resultAction.payload.message}
@@ -50,7 +50,7 @@ const Post: React.FC<IPostProps> = ({ post, isPostLikedByUser, socket }) => {
       if (resultAction.payload) {
         // if the error is sent from server payload
         toast.error(
-          <div>
+          <div id='post-delete-error'>
             Error
             <br />
             {resultAction.payload.errorMessage}
@@ -61,7 +61,7 @@ const Post: React.FC<IPostProps> = ({ post, isPostLikedByUser, socket }) => {
         );
       } else {
         toast.error(
-          <div>
+          <div id='post-delete-error'>
             Error
             <br />
             {resultAction.error}
@@ -106,7 +106,7 @@ const Post: React.FC<IPostProps> = ({ post, isPostLikedByUser, socket }) => {
 
   return (
     <>
-      <div className='post-card'>
+      <div id='post-card' className='post-card'>
         <div className='flex flex-col h-full justify-between'>
           <div className='flex justify-between'>
             <div className='p-3'>
@@ -125,9 +125,9 @@ const Post: React.FC<IPostProps> = ({ post, isPostLikedByUser, socket }) => {
             </div>
             <div className='flex gap-x-2 pr-4'>
               <div className='flex flex-col items-center'>
-                <span id='likeCount'>{post.like_count}</span>
+                <span id='like-count'>{post.like_count}</span>
                 <button
-                  id='likeButton'
+                  id='like-button'
                   type='button'
                   className='hover:text-green-600'
                   onClick={handlePostLike}
@@ -157,7 +157,7 @@ const Post: React.FC<IPostProps> = ({ post, isPostLikedByUser, socket }) => {
               {loggedInUserInfo.id === post.user.id && (
                 <div>
                   <button
-                    id='deletePostIcon'
+                    id='delete-post-icon'
                     type='button'
                     className='hover:text-red-600'
                     onClick={handlePostDelete}
@@ -165,7 +165,7 @@ const Post: React.FC<IPostProps> = ({ post, isPostLikedByUser, socket }) => {
                     <DeleteIcon />
                   </button>
                   <button
-                    id='editPostIcon'
+                    id='edit-post-icon'
                     type='button'
                     className='ml-3 hover:text-green-600'
                     onClick={() => {
